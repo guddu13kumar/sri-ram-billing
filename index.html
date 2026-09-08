@@ -43,7 +43,7 @@
       <div id="popup-header" class="p-4 flex items-center justify-between text-white bg-blue-600">
         <div class="flex items-center space-x-2">
           <span id="popup-icon" class="font-black text-lg">ℹ</span>
-          <h3 id="popup-title" class="font-bold text-base">सूचना</h3>
+          <h3 id="popup-title" class="font-bold text-base">Notification</h3>
         </div>
         <button id="popup-close-x" onclick="closePopup()" class="text-white hover:opacity-75 text-xl font-bold">✕</button>
       </div>
@@ -120,31 +120,31 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border">
         <div>
           <label class="text-xs font-bold text-slate-600">Customer Name *</label>
-          <input type="text" id="cust-name" placeholder="ग्राहक का नाम" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
+          <input type="text" id="cust-name" placeholder="ग्राहक का नाम लिखें" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
         <div>
           <label class="text-xs font-bold text-slate-600">Mobile Number *</label>
-          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का नंबर" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
+          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
         <div>
           <label class="text-xs font-bold text-slate-600">Customer Address *</label>
-          <input type="text" id="cust-address" placeholder="पूरा पता (उदा: GB-15, Sec-4, Bokaro)" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
+          <input type="text" id="cust-address" placeholder="पूरा पता लिखें (उदा: GB-15, Sec-4, Bokaro)" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
       </div>
 
       <!-- REPAIR DETAILS (FOR REPAIRING) -->
       <div id="repair-section" class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3 hidden">
-        <h3 class="font-bold text-sm text-amber-900">🔧 Device & Repair Specs (रिपेयर विवरण)</h3>
+        <h3 class="font-bold text-sm text-amber-900">🔧 Device & Repair Specs</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input type="text" id="rep-product" placeholder="Device Name (उदा: Vivo Y20, Redmi Note 12)" class="p-2 bg-white border rounded-lg text-sm" />
-          <input type="text" id="rep-imei" maxlength="15" placeholder="Device IMEI (15 अंक)" oninput="this.value=this.value.replace(/\\D/g,'')" class="p-2 bg-white border rounded-lg text-sm font-mono" />
+          <input type="text" id="rep-product" placeholder="डिवाइस का नाम (उदा: Vivo Y20, Note 12)" class="p-2 bg-white border rounded-lg text-sm" />
+          <input type="text" id="rep-imei" maxlength="15" placeholder="डिवाइस IMEI (15 अंक)" oninput="this.value=this.value.replace(/\\D/g,'')" class="p-2 bg-white border rounded-lg text-sm font-mono" />
         </div>
-        <textarea id="rep-complaint" rows="2" placeholder="Complaint / समस्या..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
-        <textarea id="rep-work" rows="2" placeholder="Work Done / किया गया काम..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
+        <textarea id="rep-complaint" rows="2" placeholder="कस्टमर की समस्या या कंप्लेंट लिखें..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
+        <textarea id="rep-work" rows="2" placeholder="किया गया काम या सर्विस विवरण..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="text-xs font-bold text-slate-600">Labour Charge (₹)</label>
-            <input type="number" id="rep-labour" placeholder="राशि भरें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold" />
+            <input type="number" id="rep-labour" placeholder="लेबर चार्ज राशि लिखें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold" />
           </div>
           <div>
             <label class="text-xs font-bold text-slate-600">Labour GST %</label>
@@ -159,12 +159,12 @@
       <div class="space-y-3">
         <h3 id="items-title" class="font-bold text-sm text-slate-800">Products / Handsets</h3>
         <div id="items-container" class="space-y-3"></div>
-        <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ अन्य आइटम जोड़ें</button>
+        <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ Add Another Item</button>
       </div>
 
       <!-- LIVE GST SUMMARY IN FORM -->
       <div id="form-gst-live-summary" class="p-3 bg-blue-50/80 border border-blue-200 rounded-xl space-y-1.5 text-xs text-blue-950 hidden">
-        <p class="font-bold text-[11px] uppercase tracking-wide text-blue-900">GST Breakdown (टैक्स का विवरण)</p>
+        <p class="font-bold text-[11px] uppercase tracking-wide text-blue-900">GST Breakdown</p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-blue-200">
           <div><span class="text-slate-500 font-medium">Taxable Amount:</span> <span id="live-taxable" class="font-bold">₹0</span></div>
           <div><span class="text-slate-500 font-medium">CGST:</span> <span id="live-cgst" class="font-bold">₹0</span></div>
@@ -173,7 +173,7 @@
         </div>
       </div>
 
-      <!-- PAYMENT SECTION (TWO DROPDOWNS: PRIMARY MODE & SECONDARY MODE) -->
+      <!-- PAYMENT SECTION -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <!-- PRIMARY MODE DROPDOWN -->
@@ -195,46 +195,39 @@
           <!-- SECONDARY MODE DROPDOWN (ONLY FINANCE & DUES) -->
           <div>
             <label class="text-xs font-bold text-rose-700 block uppercase mb-1">
-              Secondary Mode 
+              Secondary Mode
             </label>
             <select id="pay-secondary-dropdown" onchange="onSecondaryModeChange()" class="w-full p-2.5 bg-rose-50 border border-rose-300 rounded-lg text-xs font-bold text-rose-900 shadow-sm focus:border-rose-600">
-              <option value="">-- Choose here --</option>
+              <option value="">-- None (Keep Primary) --</option>
               <option value="Finance">🏦 Finance / EMI</option>
-              <option value="Dues">📝 Dues / Udhar </option>
+              <option value="Dues">📝 Dues / Udhar</option>
             </select>
           </div>
         </div>
 
-        <div class="pt-1">
-          <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
-            कुल जमा राशि (Total Amount Paid ₹) *
-          </label>
-          <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full p-2.5 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-sm shadow-sm" />
-        </div>
-
-        <!-- FINANCE DETAILS (Appears when Secondary Mode is Finance) -->
+        <!-- FINANCE DETAILS CONTAINER -->
         <div id="finance-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 hidden">
           <div class="flex justify-between items-center">
-            <h4 class="text-xs font-black text-blue-950 uppercase">🏦 Finance Details (फाइनेंस की जानकारी)</h4>
+            <h4 class="text-xs font-black text-blue-950 uppercase">🏦 Finance Details</h4>
             <span class="text-[10px] text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded">Finance Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="text-[10px] font-bold text-slate-600 uppercase">Finance Company Name *</label>
-              <input type="text" id="fin-company" placeholder="उदा: Bajaj, TVS, HDB" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+              <input type="text" id="fin-company" placeholder="फाइनेंस कंपनी का नाम लिखें (उदा: Bajaj, TVS)" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
             </div>
             <div>
               <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment (DP ₹)</label>
-              <input type="number" id="fin-dp" placeholder="DP राशि भरें" oninput="handleFinanceInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
+              <input type="number" id="fin-dp" placeholder="डाउनपेमेंट राशि लिखें" oninput="handleFinanceInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">Loan Amount (कंपनी से आएगा ₹)</label>
-              <input type="number" id="fin-loan" placeholder="लोन राशि" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-lg text-xs font-bold text-blue-900" />
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Loan Amount (From Company ₹)</label>
+              <input type="number" id="fin-loan" placeholder="कंपनी से आने वाली राशि" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-lg text-xs font-bold text-blue-900" />
             </div>
           </div>
 
           <div>
-            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Method)</label>
+            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment Method</label>
             <select id="fin-dp-mode" onchange="onFinDpModeChange()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR</option>
@@ -246,35 +239,36 @@
             </select>
           </div>
 
+          <!-- SPLIT BOXES FOR FINANCE DP -->
           <div id="fin-split-container" class="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
             <div id="fin-split-box-cash" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP Cash (₹)</label>
-              <input type="number" id="fin-split-cash" placeholder="Cash DP" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="fin-split-cash" placeholder="कैश डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
             <div id="fin-split-box-qr" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP QR (₹)</label>
-              <input type="number" id="fin-split-qr" placeholder="QR DP" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="fin-split-qr" placeholder="QR डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
             <div id="fin-split-box-card" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP Card (₹)</label>
-              <input type="number" id="fin-split-card" placeholder="Card DP" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="fin-split-card" placeholder="कार्ड डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
           </div>
         </div>
 
-        <!-- DUES DETAILS (Appears when Secondary Mode is Dues) -->
+        <!-- DUES DETAILS CONTAINER -->
         <div id="dues-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-rose-50/60 p-3.5 rounded-xl border border-rose-200 hidden">
           <div class="flex justify-between items-center">
-            <h4 class="text-xs font-black text-rose-950 uppercase">📝 Dues / Udhar (बकाया विवरण)</h4>
+            <h4 class="text-xs font-black text-rose-950 uppercase">📝 Dues / Udhar Details</h4>
             <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded">Udhar Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">अभी जमा की गई राशि (यदि कोई टोकन/एडवांस मिला हो ₹)</label>
-              <input type="number" id="dues-partial-amt" placeholder="टोकन राशि (अन्यथा खाली रखें)" oninput="handleDuesInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Advance / Token Paid (₹)</label>
+              <input type="number" id="dues-partial-amt" placeholder="टोकन राशि लिखें (खाली छोड़ सकते हैं)" oninput="handleDuesInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">जमा राशि का माध्यम (Token Payment Method)</label>
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Token Payment Method</label>
               <select id="dues-pay-mode" onchange="onDuesModeChange()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
                 <option value="Cash">💵 Cash</option>
                 <option value="QR">📲 QR</option>
@@ -287,36 +281,45 @@
             </div>
           </div>
 
+          <!-- SPLIT BOXES FOR DUES TOKEN -->
           <div id="dues-split-container" class="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
             <div id="dues-split-box-cash" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">Token Cash (₹)</label>
-              <input type="number" id="dues-split-cash" placeholder="Cash Token" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="dues-split-cash" placeholder="कैश टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
             <div id="dues-split-box-qr" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">Token QR (₹)</label>
-              <input type="number" id="dues-split-qr" placeholder="QR Token" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="dues-split-qr" placeholder="QR टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
             <div id="dues-split-box-card" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">Token Card (₹)</label>
-              <input type="number" id="dues-split-card" placeholder="Card Token" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
+              <input type="number" id="dues-split-card" placeholder="कार्ड टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-1.5 bg-white border rounded text-xs font-bold" />
             </div>
           </div>
         </div>
 
-        <!-- REGULAR SPLIT PAYMENT INPUTS (For Primary Mode Splits) -->
+        <!-- PRIMARY SPLIT INPUTS (ROW 1: CASH BOX + QR BOX) -->
         <div id="split-inputs-container" class="pt-2 border-t mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden">
           <div id="split-box-cash" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
-            <input type="number" id="split-cash" placeholder="कैश राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-cash" placeholder="कैश राशि लिखें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
           <div id="split-box-qr" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">QR Amount (₹)</label>
-            <input type="number" id="split-qr" placeholder="QR राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-qr" placeholder="QR राशि लिखें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
           <div id="split-box-card" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Card Swipe Amount (₹)</label>
-            <input type="number" id="split-card" placeholder="कार्ड राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-card" placeholder="कार्ड स्वाइप राशि लिखें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
+        </div>
+
+        <!-- ALWAYS IN NEXT ROW (LAST FIELD): TOTAL AMOUNT PAID -->
+        <div class="pt-2 border-t">
+          <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
+            Total Amount Paid (₹) *
+          </label>
+          <input type="number" id="pay-paid" placeholder="कुल जमा राशि दर्ज करें" oninput="recalcTotals()" class="w-full p-2.5 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-sm shadow-sm" />
         </div>
       </div>
 
@@ -332,9 +335,9 @@
       </div>
 
       <div class="flex space-x-2">
-        <button type="button" onclick="showView('dashboard')" class="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-sm">रद्द करें</button>
+        <button type="button" onclick="showView('dashboard')" class="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-sm">Cancel</button>
         <button type="button" onclick="saveCurrentBill()" class="flex-[2] py-3 bg-emerald-600 text-white font-black rounded-xl text-sm hover:bg-emerald-500 shadow-lg active:scale-95 transition">
-          SAVE & GENERATE BILL (सेव करें)
+          SAVE & GENERATE BILL
         </button>
       </div>
     </div>
@@ -514,7 +517,7 @@
 
       const listElem = document.getElementById("recent-bills-list");
       if (billsCache.length === 0) {
-        listElem.innerHTML = '<p class="p-4 text-xs text-slate-400">कोई बिल मौजूद नहीं है। + Mobile Sale दबाकर नया बिल बनाएं।</p>';
+        listElem.innerHTML = '<p class="p-4 text-xs text-slate-400">No bills found. Click + Mobile Sale to create a new invoice.</p>';
         return;
       }
 
@@ -587,10 +590,10 @@
       const row = document.createElement("div");
       row.className = "item-row p-3 bg-slate-50 rounded-xl border relative space-y-2.5";
       row.innerHTML = `
-        ${idx > 0 ? `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-2 text-rose-500 text-xs font-bold">हटाएं ✕</button>` : ""}
+        ${idx > 0 ? `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-2 text-rose-500 text-xs font-bold">Remove ✕</button>` : ""}
         <div>
           <label class="text-[10px] text-slate-500 font-bold uppercase">Product Name / Description *</label>
-          <input type="text" placeholder="Product Name (उदा: Samsung Galaxy A15 5G / Type-C Cable)" class="item-product-name w-full mt-0.5 p-2 border rounded text-xs bg-white font-medium" />
+          <input type="text" placeholder="प्रोडक्ट का नाम लिखें (उदा: Samsung Galaxy A15 5G / Type-C Cable)" class="item-product-name w-full mt-0.5 p-2 border rounded text-xs bg-white font-medium" />
         </div>
         
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -604,7 +607,7 @@
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">Discount (₹)</label>
-            <input type="number" placeholder="छूट (यदि हो)" oninput="recalcTotals()" class="item-disc w-full p-2 border rounded text-xs bg-white" />
+            <input type="number" placeholder="छूट लिखें" oninput="recalcTotals()" class="item-disc w-full p-2 border rounded text-xs bg-white" />
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">GST Slab</label>
@@ -648,7 +651,7 @@
       for (let i = 1; i <= qty; i++) {
         const div = document.createElement("div");
         div.innerHTML = `
-          <input type="text" maxlength="15" placeholder="IMEI ${i} (ठीक 15 अंक) *" oninput="this.value=this.value.replace(/\\D/g,'')" class="item-imei-input w-full p-1.5 border rounded text-xs bg-white font-mono" />
+          <input type="text" maxlength="15" placeholder="IMEI ${i} (ठीक 15 अंक लिखें) *" oninput="this.value=this.value.replace(/\\D/g,'')" class="item-imei-input w-full p-1.5 border rounded text-xs bg-white font-mono" />
         `;
         grid.appendChild(div);
       }
@@ -656,19 +659,12 @@
     }
 
     function onPrimaryModeChange() {
-      // If primary mode changes, reset secondary mode dropdown
       document.getElementById("pay-secondary-dropdown").value = "";
       updatePaymentFields();
     }
 
     function onSecondaryModeChange() {
       updatePaymentFields();
-    }
-
-    function getEffectivePaymentMode() {
-      const secVal = document.getElementById("pay-secondary-dropdown").value;
-      if (secVal) return secVal;
-      return document.getElementById("pay-primary-dropdown").value;
     }
 
     function updatePaymentFields() {
@@ -704,7 +700,7 @@
         paidInput.readOnly = false;
         paidInput.classList.remove("bg-slate-100");
       } else {
-        // Primary Split Modes
+        // Primary Split Modes (Cash + QR, etc.)
         splitBox.classList.remove("hidden");
         paidInput.readOnly = true;
         paidInput.classList.add("bg-slate-100");
@@ -899,19 +895,19 @@
       const phone = document.getElementById("cust-phone").value.trim();
       const address = document.getElementById("cust-address").value.trim();
 
-      if (!name) return showPopup("error", "डेटा अधूरा है", ["कृपया Customer Name अवश्य भरें।"]);
-      if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "गलत नंबर", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
-      if (!address) return showPopup("error", "पता अनिवार्य है", ["कृपया Customer Address अवश्य भरें।"]);
+      if (!name) return showPopup("error", "Incomplete Form", ["Please enter customer name."]);
+      if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["Please enter a valid 10-digit mobile number."]);
+      if (!address) return showPopup("error", "Address Required", ["Please enter customer address."]);
 
       const { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst } = recalcTotals();
-      if (grand <= 0) return showPopup("error", "गलत राशि", ["बिल की कुल राशि 0 से अधिक होनी चाहिए। कृपया सही Rate भरें।"]);
+      if (grand <= 0) return showPopup("error", "Invalid Amount", ["Total invoice amount must be greater than 0. Please enter rate."]);
 
       let imeiValidationError = false;
       const items = [];
       document.querySelectorAll(".item-row").forEach((r, idx) => {
         const pName = r.querySelector(".item-product-name").value.trim();
         if (!pName) {
-          showPopup("error", "प्रोडक्ट नाम लिखें", [`लाइन #${idx+1} में Product Name खाली है।`]);
+          showPopup("error", "Product Name Required", [`Product Name is empty in row #${idx+1}.`]);
           imeiValidationError = true;
           return;
         }
@@ -921,7 +917,7 @@
           r.querySelectorAll(".item-imei-input").forEach((inp, iIdx) => {
             const val = inp.value.trim();
             if (val.length !== 15) {
-              showPopup("error", "गलत IMEI नंबर", [`आइटम #${idx+1} का IMEI ${iIdx+1} ठीक 15 अंकों का होना चाहिए (अभी ${val.length} अंक हैं)।`]);
+              showPopup("error", "Invalid IMEI", [`Row #${idx+1} IMEI ${iIdx+1} must be exactly 15 digits (currently ${val.length} digits).`]);
               imeiValidationError = true;
               return;
             }
@@ -942,14 +938,17 @@
 
       if (imeiValidationError) return;
 
-      const effectiveMode = getEffectivePaymentMode();
+      const secVal = document.getElementById("pay-secondary-dropdown").value;
+      const primVal = document.getElementById("pay-primary-dropdown").value;
+      const effectiveMode = secVal ? secVal : primVal;
+
       let financeDetails = null;
       let duesDetails = null;
 
       if (effectiveMode === "Finance") {
         const finComp = document.getElementById("fin-company").value.trim();
         if (!finComp) {
-          return showPopup("error", "फाइनेंस कंपनी भरें", ["कृपया Finance Company Name दर्ज करें।"]);
+          return showPopup("error", "Finance Company Required", ["Please enter finance company name."]);
         }
         financeDetails = {
           company: finComp,
@@ -1000,9 +999,9 @@
       localStorage.setItem("sre_bills_cache", JSON.stringify(billsCache));
 
       if (gasUrl) {
-        showPopup("progress", "Google Sheets में डेटा सेव हो रहा है...", [
-          "• Bills शीट में इनवॉइस लिखा जा रहा है...",
-          "• Bill Items शीट में पार्ट्स/हैंडसेट दर्ज हो रहे हैं..."
+        showPopup("progress", "Saving to Google Sheets...", [
+          "• Recording invoice in Bills sheet...",
+          "• Logging handset / parts in Bill Items..."
         ]);
 
         try {
@@ -1013,38 +1012,38 @@
           });
           const d = await res.json();
           if (d.success) {
-            showPopup("success", "सफलतापूर्वक सेव हुआ!", [
-              `✓ इनवॉइस: ${billPayload.invoiceNo}`,
-              `✓ ग्राहक: ${name} (${address})`,
+            showPopup("success", "Saved Successfully!", [
+              `✓ Invoice: ${billPayload.invoiceNo}`,
+              `✓ Customer: ${name} (${address})`,
               `✓ Mode: ${effectiveMode}`,
-              `✓ कुल बिल: ₹${grand} (जमा: ₹${paid})`
-            ], "इनवॉइस देखें", () => {
+              `✓ Total: ₹${grand} (Paid: ₹${paid})`
+            ], "View Invoice", () => {
               closePopup();
               displayInvoice(billPayload);
             });
           } else {
-            showPopup("error", "Sheets में समस्या आई", [
-              "एरर: " + (d.error || "Unknown error"),
-              "चिंता न करें, इनवॉइस फोन मेमोरी में सेव हो चुका है।"
-            ], "लोकल इनवॉइस देखें", () => {
+            showPopup("error", "Google Sheets Error", [
+              "Error: " + (d.error || "Unknown error"),
+              "Bill is safely cached on device."
+            ], "View Local Invoice", () => {
               closePopup();
               displayInvoice(billPayload);
             });
           }
         } catch (e) {
-          showPopup("error", "कनेक्शन एरर", [
-            "Apps Script कनेक्ट नहीं हुआ: " + e.message,
-            "बिल आपके फोन में सुरक्षित है।"
-          ], "लोकल इनवॉइस देखें", () => {
+          showPopup("error", "Connection Error", [
+            "Apps Script unreachable: " + e.message,
+            "Bill saved safely in local memory."
+          ], "View Local Invoice", () => {
             closePopup();
             displayInvoice(billPayload);
           });
         }
       } else {
-        showPopup("info", "फोन में सेव हो गया", [
-          `✓ इनवॉइस: ${billPayload.invoiceNo} सेव हो गया है।`,
-          "⚠ Google Apps Script URL सेट नहीं है।"
-        ], "इनवॉइस देखें", () => {
+        showPopup("info", "Saved Locally", [
+          `✓ Invoice: ${billPayload.invoiceNo} saved to device.`,
+          "⚠ Google Apps Script URL not configured."
+        ], "View Invoice", () => {
           closePopup();
           displayInvoice(billPayload);
         });
@@ -1186,9 +1185,9 @@
 
         const targetGas = queryGas || gasUrl;
         if (targetGas) {
-          showPopup("progress", "QR इनवॉइस लोड हो रहा है...", [
-            "• Google Sheet से बिल का डेटा प्राप्त हो रहा है...",
-            "• कृपया 2 सेकंड प्रतीक्षा करें..."
+          showPopup("progress", "Loading QR Invoice...", [
+            "• Fetching bill from Google Sheets...",
+            "• Please wait 2 seconds..."
           ]);
 
           try {
@@ -1198,19 +1197,19 @@
               closePopup();
               displayInvoice(d.bill, true);
             } else {
-              showPopup("error", "बिल नहीं मिला", [
-                "यह बिल Google Sheets में उपलब्ध नहीं है या हटा दिया गया है।"
+              showPopup("error", "Invoice Not Found", [
+                "This bill does not exist in Google Sheets or token is invalid."
               ]);
             }
           } catch (e) {
-            showPopup("error", "सर्वर एरर", [
-              "Google Apps Script से संपर्क नहीं हो सका: " + e.message
+            showPopup("error", "Server Error", [
+              "Could not reach Apps Script: " + e.message
             ]);
           }
         } else {
-          showPopup("error", "सर्वर लिंक अनुपलब्ध", [
-            "इस बिल के QR कोड में क्लाउड सर्वर लिंक नहीं मिला।",
-            "कृपया बिल जारीकर्ता से संपर्क करें।"
+          showPopup("error", "Server Link Missing", [
+            "Cloud backend URL missing in this QR invoice.",
+            "Please contact the store."
           ]);
         }
       }
@@ -1230,14 +1229,14 @@
       if (!activeInvoiceData) return;
       const phone = (activeInvoiceData.customer?.mobile || "").replace(/\D/g, "");
       const formatted = phone.startsWith("91") ? phone : "91" + phone;
-      const text = encodeURIComponent(`नमस्ते ${activeInvoiceData.customer?.name}, आपका SRI RAM ENTERPRISES का बिल तैयार है: ${activeInvoiceData.publicUrl}`);
+      const text = encodeURIComponent(`Hello ${activeInvoiceData.customer?.name}, your SRI RAM ENTERPRISES bill is ready: ${activeInvoiceData.publicUrl}`);
       window.open(`https://wa.me/${formatted}?text=${text}`, "_blank");
     }
 
     function saveSettings() {
       gasUrl = document.getElementById("settings-gas-url").value.trim();
       localStorage.setItem("sre_gas_url", gasUrl);
-      showPopup("success", "सेटिंग्स सेव हो गई", ["Google Apps Script URL सुरक्षित हो गया है।"], "डैशबोर्ड पर जाएँ", () => {
+      showPopup("success", "Settings Saved", ["Google Apps Script URL has been successfully saved."], "Go to Dashboard", () => {
         closePopup();
         showView("dashboard");
       });
