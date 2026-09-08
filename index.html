@@ -158,16 +158,62 @@
         <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ अन्य आइटम जोड़ें</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border">
-        <div>
-          <label class="text-xs font-bold text-slate-600">जमा राशि (Amount Paid ₹)</label>
-          <input type="number" id="pay-paid" value="0" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
+      <!-- PAYMENT SECTION WITH RADIO BUTTONS -->
+      <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
+        <label class="text-xs font-bold text-slate-700 block uppercase">Payment Mode (भुगतान का प्रकार चुनें)</label>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="Cash" checked onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">💵 Cash</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">📲 QR</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="Cash + QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">💵 Cash + 📲 QR</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="Card Swipe + QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">💳 Card + 📲 QR</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="Card Swipe + Cash" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">💳 Card + 💵 Cash</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-2.5 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
+            <input type="radio" name="pay-mode-radio" value="Card Swipe + QR + Cash" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
+            <span class="text-xs font-bold text-slate-800">💳 Card + 📲 QR + 💵 Cash</span>
+          </label>
         </div>
-        <div>
-          <label class="text-xs font-bold text-slate-600">Payment Mode</label>
-          <select id="pay-mode" class="w-full mt-1 p-2.5 border rounded-lg bg-white text-sm">
-            <option value="Cash">Cash</option><option value="UPI">UPI / QR</option><option value="Card">Card</option>
-          </select>
+
+        <!-- SPLIT PAYMENT INPUTS -->
+        <div id="split-inputs-container" class="pt-2 border-t mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden">
+          <div id="split-box-cash" class="hidden">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
+            <input type="number" id="split-cash" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+          </div>
+          <div id="split-box-qr" class="hidden">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">QR Amount (₹)</label>
+            <input type="number" id="split-qr" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+          </div>
+          <div id="split-box-card" class="hidden">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Card Swipe Amount (₹)</label>
+            <input type="number" id="split-card" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+          </div>
+        </div>
+
+        <!-- TOTAL PAID BOX -->
+        <div class="pt-2">
+          <label class="text-xs font-bold text-slate-700">कुल जमा राशि (Total Amount Paid ₹)</label>
+          <input type="number" id="pay-paid" value="0" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
         </div>
       </div>
 
@@ -221,7 +267,7 @@
             <p id="inv-cust-phone" class="text-slate-500"></p>
           </div>
           <div class="text-right">
-            <p id="inv-pay-mode" class="text-slate-600">Mode: Cash</p>
+            <p id="inv-pay-mode" class="text-slate-800 font-bold">Mode: Cash</p>
           </div>
         </div>
 
@@ -242,7 +288,6 @@
 
         <div class="flex justify-between items-center pt-3 border-t">
           <div class="flex flex-col items-center bg-slate-50 p-2 border rounded-lg">
-            <!-- GUARANTEED RENDERED QR IMAGE -->
             <img id="inv-qr-img" src="" alt="Invoice QR" class="w-24 h-24 border bg-white p-1 rounded" />
             <span class="text-[9px] text-slate-500 font-bold mt-1">Scan to Verify Invoice</span>
           </div>
@@ -378,6 +423,11 @@
       document.getElementById("cust-phone").value = "";
       document.getElementById("pay-paid").value = "0";
 
+      // Reset payment radio to Cash
+      const cashRadio = document.querySelector('input[name="pay-mode-radio"][value="Cash"]');
+      if (cashRadio) cashRadio.checked = true;
+      updatePaymentFields();
+
       const container = document.getElementById("items-container");
       container.innerHTML = "";
       addNewItemRow();
@@ -440,6 +490,49 @@
         </div>
       `;
       container.appendChild(row);
+    }
+
+    // PAYMENT RADIO & SPLIT LOGIC
+    function getSelectedPayMode() {
+      const selected = document.querySelector('input[name="pay-mode-radio"]:checked');
+      return selected ? selected.value : "Cash";
+    }
+
+    function updatePaymentFields() {
+      const mode = getSelectedPayMode();
+      const splitBox = document.getElementById("split-inputs-container");
+      const boxCash = document.getElementById("split-box-cash");
+      const boxQr = document.getElementById("split-box-qr");
+      const boxCard = document.getElementById("split-box-card");
+      const paidInput = document.getElementById("pay-paid");
+
+      if (mode === "Cash" || mode === "QR") {
+        splitBox.classList.add("hidden");
+        paidInput.readOnly = false;
+        paidInput.classList.remove("bg-slate-100");
+      } else {
+        splitBox.classList.remove("hidden");
+        paidInput.readOnly = true;
+        paidInput.classList.add("bg-slate-100");
+
+        boxCash.classList.toggle("hidden", !mode.includes("Cash"));
+        boxQr.classList.toggle("hidden", !mode.includes("QR"));
+        boxCard.classList.toggle("hidden", !mode.includes("Card"));
+
+        handleSplitInput();
+      }
+      recalcTotals();
+    }
+
+    function handleSplitInput() {
+      const mode = getSelectedPayMode();
+      let total = 0;
+      if (mode.includes("Cash")) total += Number(document.getElementById("split-cash").value) || 0;
+      if (mode.includes("QR")) total += Number(document.getElementById("split-qr").value) || 0;
+      if (mode.includes("Card")) total += Number(document.getElementById("split-card").value) || 0;
+
+      document.getElementById("pay-paid").value = total;
+      recalcTotals();
     }
 
     function recalcTotals() {
@@ -505,6 +598,8 @@
         labourCharge: Number(document.getElementById("rep-labour").value) || 0
       } : null;
 
+      const selectedMode = getSelectedPayMode();
+
       const billPayload = {
         invoiceNo,
         billType: currentBillType,
@@ -512,7 +607,7 @@
         customer: { name, mobile: phone },
         items,
         repairDetails,
-        payment: { mode: document.getElementById("pay-mode").value, amountPaid: paid, dueAmount: due },
+        payment: { mode: selectedMode, amountPaid: paid, dueAmount: due },
         totals: { grand, paid, due },
         secureToken,
         publicUrl
@@ -538,6 +633,7 @@
             showPopup("success", "सफलतापूर्वक सेव हुआ!", [
               `✓ इनवॉइस: ${billPayload.invoiceNo}`,
               `✓ Google Sheets में डेटा सुरक्षित हो गया`,
+              `✓ भुगतान मोड: ${selectedMode}`,
               `✓ कुल बिल: ₹${grand} (जमा: ₹${paid})`
             ], "इनवॉइस देखें", () => {
               closePopup();
@@ -623,7 +719,6 @@
       document.getElementById("inv-tot-paid").innerText = "Paid: ₹" + Number(paid).toLocaleString("en-IN");
       document.getElementById("inv-tot-due").innerText = Number(due) > 0 ? `Due: ₹${Number(due).toLocaleString("en-IN")}` : "";
 
-      // 100% RELIABLE INSTANT QR CODE IMAGE RENDER
       const qrTargetUrl = bill.publicUrl || `${window.location.origin}${window.location.pathname}#/bill/${bill.secureToken}`;
       const qrImg = document.getElementById("inv-qr-img");
       qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrTargetUrl)}`;
