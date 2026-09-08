@@ -116,27 +116,31 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border">
+      <!-- CUSTOMER DETAILS (NAME, PHONE & ADDRESS) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border">
         <div>
           <label class="text-xs font-bold text-slate-600">Customer Name *</label>
-          <input type="text" id="cust-name" placeholder="ग्राहक का नाम" class="w-full mt-1 p-2.5 bg-white border rounded-lg text-sm" />
+          <input type="text" id="cust-name" placeholder="ग्राहक का नाम" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
         <div>
           <label class="text-xs font-bold text-slate-600">Mobile Number *</label>
-          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का नंबर" class="w-full mt-1 p-2.5 bg-white border rounded-lg text-sm" />
+          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का नंबर" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600">Customer Address</label>
+          <input type="text" id="cust-address" placeholder="पता / City (जैसे: Sector-4, Bokaro)" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
       </div>
 
-      <!-- Repair Details Container -->
+      <!-- REPAIR DETAILS (ONLY FOR REPAIRING) -->
       <div id="repair-section" class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3 hidden">
         <h3 class="font-bold text-sm text-amber-900">🔧 Device & Repair Specs (रिपेयर विवरण)</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <input type="text" id="rep-brand" placeholder="Device Brand (Vivo, Samsung)" class="p-2.5 bg-white border rounded-lg text-sm" />
-          <input type="text" id="rep-model" placeholder="Model (Y20, Note 12)" class="p-2.5 bg-white border rounded-lg text-sm" />
-          <input type="text" id="rep-imei" placeholder="Device IMEI / Serial" class="p-2.5 bg-white border rounded-lg text-sm" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="text" id="rep-product" placeholder="Device Name (उदा: Vivo Y20, Redmi Note 12)" class="p-2 bg-white border rounded-lg text-sm" />
+          <input type="text" id="rep-imei" placeholder="Device IMEI / Serial No." class="p-2 bg-white border rounded-lg text-sm" />
         </div>
-        <textarea id="rep-complaint" rows="2" placeholder="Complaint / समस्या..." class="w-full p-2.5 bg-white border rounded-lg text-sm"></textarea>
-        <textarea id="rep-work" rows="2" placeholder="Work Done / किया गया काम..." class="w-full p-2.5 bg-white border rounded-lg text-sm"></textarea>
+        <textarea id="rep-complaint" rows="2" placeholder="Complaint / समस्या..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
+        <textarea id="rep-work" rows="2" placeholder="Work Done / किया गया काम..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="text-xs font-bold text-slate-600">Labour Charge (₹)</label>
@@ -151,14 +155,14 @@
         </div>
       </div>
 
-      <!-- Items Section -->
+      <!-- ITEMS SECTION (PRODUCT NAME, DYNAMIC IMEI, GST SLAB) -->
       <div class="space-y-3">
         <h3 id="items-title" class="font-bold text-sm text-slate-800">Products / Handsets</h3>
         <div id="items-container" class="space-y-3"></div>
         <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ अन्य आइटम जोड़ें</button>
       </div>
 
-      <!-- PAYMENT SECTION WITH RADIO BUTTONS -->
+      <!-- PAYMENT MODES (RADIO BUTTONS) -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
         <label class="text-xs font-bold text-slate-700 block uppercase">Payment Mode (भुगतान का प्रकार चुनें)</label>
         
@@ -210,7 +214,6 @@
           </div>
         </div>
 
-        <!-- TOTAL PAID BOX -->
         <div class="pt-2">
           <label class="text-xs font-bold text-slate-700">कुल जमा राशि (Total Amount Paid ₹)</label>
           <input type="number" id="pay-paid" value="0" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
@@ -265,6 +268,7 @@
             <p class="font-bold text-slate-400 text-[9px]">CUSTOMER:</p>
             <p id="inv-cust-name" class="font-bold"></p>
             <p id="inv-cust-phone" class="text-slate-500"></p>
+            <p id="inv-cust-address" class="text-slate-500 text-[10px]"></p>
           </div>
           <div class="text-right">
             <p id="inv-pay-mode" class="text-slate-800 font-bold">Mode: Cash</p>
@@ -276,9 +280,10 @@
         <table class="w-full my-3 border-collapse">
           <thead>
             <tr class="bg-slate-100 text-[9px] uppercase border-y">
-              <th class="p-1.5 text-left">Item / Service</th>
-              <th class="p-1.5 text-left">IMEI / Serial</th>
+              <th class="p-1.5 text-left">Item / Product Name</th>
+              <th class="p-1.5 text-left">IMEI / Serial Details</th>
               <th class="p-1.5 text-center">Qty</th>
+              <th class="p-1.5 text-center">GST</th>
               <th class="p-1.5 text-right">Rate</th>
               <th class="p-1.5 text-right">Amount</th>
             </tr>
@@ -421,9 +426,9 @@
       changeBillType(type);
       document.getElementById("cust-name").value = "";
       document.getElementById("cust-phone").value = "";
+      document.getElementById("cust-address").value = "";
       document.getElementById("pay-paid").value = "0";
 
-      // Reset payment radio to Cash
       const cashRadio = document.querySelector('input[name="pay-mode-radio"][value="Cash"]');
       if (cashRadio) cashRadio.checked = true;
       updatePaymentFields();
@@ -459,6 +464,9 @@
         repSec.classList.add("hidden");
         document.getElementById("items-title").innerText = type === "MOBILE" ? "Mobile Handset Details" : "Accessories Details";
       }
+      
+      // Update existing item rows for type change
+      document.querySelectorAll(".item-row").forEach(r => renderItemImeis(r));
       recalcTotals();
     }
 
@@ -466,18 +474,18 @@
       const container = document.getElementById("items-container");
       const idx = container.children.length;
       const row = document.createElement("div");
-      row.className = "item-row p-3 bg-slate-50 rounded-xl border relative space-y-2";
+      row.className = "item-row p-3 bg-slate-50 rounded-xl border relative space-y-2.5";
       row.innerHTML = `
         ${idx > 0 ? `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-2 text-rose-500 text-xs font-bold">हटाएं ✕</button>` : ""}
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <input type="text" placeholder="Brand (Samsung)" class="item-brand p-2 border rounded text-xs bg-white" />
-          <input type="text" placeholder="Model (Galaxy A15)" class="item-model p-2 border rounded text-xs bg-white" />
-          <input type="text" placeholder="IMEI 1 (15 अंक)" class="item-imei p-2 border rounded text-xs bg-white ${currentBillType === "MOBILE" ? "" : "hidden"}" />
+        <div>
+          <label class="text-[10px] text-slate-500 font-bold uppercase">Product Name / Description *</label>
+          <input type="text" placeholder="Product Name (उदा: Samsung Galaxy A15 5G / Type-C Cable)" class="item-product-name w-full mt-0.5 p-2 border rounded text-xs bg-white font-medium" />
         </div>
-        <div class="grid grid-cols-3 gap-2">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">Qty</label>
-            <input type="number" min="1" value="1" oninput="recalcTotals()" class="item-qty w-full p-2 border rounded text-xs bg-white font-bold" />
+            <input type="number" min="1" value="1" oninput="onItemQtyChange(this)" class="item-qty w-full p-2 border rounded text-xs bg-white font-bold" />
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">Rate (₹) *</label>
@@ -487,12 +495,56 @@
             <label class="text-[10px] text-slate-500 font-bold uppercase">Discount (₹)</label>
             <input type="number" value="0" oninput="recalcTotals()" class="item-disc w-full p-2 border rounded text-xs bg-white" />
           </div>
+          <div>
+            <label class="text-[10px] text-slate-500 font-bold uppercase">GST Slab</label>
+            <select class="item-gst w-full p-2 border rounded text-xs bg-white font-bold" onchange="recalcTotals()">
+              <option value="18" selected>18%</option>
+              <option value="12">12%</option>
+              <option value="5">5%</option>
+              <option value="28">28%</option>
+              <option value="0">0%</option>
+            </select>
+          </div>
         </div>
+
+        <!-- DYNAMIC IMEI CONTAINER (Opens based on Qty for MOBILE) -->
+        <div class="item-imeis-box space-y-1.5 pt-1"></div>
       `;
       container.appendChild(row);
+      renderItemImeis(row);
     }
 
-    // PAYMENT RADIO & SPLIT LOGIC
+    function onItemQtyChange(input) {
+      const row = input.closest(".item-row");
+      renderItemImeis(row);
+      recalcTotals();
+    }
+
+    function renderItemImeis(row) {
+      const imeiBox = row.querySelector(".item-imeis-box");
+      imeiBox.innerHTML = "";
+
+      if (currentBillType !== "MOBILE") {
+        imeiBox.classList.add("hidden");
+        return;
+      }
+      imeiBox.classList.remove("hidden");
+
+      const qty = Math.max(1, Math.min(20, Number(row.querySelector(".item-qty").value) || 1));
+      
+      const grid = document.createElement("div");
+      grid.className = "grid grid-cols-1 sm:grid-cols-2 gap-2";
+
+      for (let i = 1; i <= qty; i++) {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <input type="text" placeholder="IMEI ${i} (15 अंक) *" class="item-imei-input w-full p-1.5 border rounded text-xs bg-white font-mono" />
+        `;
+        grid.appendChild(div);
+      }
+      imeiBox.appendChild(grid);
+    }
+
     function getSelectedPayMode() {
       const selected = document.querySelector('input[name="pay-mode-radio"]:checked');
       return selected ? selected.value : "Cash";
@@ -563,6 +615,7 @@
     async function saveCurrentBill() {
       const name = document.getElementById("cust-name").value.trim();
       const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
 
       if (!name) return showPopup("error", "डेटा अधूरा है", ["कृपया Customer Name भरें।"]);
       if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "गलत नंबर", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
@@ -579,23 +632,30 @@
 
       const items = [];
       document.querySelectorAll(".item-row").forEach(r => {
+        const imeis = [];
+        r.querySelectorAll(".item-imei-input").forEach(inp => {
+          if (inp.value.trim()) imeis.push(inp.value.trim());
+        });
+
         items.push({
-          brand: r.querySelector(".item-brand").value.trim(),
-          productName: r.querySelector(".item-model").value.trim(),
-          imei1: r.querySelector(".item-imei").value.trim(),
+          productName: r.querySelector(".item-product-name").value.trim() || "Item",
+          brand: "",
+          imei1: imeis.join(", "),
           quantity: Number(r.querySelector(".item-qty").value) || 1,
           rate: Number(r.querySelector(".item-rate").value) || 0,
-          discount: Number(r.querySelector(".item-disc").value) || 0
+          discount: Number(r.querySelector(".item-disc").value) || 0,
+          gstRate: Number(r.querySelector(".item-gst").value) || 18
         });
       });
 
       const repairDetails = currentBillType === "REPAIRING" ? {
-        brand: document.getElementById("rep-brand").value.trim(),
-        model: document.getElementById("rep-model").value.trim(),
+        brand: document.getElementById("rep-product").value.trim(),
+        model: "",
         imei: document.getElementById("rep-imei").value.trim(),
         complaint: document.getElementById("rep-complaint").value.trim(),
         workDone: document.getElementById("rep-work").value.trim(),
-        labourCharge: Number(document.getElementById("rep-labour").value) || 0
+        labourCharge: Number(document.getElementById("rep-labour").value) || 0,
+        gstRate: Number(document.getElementById("rep-gst").value) || 18
       } : null;
 
       const selectedMode = getSelectedPayMode();
@@ -604,7 +664,7 @@
         invoiceNo,
         billType: currentBillType,
         billDate,
-        customer: { name, mobile: phone },
+        customer: { name, mobile: phone, address },
         items,
         repairDetails,
         payment: { mode: selectedMode, amountPaid: paid, dueAmount: due },
@@ -675,13 +735,14 @@
       document.getElementById("inv-date-display").innerText = bill.billDate;
       document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName;
       document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile;
+      document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `Address: ${bill.customer?.address || bill.address}` : "";
       document.getElementById("inv-pay-mode").innerText = "Mode: " + (bill.payment?.mode || bill.paymentMode || "Cash");
 
       const repBox = document.getElementById("inv-rep-box");
       if (bill.billType === "REPAIRING" && bill.repairDetails) {
         repBox.classList.remove("hidden");
         repBox.innerHTML = `
-          <p class="font-bold text-slate-800">Device: ${bill.repairDetails.brand || ""} ${bill.repairDetails.model || ""} (${bill.repairDetails.imei || "N/A"})</p>
+          <p class="font-bold text-slate-800">Device: ${bill.repairDetails.brand || ""} (${bill.repairDetails.imei || "N/A"})</p>
           <p class="text-slate-600">Issue: ${bill.repairDetails.complaint || "N/A"}</p>
           <p class="text-slate-600">Work Done: ${bill.repairDetails.workDone || "N/A"}</p>
         `;
@@ -692,9 +753,10 @@
       const tbody = document.getElementById("inv-items-tbody");
       tbody.innerHTML = (bill.items || []).map(it => `
         <tr class="border-b">
-          <td class="p-1.5 font-bold">${it.brand || ""} ${it.productName || it.partName || ""}</td>
+          <td class="p-1.5 font-bold">${it.productName || it.partName || "Product"}</td>
           <td class="p-1.5 font-mono text-[9px]">${it.imei1 || "-"}</td>
           <td class="p-1.5 text-center">${it.quantity || 1}</td>
+          <td class="p-1.5 text-center">${it.gstRate || 18}%</td>
           <td class="p-1.5 text-right">₹${it.rate || 0}</td>
           <td class="p-1.5 text-right font-bold">₹${((it.quantity || 1) * (it.rate || 0) - (it.discount || 0)).toLocaleString("en-IN")}</td>
         </tr>
@@ -705,6 +767,7 @@
           <tr class="border-b">
             <td colspan="2" class="p-1.5 font-bold">Repair Labour & Service Charge</td>
             <td class="p-1.5 text-center">1</td>
+            <td class="p-1.5 text-center">${bill.repairDetails.gstRate || 18}%</td>
             <td class="p-1.5 text-right">₹${bill.repairDetails.labourCharge}</td>
             <td class="p-1.5 text-right font-bold">₹${bill.repairDetails.labourCharge}</td>
           </tr>
