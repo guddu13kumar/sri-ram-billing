@@ -173,20 +173,18 @@
         </div>
       </div>
 
-      <!-- PAYMENT SECTION (1ST METHOD - SINGLE ROW LAYOUT) -->
+      <!-- PAYMENT SECTION (TWO DROPDOWNS: PRIMARY MODE & SECONDARY MODE) -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
-        <!-- SINGLE ROW: 1ST METHOD DROPDOWN & TOTAL PAID AMOUNT -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- PRIMARY MODE DROPDOWN -->
           <div>
             <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
-              1st Method (भुगतान माध्यम चुनें) *
+              Primary Mode (मुख्य माध्यम) *
             </label>
-            <select id="pay-mode-dropdown" onchange="updatePaymentFields()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 shadow-sm focus:border-blue-900 focus:ring-1 focus:ring-blue-900">
+            <select id="pay-primary-dropdown" onchange="onPrimaryModeChange()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 shadow-sm focus:border-blue-900">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR</option>
               <option value="Card Swipe">💳 Card Swipe</option>
-              <option value="Finance">🏦 Finance / EMI</option>
-              <option value="Dues">📝 Dues / Udhar (बकाया)</option>
               <option value="Cash + QR">💵 Cash + 📲 QR</option>
               <option value="Card Swipe + QR">💳 Card Swipe + 📲 QR</option>
               <option value="Card Swipe + Cash">💳 Card Swipe + 💵 Cash</option>
@@ -194,24 +192,36 @@
             </select>
           </div>
 
+          <!-- SECONDARY MODE DROPDOWN (ONLY FINANCE & DUES) -->
           <div>
-            <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
-              कुल जमा राशि (Total Amount Paid ₹) *
+            <label class="text-xs font-bold text-rose-700 block uppercase mb-1">
+              Secondary Mode (विशेष माध्यम)
             </label>
-            <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full p-2.5 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-sm shadow-sm" />
+            <select id="pay-secondary-dropdown" onchange="onSecondaryModeChange()" class="w-full p-2.5 bg-rose-50 border border-rose-300 rounded-lg text-xs font-bold text-rose-900 shadow-sm focus:border-rose-600">
+              <option value="">-- सामान्य मोड रखें (कोई नहीं) --</option>
+              <option value="Finance">🏦 Finance / EMI</option>
+              <option value="Dues">📝 Dues / Udhar (बकाया)</option>
+            </select>
           </div>
         </div>
 
-        <!-- FINANCE DETAILS (Appears when Finance is selected) -->
+        <div class="pt-1">
+          <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
+            कुल जमा राशि (Total Amount Paid ₹) *
+          </label>
+          <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full p-2.5 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-sm shadow-sm" />
+        </div>
+
+        <!-- FINANCE DETAILS (Appears when Secondary Mode is Finance) -->
         <div id="finance-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 hidden">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-black text-blue-950 uppercase">🏦 Finance Details (फाइनेंस की जानकारी)</h4>
-            <span class="text-[10px] text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded">Finance Mode Active</span>
+            <span class="text-[10px] text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded">Finance Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="text-[10px] font-bold text-slate-600 uppercase">Finance Company Name *</label>
-              <input type="text" id="fin-company" placeholder="उदा: Bajaj, TVS, HDB, Home Credit" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+              <input type="text" id="fin-company" placeholder="उदा: Bajaj, TVS, HDB" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
             </div>
             <div>
               <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment (DP ₹)</label>
@@ -224,7 +234,7 @@
           </div>
 
           <div>
-            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Payment Method)</label>
+            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Method)</label>
             <select id="fin-dp-mode" onchange="onFinDpModeChange()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR</option>
@@ -252,11 +262,11 @@
           </div>
         </div>
 
-        <!-- DUES DETAILS (Appears when Dues is selected) -->
+        <!-- DUES DETAILS (Appears when Secondary Mode is Dues) -->
         <div id="dues-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-rose-50/60 p-3.5 rounded-xl border border-rose-200 hidden">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-black text-rose-950 uppercase">📝 Dues / Udhar (बकाया विवरण)</h4>
-            <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded">Udhar Mode Active</span>
+            <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded">Udhar Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -293,7 +303,7 @@
           </div>
         </div>
 
-        <!-- REGULAR SPLIT PAYMENT INPUTS -->
+        <!-- REGULAR SPLIT PAYMENT INPUTS (For Primary Mode Splits) -->
         <div id="split-inputs-container" class="pt-2 border-t mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden">
           <div id="split-box-cash" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
@@ -531,7 +541,8 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("pay-paid").value = "";
 
-      document.getElementById("pay-mode-dropdown").value = "Cash";
+      document.getElementById("pay-primary-dropdown").value = "Cash";
+      document.getElementById("pay-secondary-dropdown").value = "";
       updatePaymentFields();
 
       const container = document.getElementById("items-container");
@@ -644,8 +655,27 @@
       imeiBox.appendChild(grid);
     }
 
+    function onPrimaryModeChange() {
+      // If primary mode changes, reset secondary mode dropdown
+      document.getElementById("pay-secondary-dropdown").value = "";
+      updatePaymentFields();
+    }
+
+    function onSecondaryModeChange() {
+      updatePaymentFields();
+    }
+
+    function getEffectivePaymentMode() {
+      const secVal = document.getElementById("pay-secondary-dropdown").value;
+      if (secVal) return secVal;
+      return document.getElementById("pay-primary-dropdown").value;
+    }
+
     function updatePaymentFields() {
-      const mode = document.getElementById("pay-mode-dropdown").value;
+      const secVal = document.getElementById("pay-secondary-dropdown").value;
+      const primVal = document.getElementById("pay-primary-dropdown").value;
+      const mode = secVal ? secVal : primVal;
+
       const splitBox = document.getElementById("split-inputs-container");
       const boxCash = document.getElementById("split-box-cash");
       const boxQr = document.getElementById("split-box-qr");
@@ -674,7 +704,7 @@
         paidInput.readOnly = false;
         paidInput.classList.remove("bg-slate-100");
       } else {
-        // Regular Split Modes
+        // Primary Split Modes
         splitBox.classList.remove("hidden");
         paidInput.readOnly = true;
         paidInput.classList.add("bg-slate-100");
@@ -779,9 +809,9 @@
       recalcTotals();
     }
 
-    // REGULAR SPLIT LOGIC
+    // PRIMARY SPLIT LOGIC
     function handleSplitInput() {
-      const mode = document.getElementById("pay-mode-dropdown").value;
+      const mode = document.getElementById("pay-primary-dropdown").value;
       let total = 0;
       let hasValue = false;
 
@@ -912,7 +942,7 @@
 
       if (imeiValidationError) return;
 
-      const effectiveMode = document.getElementById("pay-mode-dropdown").value;
+      const effectiveMode = getEffectivePaymentMode();
       let financeDetails = null;
       let duesDetails = null;
 
@@ -986,7 +1016,7 @@
             showPopup("success", "सफलतापूर्वक सेव हुआ!", [
               `✓ इनवॉइस: ${billPayload.invoiceNo}`,
               `✓ ग्राहक: ${name} (${address})`,
-              `✓ 1st Method: ${effectiveMode}`,
+              `✓ Mode: ${effectiveMode}`,
               `✓ कुल बिल: ₹${grand} (जमा: ₹${paid})`
             ], "इनवॉइस देखें", () => {
               closePopup();
