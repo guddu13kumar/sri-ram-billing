@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SRI RAM ENTERPRISES - Billing & Inventory</title>
+  <meta name="theme-color" content="#1e3a8a" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React 18 & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- jsPDF & html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- QRCode Generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #invoice-capture, #invoice-capture * { visibility: visible; }
+      #invoice-capture { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const DEFAULT_BUSINESS = {
+      name: "SRI RAM ENTERPRISES",
+      tagline: "Mobile • Accessories • Repairing",
+      address: "GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)",
+      phones: ["9334765000", "9334237111", "9335136000"],
+      gstin: "20APOPK6864K1ZH",
+      terms: "1. Goods once sold will not be taken back without original invoice.\n2. 1-year brand warranty for handsets covered at respective service centers.\n3. Physical & liquid damages not covered under warranty."
+    };
+
+    function App() {
+      const [view, setView] = useState("dashboard");
+      const [billType, setBillType] = useState("MOBILE");
+      const [business, setBusiness] = useState(() => {
+        const saved = localStorage.getItem("sre_business");
+        return saved ? JSON.parse(saved) : DEFAULT_BUSINESS;
+      });
+
+      const [gasUrl, setGasUrl] = useState(() => localStorage.getItem("sre_gas_url") || "");
+      const [bills, setBills] = useState(() => {
+        const saved = localStorage.getItem("sre_bills_cache");
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const [activeBill, setActiveBill] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [statusMsg, setStatusMsg] = useState("");
+
+      const [invoiceNo, setInvoiceNo] = useState("SRE-2026-00001");
+      const [billDate, setBillDate] = useState(new Date().toISOString().split("T")[0]);
+      const [taxTreatment, setTaxTreatment] = useState("INTRA_STATE");
+      
+      const [customer, setCustomer] = useState({
+        name: "", mobile: "", address: "", gstin: ""
+      });
+
+      const [items, setItems] = useState([
+        {
+          brand: "", productName: "", model: "", colour: "", ram: "", storage: "",
+          imei1: "", imei2: "", serialNumber: "", partName: "",
+          quantity: 1, rate: 0, discount: 0, gstRate: 18
+        }
+      ]);
+
+      const [repairDetails, setRepairDetails] = useState({
+        brand: "", model: "", imei: "", complaint: "", workDone: "", labourCharge: 0, gstRate: 18
+      });
+
+      const [payment, setPayment] = useState({
+        amountPaid: 0, mode: "Cash", reference: "", notes: ""
+      });
+
+      useEffect(() => {
+        generateLocalInvoiceNo();
+        if (gasUrl) {
+          fetchServerInvoiceNo();
+          syncBillsFromServer();
+        }
+      }, [gasUrl]);
+
+      const generateLocalInvoiceNo = () => {
+        const year = new Date().getFullYear();
+        const num = (bills.length + 1).toString().padStart(5, "0");
+        setInvoiceNo(`SRE-${year}-${num}`);
+      };
+
+      const fetchServerInvoiceNo = async () => {
+        try {
+          const res = await fetch(`${gasUrl}?action=getNextInvoiceNumber`);
+          const d = await res.json();
+          if (d.success) setInvoiceNo(d.invoiceNo);
+        } catch (e) {
+          console.warn("Using offline invoice counter");
+        }
+      };
+
+      const syncBillsFromServer = async () => {
+        try {
+          const res = await fetch(`${gasUrl}?action=getBills`);
+          const d = await res.json();
+          if (d.success) {
+            setBills(d.bills);
+            localStorage.setItem("sre_bills_cache", JSON.stringify(d.bills));
+          }
+        } catch (e) {
+          console.log("Offline mode: Reading from cache");
+        }
+      };
+
+      const addItem = () => {
+        setItems([...items, {
+          brand: "", productName: "", model: "", colour: "", ram: "", storage: "",
+          imei1: "", imei2: "", serialNumber: "", partName: "",
+          quantity: 1, rate: 0, discount: 0, gstRate: 18
+        }]);
+      };
+
+      const removeItem = (idx) => {
+        if (items.length === 1) return;
+        setItems(items.filter((_, i) => i !== idx));
+      };
+
+      const updateItem = (idx, field, val) => {
+        const copy = [...items];
+        copy[idx][field] = val;
+        setItems(copy);
+      };
+
+      const calculateTotals = () => {
+        let subtotal = 0;
+        let totalDiscount = 0;
+        let taxable = 0;
+        let totalGst = 0;
+
+        items.forEach(item => {
+          const q = Number(item.quantity) || 1;
+          const r = Number(item.rate) || 0;
+          const d = Number(item.discount) || 0;
+          const gRate = Number(item.gstRate) || 0;
+
+          const line = (q * r) - d;
+          const tax = line / (1 + (gRate / 100));
+          const gst = line - tax;
+
+          subtotal += (q * r);
+          totalDiscount += d;
+          taxable += tax;
+          totalGst += gst;
+        });
+
+        if (billType === "REPAIRING") {
+          const l = Number(repairDetails.labourCharge) || 0;
+          const lg = Number(repairDetails.gstRate) || 0;
+          const lTax = l / (1 + (lg / 100));
+          const lGst = l - lTax;
+
+          subtotal += l;
+          taxable += lTax;
+          totalGst += lGst;
+        }
+
+        const grand = Math.round(taxable + totalGst);
+        const paid = Math.min(Number(payment.amountPaid) || 0, grand);
+        const due = Math.max(0, grand - paid);
+
+        return {
+          subtotal: subtotal.toFixed(2),
+          totalDiscount: totalDiscount.toFixed(2),
+          taxable: taxable.toFixed(2),
+          cgst: (taxTreatment === "INTRA_STATE" ? totalGst / 2 : 0).toFixed(2),
+          sgst: (taxTreatment === "INTRA_STATE" ? totalGst / 2 : 0).toFixed(2),
+          igst: (taxTreatment === "INTER_STATE" ? totalGst : 0).toFixed(2),
+          grand,
+          paid,
+          due
+        };
+      };
+
+      const totals = calculateTotals();
+
+      const handleSaveBill = async () => {
+        if (!customer.name.trim()) return alert("कृपया Customer Name दर्ज करें।");
+        if (!/^[6-9]\d{9}$/.test(customer.mobile.trim())) {
+          return alert("कृपया वैध 10 अंकों का भारतीय मोबाइल नंबर दर्ज करें।");
+        }
+        if (items.some(i => (Number(i.rate) || 0) <= 0 && billType !== "REPAIRING")) {
+          return alert("कृपया सभी आइटम का सही Rate भरें।");
+        }
+
+        setLoading(true);
+        setStatusMsg("Generating Invoice & QR...");
+
+        const secureToken = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+        const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}`;
+
+        const billPayload = {
+          invoiceNo,
+          billType,
+          billDate,
+          taxTreatment,
+          customer,
+          items,
+          repairDetails,
+          payment: {
+            ...payment,
+            amountPaid: totals.paid,
+            dueAmount: totals.due
+          },
+          totals,
+          secureToken,
+          publicUrl,
+          frontendDomain: window.location.origin
+        };
+
+        const updatedBills = [billPayload, ...bills];
+        setBills(updatedBills);
+        localStorage.setItem("sre_bills_cache", JSON.stringify(updatedBills));
+
+        if (gasUrl) {
+          setStatusMsg("Syncing with Google Sheets & Drive...");
+          try {
+            const res = await fetch(gasUrl, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: JSON.stringify({ action: "createBill", billData: billPayload })
+            });
+            const d = await res.json();
+            if (d.success) {
+              billPayload.pdfUrl = d.pdfUrl;
+              billPayload.publicUrl = d.publicUrl;
+            }
+          } catch (e) {
+            console.warn("Drive sync queued offline");
+          }
+        }
+
+        setActiveBill(billPayload);
+        setLoading(false);
+        setView("after-save");
+      };
+
+      const resetForm = (type) => {
+        setBillType(type);
+        setCustomer({ name: "", mobile: "", address: "", gstin: "" });
+        setItems([{
+          brand: "", productName: "", model: "", colour: "", ram: "", storage: "",
+          imei1: "", imei2: "", serialNumber: "", partName: "",
+          quantity: 1, rate: 0, discount: 0, gstRate: 18
+        }]);
+        setRepairDetails({ brand: "", model: "", imei: "", complaint: "", workDone: "", labourCharge: 0, gstRate: 18 });
+        setPayment({ amountPaid: 0, mode: "Cash", reference: "", notes: "" });
+        generateLocalInvoiceNo();
+        if (gasUrl) fetchServerInvoiceNo();
+        setView("new-bill");
+      };
+
+      return (
+        <div className="min-h-screen pb-12 flex flex-col">
+          <header className="bg-blue-900 text-white shadow-md sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setView("dashboard")}>
+              <div className="bg-amber-400 text-blue-950 font-black p-1.5 rounded-lg text-sm tracking-wider">SRE</div>
+              <div>
+                <h1 className="font-bold text-base leading-tight tracking-wide">SRI RAM ENTERPRISES</h1>
+                <p className="text-xs text-blue-200">Sector-4, B.S. City • Billing PWA</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button onClick={() => setView("settings")} className="p-2 bg-blue-800 rounded-lg hover:bg-blue-700">
+                <i data-lucide="settings" className="w-5 h-5"></i>
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5">
+            {view === "dashboard" && (
+              <DashboardView 
+                bills={bills} 
+                onNewBill={resetForm} 
+                onViewBills={() => setView("all-bills")}
+                onViewDues={() => setView("dues")}
+                onViewReports={() => setView("reports")}
+                onSelectBill={(b) => { setActiveBill(b); setView("after-save"); }}
+              />
+            )}
+
+            {view === "new-bill" && (
+              <NewBillForm 
+                billType={billType}
+                setBillType={setBillType}
+                invoiceNo={invoiceNo}
+                billDate={billDate}
+                setBillDate={setBillDate}
+                taxTreatment={taxTreatment}
+                setTaxTreatment={setTaxTreatment}
+                customer={customer}
+                setCustomer={setCustomer}
+                items={items}
+                addItem={addItem}
+                removeItem={removeItem}
+                updateItem={updateItem}
+                repairDetails={repairDetails}
+                setRepairDetails={setRepairDetails}
+                payment={payment}
+                setPayment={setPayment}
+                totals={totals}
+                onSave={handleSaveBill}
+                loading={loading}
+                statusMsg={statusMsg}
+                onCancel={() => setView("dashboard")}
+              />
+            )}
+
+            {view === "after-save" && activeBill && (
+              <AfterSaveView 
+                bill={activeBill} 
+                business={business} 
+                onNewBill={() => setView("dashboard")} 
+              />
+            )}
+
+            {view === "all-bills" && (
+              <AllBillsView 
+                bills={bills} 
+                onSelectBill={(b) => { setActiveBill(b); setView("after-save"); }} 
+                onBack={() => setView("dashboard")} 
+              />
+            )}
+
+            {view === "dues" && (
+              <DuesView 
+                bills={bills} 
+                gasUrl={gasUrl} 
+                onRefresh={syncBillsFromServer} 
+                onBack={() => setView("dashboard")} 
+              />
+            )}
+
+            {view === "reports" && (
+              <ReportsView 
+                bills={bills} 
+                onBack={() => setView("dashboard")} 
+              />
+            )}
+
+            {view === "settings" && (
+              <SettingsView 
+                business={business} 
+                setBusiness={(b) => { setBusiness(b); localStorage.setItem("sre_business", JSON.stringify(b)); }}
+                gasUrl={gasUrl}
+                setGasUrl={(u) => { setGasUrl(u); localStorage.setItem("sre_gas_url", u); }}
+                onBack={() => setView("dashboard")} 
+              />
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    function DashboardView({ bills, onNewBill, onViewBills, onViewDues, onViewReports, onSelectBill }) {
+      useEffect(() => { lucide.createIcons(); }, []);
+
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayBills = bills.filter(b => b.billDate === todayStr);
+
+      const todaySales = todayBills.reduce((acc, b) => acc + (Number(b.totals?.grand || b.grandTotal) || 0), 0);
+      const todayCollection = todayBills.reduce((acc, b) => acc + (Number(b.totals?.paid || b.paid) || 0), 0);
+      const totalDue = bills.reduce((acc, b) => acc + (Number(b.totals?.due || b.due) || 0), 0);
+
+      return (
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Today's Bills</p>
+              <p className="text-2xl font-bold text-slate-800 mt-1">{todayBills.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Today's Sales</p>
+              <p className="text-2xl font-bold text-blue-900 mt-1">₹{todaySales.toLocaleString("en-IN")}</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Collection</p>
+              <p className="text-2xl font-bold text-emerald-600 mt-1">₹{todayCollection.toLocaleString("en-IN")}</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+              <p className="text-xs font-semibold text-slate-500 uppercase">Total Due</p>
+              <p className="text-2xl font-bold text-rose-600 mt-1">₹{totalDue.toLocaleString("en-IN")}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <button onClick={() => onNewBill("MOBILE")} className="flex flex-col items-center justify-center p-4 bg-blue-900 text-white rounded-xl shadow hover:bg-blue-800 transition active:scale-95">
+              <i data-lucide="smartphone" className="w-7 h-7 mb-1 text-amber-400"></i>
+              <span className="font-bold text-sm">Mobile Sale</span>
+            </button>
+            <button onClick={() => onNewBill("ACCESSORIES")} className="flex flex-col items-center justify-center p-4 bg-indigo-900 text-white rounded-xl shadow hover:bg-indigo-800 transition active:scale-95">
+              <i data-lucide="headphones" className="w-7 h-7 mb-1 text-amber-400"></i>
+              <span className="font-bold text-sm">Accessories</span>
+            </button>
+            <button onClick={() => onNewBill("REPAIRING")} className="flex flex-col items-center justify-center p-4 bg-slate-900 text-white rounded-xl shadow hover:bg-slate-800 transition active:scale-95">
+              <i data-lucide="wrench" className="w-7 h-7 mb-1 text-amber-400"></i>
+              <span className="font-bold text-sm">Repairing</span>
+            </button>
+          </div>
+
+          <div className="flex space-x-2 overflow-x-auto pb-1">
+            <button onClick={onViewBills} className="flex items-center space-x-1.5 px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">
+              <i data-lucide="receipt" className="w-4 h-4 text-blue-700"></i>
+              <span>All Invoices</span>
+            </button>
+            <button onClick={onViewDues} className="flex items-center space-x-1.5 px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">
+              <i data-lucide="alert-circle" className="w-4 h-4 text-rose-600"></i>
+              <span>Due Ledger</span>
+            </button>
+            <button onClick={onViewReports} className="flex items-center space-x-1.5 px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">
+              <i data-lucide="bar-chart-3" className="w-4 h-4 text-emerald-600"></i>
+              <span>Sales Reports</span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="font-bold text-slate-800">Recent Invoices</h2>
+              <button onClick={onViewBills} className="text-xs text-blue-700 font-semibold hover:underline">View All</button>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {bills.slice(0, 6).map((b, i) => (
+                <div key={i} onClick={() => onSelectBill(b)} className="p-3 sm:p-4 hover:bg-slate-50 cursor-pointer flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-blue-900 text-sm">{b.invoiceNo}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded font-bold uppercase bg-slate-100 text-slate-600">{b.billType}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-700 mt-0.5">{b.customer?.name || b.customerName}</p>
+                    <p className="text-xs text-slate-400">{b.billDate}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-slate-900">₹{(b.totals?.grand || b.grandTotal).toLocaleString("en-IN")}</p>
+                    {(Number(b.totals?.due || b.due) > 0) ? (
+                      <span className="text-xs text-rose-600 font-semibold">Due: ₹{(b.totals?.due || b.due)}</span>
+                    ) : (
+                      <span className="text-xs text-emerald-600 font-semibold">Paid</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {bills.length === 0 && (
+                <div className="p-8 text-center text-slate-400 text-sm">No bills generated yet. Tap a button above to start.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function NewBillForm({
+      billType, setBillType, invoiceNo, billDate, setBillDate,
+      taxTreatment, setTaxTreatment, customer, setCustomer,
+      items, addItem, removeItem, updateItem,
+      repairDetails, setRepairDetails, payment, setPayment,
+      totals, onSave, loading, statusMsg, onCancel
+    }) {
+      useEffect(() => { lucide.createIcons(); }, [items, billType]);
+
+      return (
+        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden space-y-6 p-4 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between border-b pb-4 gap-3">
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">TAX INVOICE ENTRY</span>
+              <h2 className="text-xl font-extrabold text-slate-800">{invoiceNo}</h2>
+            </div>
+            <div className="flex bg-slate-100 p-1 rounded-lg">
+              {["MOBILE", "ACCESSORIES", "REPAIRING"].map(t => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setBillType(t)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${billType === t ? "bg-blue-900 text-white shadow" : "text-slate-600 hover:text-slate-900"}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-slate-600">Bill Date</label>
+              <input 
+                type="date" 
+                value={billDate} 
+                onChange={(e) => setBillDate(e.target.value)} 
+                className="w-full mt-1 p-2 border rounded-lg text-sm bg-slate-50 focus:bg-white"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-600">GST Region / Tax Treatment</label>
+              <select 
+                value={taxTreatment} 
+                onChange={(e) => setTaxTreatment(e.target.value)} 
+                className="w-full mt-1 p-2 border rounded-lg text-sm bg-slate-50 focus:bg-white"
+              >
+                <option value="INTRA_STATE">Intra-State (CGST + SGST) - Jharkhand</option>
+                <option value="INTER_STATE">Inter-State (IGST) - Outside State</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <h3 className="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="user" className="w-4 h-4 text-blue-800"></i>
+              <span>Customer Details</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input 
+                type="text" 
+                placeholder="Customer Name *" 
+                value={customer.name}
+                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm focus:ring-2 focus:ring-blue-800 outline-none"
+              />
+              <input 
+                type="tel" 
+                maxLength="10"
+                placeholder="Mobile Number (10 digits) *" 
+                value={customer.mobile}
+                onChange={(e) => setCustomer({ ...customer, mobile: e.target.value.replace(/\D/g, "") })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm focus:ring-2 focus:ring-blue-800 outline-none"
+              />
+              <input 
+                type="text" 
+                placeholder="Full Address / City" 
+                value={customer.address}
+                onChange={(e) => setCustomer({ ...customer, address: e.target.value })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm focus:ring-2 focus:ring-blue-800 outline-none"
+              />
+              <input 
+                type="text" 
+                placeholder="Customer GSTIN (Optional)" 
+                value={customer.gstin}
+                onChange={(e) => setCustomer({ ...customer, gstin: e.target.value.toUpperCase() })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm focus:ring-2 focus:ring-blue-800 outline-none"
+              />
+            </div>
+          </div>
+
+          {billType === "REPAIRING" && (
+            <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3">
+              <h3 className="font-bold text-sm text-amber-900 flex items-center space-x-1.5">
+                <i data-lucide="wrench" className="w-4 h-4 text-amber-700"></i>
+                <span>Device & Repair Specs</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input 
+                  type="text" placeholder="Device Brand (Vivo, Samsung)" 
+                  value={repairDetails.brand}
+                  onChange={(e) => setRepairDetails({ ...repairDetails, brand: e.target.value })}
+                  className="p-2.5 bg-white border rounded-lg text-sm"
+                />
+                <input 
+                  type="text" placeholder="Device Model (Y20, Note 12)" 
+                  value={repairDetails.model}
+                  onChange={(e) => setRepairDetails({ ...repairDetails, model: e.target.value })}
+                  className="p-2.5 bg-white border rounded-lg text-sm"
+                />
+                <input 
+                  type="text" placeholder="Device IMEI / Serial No." 
+                  value={repairDetails.imei}
+                  onChange={(e) => setRepairDetails({ ...repairDetails, imei: e.target.value })}
+                  className="p-2.5 bg-white border rounded-lg text-sm"
+                />
+              </div>
+              <textarea 
+                rows="2" placeholder="Complaint / Customer Problem..."
+                value={repairDetails.complaint}
+                onChange={(e) => setRepairDetails({ ...repairDetails, complaint: e.target.value })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm"
+              />
+              <textarea 
+                rows="2" placeholder="Repairing Work Performed..."
+                value={repairDetails.workDone}
+                onChange={(e) => setRepairDetails({ ...repairDetails, workDone: e.target.value })}
+                className="w-full p-2.5 bg-white border rounded-lg text-sm"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Labour Charge (₹)</label>
+                  <input 
+                    type="number" 
+                    value={repairDetails.labourCharge}
+                    onChange={(e) => setRepairDetails({ ...repairDetails, labourCharge: Number(e.target.value) })}
+                    className="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Labour GST %</label>
+                  <select 
+                    value={repairDetails.gstRate}
+                    onChange={(e) => setRepairDetails({ ...repairDetails, gstRate: Number(e.target.value) })}
+                    className="w-full mt-1 p-2 bg-white border rounded-lg text-sm"
+                  >
+                    {[0, 5, 12, 18, 28].map(r => <option key={r} value={r}>{r}%</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-sm text-slate-800">
+                {billType === "REPAIRING" ? "Spare Parts Used" : "Products / Handsets"}
+              </h3>
+              <button 
+                type="button" 
+                onClick={addItem} 
+                className="flex items-center space-x-1 text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100"
+              >
+                <i data-lucide="plus" className="w-3.5 h-3.5"></i>
+                <span>Add Item</span>
+              </button>
+            </div>
+
+            {items.map((item, idx) => (
+              <div key={idx} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 relative space-y-3">
+                {items.length > 1 && (
+                  <button 
+                    type="button" 
+                    onClick={() => removeItem(idx)} 
+                    className="absolute top-2 right-2 p-1 text-rose-500 hover:bg-rose-50 rounded"
+                  >
+                    <i data-lucide="trash-2" className="w-4 h-4"></i>
+                  </button>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <input 
+                    type="text" placeholder="Brand (e.g. Samsung)" 
+                    value={item.brand} 
+                    onChange={(e) => updateItem(idx, "brand", e.target.value)}
+                    className="p-2 bg-white border rounded text-xs"
+                  />
+                  <input 
+                    type="text" placeholder={billType === "REPAIRING" ? "Part Name (Display, Battery)" : "Model Name (Galaxy A56)"}
+                    value={billType === "REPAIRING" ? item.partName : item.productName} 
+                    onChange={(e) => updateItem(idx, billType === "REPAIRING" ? "partName" : "productName", e.target.value)}
+                    className="p-2 bg-white border rounded text-xs"
+                  />
+                  {billType === "MOBILE" && (
+                    <input 
+                      type="text" placeholder="Colour" 
+                      value={item.colour} 
+                      onChange={(e) => updateItem(idx, "colour", e.target.value)}
+                      className="p-2 bg-white border rounded text-xs"
+                    />
+                  )}
+                </div>
+
+                {billType === "MOBILE" && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <input 
+                      type="text" placeholder="RAM (e.g. 8GB)" 
+                      value={item.ram} 
+                      onChange={(e) => updateItem(idx, "ram", e.target.value)}
+                      className="p-2 bg-white border rounded text-xs"
+                    />
+                    <input 
+                      type="text" placeholder="Storage (e.g. 128GB)" 
+                      value={item.storage} 
+                      onChange={(e) => updateItem(idx, "storage", e.target.value)}
+                      className="p-2 bg-white border rounded text-xs"
+                    />
+                    <input 
+                      type="text" placeholder="IMEI 1 (15 digits)" 
+                      value={item.imei1} 
+                      onChange={(e) => updateItem(idx, "imei1", e.target.value)}
+                      className="p-2 bg-white border rounded text-xs"
+                    />
+                    <input 
+                      type="text" placeholder="IMEI 2 (Optional)" 
+                      value={item.imei2} 
+                      onChange={(e) => updateItem(idx, "imei2", e.target.value)}
+                      className="p-2 bg-white border rounded text-xs"
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-center">
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Qty</label>
+                    <input 
+                      type="number" min="1" 
+                      value={item.quantity} 
+                      onChange={(e) => updateItem(idx, "quantity", Number(e.target.value))}
+                      className="w-full p-2 bg-white border rounded text-xs font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Rate (₹)</label>
+                    <input 
+                      type="number" 
+                      value={item.rate} 
+                      onChange={(e) => updateItem(idx, "rate", Number(e.target.value))}
+                      className="w-full p-2 bg-white border rounded text-xs font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Discount (₹)</label>
+                    <input 
+                      type="number" 
+                      value={item.discount} 
+                      onChange={(e) => updateItem(idx, "discount", Number(e.target.value))}
+                      className="w-full p-2 bg-white border rounded text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">GST %</label>
+                    <select 
+                      value={item.gstRate} 
+                      onChange={(e) => updateItem(idx, "gstRate", Number(e.target.value))}
+                      className="w-full p-2 bg-white border rounded text-xs"
+                    >
+                      {[0, 5, 12, 18, 28].map(r => <option key={r} value={r}>{r}%</option>)}
+                    </select>
+                  </div>
+                  <div className="col-span-2 sm:col-span-1 text-right">
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Net Total</label>
+                    <div className="font-extrabold text-sm text-slate-800">
+                      ₹{((item.quantity * item.rate) - (item.discount || 0)).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <h3 className="font-bold text-sm text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="credit-card" className="w-4 h-4 text-emerald-700"></i>
+              <span>Payment Breakdown</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-bold text-slate-600">Payment Mode</label>
+                <select 
+                  value={payment.mode} 
+                  onChange={(e) => setPayment({ ...payment, mode: e.target.value })}
+                  className="w-full mt-1 p-2 bg-white border rounded-lg text-sm"
+                >
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI / QR</option>
+                  <option value="Card">Debit / Credit Card</option>
+                  <option value="Finance">Bajaj / TVS / Finance</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600">Amount Paid (₹)</label>
+                <input 
+                  type="number" 
+                  value={payment.amountPaid} 
+                  onChange={(e) => setPayment({ ...payment, amountPaid: Number(e.target.value) })}
+                  className="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold text-emerald-700"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600">Reference / Txn ID</label>
+                <input 
+                  type="text" 
+                  placeholder="UPI Ref / Last 4 digits"
+                  value={payment.reference} 
+                  onChange={(e) => setPayment({ ...payment, reference: e.target.value })}
+                  className="w-full mt-1 p-2 bg-white border rounded-lg text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-900 text-white p-4 rounded-xl space-y-2">
+            <div className="flex justify-between text-xs text-blue-200">
+              <span>Subtotal: ₹{totals.subtotal}</span>
+              <span>Taxable: ₹{totals.taxable}</span>
+              <span>CGST: ₹{totals.cgst}</span>
+              <span>SGST: ₹{totals.sgst}</span>
+            </div>
+            <div className="border-t border-blue-800 pt-2 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-blue-300">Total Invoice Amount</p>
+                <p className="text-2xl font-black text-amber-400">₹{totals.grand.toLocaleString("en-IN")}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-blue-300">Balance Due</p>
+                <p className={`text-lg font-bold ${totals.due > 0 ? "text-rose-400" : "text-emerald-400"}`}>
+                  ₹{totals.due.toLocaleString("en-IN")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex space-x-3 pt-2">
+            <button 
+              type="button" 
+              onClick={onCancel}
+              className="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition"
+            >
+              Cancel
+            </button>
+            <button 
+              type="button" 
+              onClick={onSave}
+              disabled={loading}
+              className="flex-[2] py-3 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 shadow-lg transition active:scale-95 flex items-center justify-center space-x-2"
+            >
+              {loading ? (
+                <span>{statusMsg || "Processing..."}</span>
+              ) : (
+                <>
+                  <i data-lucide="check-circle" className="w-5 h-5"></i>
+                  <span>SAVE & GENERATE BILL</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function AfterSaveView({ bill, business, onNewBill }) {
+      const invoiceRef = useRef(null);
+      const qrRef = useRef(null);
+      const [qrGenerated, setQrGenerated] = useState(false);
+
+      useEffect(() => {
+        lucide.createIcons();
+        if (qrRef.current && !qrGenerated) {
+          qrRef.current.innerHTML = "";
+          new QRCode(qrRef.current, {
+            text: bill.publicUrl || `https://sre-bills.web.app/bill/${bill.secureToken}`,
+            width: 90,
+            height: 90,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          setQrGenerated(true);
+        }
+      }, [bill, qrGenerated]);
+
+      const downloadPDF = async () => {
+        const element = invoiceRef.current;
+        const opt = { scale: 2, useCORS: true };
+        const canvas = await html2canvas(element, opt);
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`SRE-Invoice-${bill.invoiceNo}.pdf`);
+      };
+
+      const shareWhatsApp = () => {
+        const rawPhone = bill.customer?.mobile || bill.mobile;
+        const phone = rawPhone.startsWith("91") ? rawPhone : `91${rawPhone}`;
+        const msg = encodeURIComponent(
+          `Hello ${bill.customer?.name || bill.customerName} 👋\n\n` +
+          `Thank you for shopping with Sri Ram Enterprises.\n\n` +
+          `Your bill details:\n` +
+          `Invoice No: ${bill.invoiceNo}\n` +
+          `Total Amount: ₹${bill.totals?.grand || bill.grandTotal}\n` +
+          `Paid: ₹${bill.totals?.paid || bill.paid}\n` +
+          `Due: ₹${bill.totals?.due || bill.due}\n\n` +
+          `View / Download your bill online:\n${bill.publicUrl}\n\n` +
+          `Thank you for your business. 🙏`
+        );
+        window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+      };
+
+      const copyLink = () => {
+        navigator.clipboard.writeText(bill.publicUrl);
+        alert("Public Bill Link copied to clipboard!");
+      };
+
+      return (
+        <div className="space-y-6">
+          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold">✓</div>
+              <div>
+                <h3 className="font-extrabold text-emerald-900">BILL SAVED SUCCESSFULLY</h3>
+                <p className="text-xs text-emerald-700">Invoice: {bill.invoiceNo} • {bill.customer?.name || bill.customerName}</p>
+              </div>
+            </div>
+            <button onClick={onNewBill} className="px-3 py-1.5 bg-blue-900 text-white text-xs font-bold rounded-lg hover:bg-blue-800">
+              + New Bill
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onClick={downloadPDF} className="p-3 bg-white border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-slate-50 shadow-sm">
+              <i data-lucide="download" className="w-4 h-4 text-blue-800"></i>
+              <span>DOWNLOAD PDF</span>
+            </button>
+            <button onClick={shareWhatsApp} className="p-3 bg-emerald-600 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-emerald-500 shadow-sm">
+              <i data-lucide="message-circle" className="w-4 h-4"></i>
+              <span>WHATSAPP BILL</span>
+            </button>
+            <button onClick={() => window.print()} className="p-3 bg-white border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-slate-50 shadow-sm">
+              <i data-lucide="printer" className="w-4 h-4 text-slate-700"></i>
+              <span>PRINT INVOICE</span>
+            </button>
+            <button onClick={copyLink} className="p-3 bg-white border border-slate-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-slate-50 shadow-sm">
+              <i data-lucide="copy" className="w-4 h-4 text-slate-700"></i>
+              <span>COPY BILL LINK</span>
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <div id="invoice-capture" ref={invoiceRef} className="w-full max-w-[800px] mx-auto bg-white p-6 sm:p-8 border border-slate-300 shadow-lg text-slate-800 text-xs">
+              <div className="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
+                <div>
+                  <h1 className="text-2xl font-black tracking-tight text-blue-950">{business.name}</h1>
+                  <p className="font-bold text-slate-600 text-xs tracking-wide uppercase mt-0.5">{business.tagline}</p>
+                  <p className="text-[11px] text-slate-600 mt-1 max-w-sm">{business.address}</p>
+                  <p className="text-[11px] text-slate-600 font-semibold">Phone: {business.phones.join(", ")}</p>
+                  <p className="text-[11px] font-bold text-blue-900 mt-0.5">GSTIN: {business.gstin}</p>
+                </div>
+                <div className="text-right">
+                  <div className="bg-slate-900 text-white font-black px-3 py-1 text-sm tracking-widest inline-block uppercase">TAX INVOICE</div>
+                  <p className="font-extrabold text-sm text-slate-900 mt-2">No: {bill.invoiceNo}</p>
+                  <p className="text-slate-600 text-[11px]">Date: {bill.billDate}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 py-3 border-b border-slate-200">
+                <div>
+                  <p className="font-bold text-slate-400 uppercase text-[10px]">BILLED TO:</p>
+                  <p className="font-bold text-sm text-slate-900">{bill.customer?.name || bill.customerName}</p>
+                  <p className="text-slate-600">Mobile: {bill.customer?.mobile || bill.mobile}</p>
+                  {bill.customer?.address && <p className="text-slate-600">Address: {bill.customer.address}</p>}
+                  {bill.customer?.gstin && <p className="font-semibold text-slate-700">GSTIN: {bill.customer.gstin}</p>}
+                </div>
+                <div className="text-right space-y-1">
+                  <p className="font-bold text-slate-400 uppercase text-[10px]">INVOICE DETAILS:</p>
+                  <p className="text-slate-700"><span className="font-semibold">Type:</span> {bill.billType}</p>
+                  <p className="text-slate-700"><span className="font-semibold">Payment Mode:</span> {bill.payment?.mode || bill.paymentMode}</p>
+                  {bill.payment?.reference && <p className="text-slate-700"><span className="font-semibold">Ref:</span> {bill.payment.reference}</p>}
+                </div>
+              </div>
+
+              {bill.billType === "REPAIRING" && bill.repairDetails && (
+                <div className="py-2.5 bg-slate-50 border-b border-slate-200 px-2 space-y-1 my-2">
+                  <p className="font-bold text-slate-800">Device: {bill.repairDetails.brand} {bill.repairDetails.model} (IMEI/SN: {bill.repairDetails.imei || "N/A"})</p>
+                  <p className="text-slate-600"><span className="font-semibold">Reported Issue:</span> {bill.repairDetails.complaint}</p>
+                  <p className="text-slate-600"><span className="font-semibold">Work Carried Out:</span> {bill.repairDetails.workDone}</p>
+                </div>
+              )}
+
+              <table className="w-full my-4 border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 border-y border-slate-300 text-[10px] uppercase font-bold text-slate-700">
+                    <th className="p-2 text-left">#</th>
+                    <th className="p-2 text-left">Description</th>
+                    <th className="p-2 text-left">Identifiers (IMEI/Serial)</th>
+                    <th className="p-2 text-center">Qty</th>
+                    <th className="p-2 text-right">Rate</th>
+                    <th className="p-2 text-right">Disc</th>
+                    <th className="p-2 text-right">GST</th>
+                    <th className="p-2 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {bill.items?.map((item, idx) => (
+                    <tr key={idx} className="align-top">
+                      <td className="p-2 font-semibold text-slate-500">{idx + 1}</td>
+                      <td className="p-2">
+                        <p className="font-bold text-slate-900">{item.brand} {item.productName || item.partName || item.model}</p>
+                        {(item.ram || item.storage || item.colour) && (
+                          <p className="text-[10px] text-slate-500">{[item.colour, item.ram, item.storage].filter(Boolean).join(" • ")}</p>
+                        )}
+                      </td>
+                      <td className="p-2 font-mono text-[10px] text-slate-600">
+                        {item.imei1 && <div>IMEI 1: {item.imei1}</div>}
+                        {item.imei2 && <div>IMEI 2: {item.imei2}</div>}
+                        {item.serialNumber && <div>SN: {item.serialNumber}</div>}
+                        {!item.imei1 && !item.serialNumber && "-"}
+                      </td>
+                      <td className="p-2 text-center font-semibold">{item.quantity || 1}</td>
+                      <td className="p-2 text-right">₹{item.rate}</td>
+                      <td className="p-2 text-right">₹{item.discount || 0}</td>
+                      <td className="p-2 text-right">{item.gstRate}%</td>
+                      <td className="p-2 text-right font-bold">
+                        ₹{((item.quantity * item.rate) - (item.discount || 0)).toLocaleString("en-IN")}
+                      </td>
+                    </tr>
+                  ))}
+                  {bill.billType === "REPAIRING" && Number(bill.repairDetails?.labourCharge) > 0 && (
+                    <tr className="align-top">
+                      <td className="p-2 font-semibold text-slate-500">{(bill.items?.length || 0) + 1}</td>
+                      <td className="p-2 font-bold text-slate-900" colSpan="2">Repair Labour & Service Charge</td>
+                      <td className="p-2 text-center font-semibold">1</td>
+                      <td className="p-2 text-right">₹{bill.repairDetails.labourCharge}</td>
+                      <td className="p-2 text-right">₹0</td>
+                      <td className="p-2 text-right">{bill.repairDetails.gstRate}%</td>
+                      <td className="p-2 text-right font-bold">₹{bill.repairDetails.labourCharge}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+
+              <div className="grid grid-cols-2 gap-4 border-t border-slate-300 pt-3">
+                <div className="flex space-x-3 items-center">
+                  <div ref={qrRef} className="p-1 border bg-white"></div>
+                  <div>
+                    <p className="font-extrabold text-[11px] text-slate-800 uppercase">SCAN TO VERIFY</p>
+                    <p className="text-[10px] text-slate-500 leading-tight mt-0.5">Scan with camera to open or download original digital invoice.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-right">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Subtotal:</span>
+                    <span className="font-semibold">₹{bill.totals?.subtotal || bill.subtotal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Taxable Value:</span>
+                    <span className="font-semibold">₹{bill.totals?.taxable || bill.taxableAmount}</span>
+                  </div>
+                  {Number(bill.totals?.cgst || bill.cgst) > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">CGST:</span>
+                      <span>₹{bill.totals?.cgst || bill.cgst}</span>
+                    </div>
+                  )}
+                  {Number(bill.totals?.sgst || bill.sgst) > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">SGST:</span>
+                      <span>₹{bill.totals?.sgst || bill.sgst}</span>
+                    </div>
+                  )}
+                  {Number(bill.totals?.igst || bill.igst) > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">IGST:</span>
+                      <span>₹{bill.totals?.igst || bill.igst}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t border-slate-800 pt-1 text-sm font-black text-slate-900">
+                    <span>Grand Total:</span>
+                    <span>₹{(bill.totals?.grand || bill.grandTotal).toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between text-emerald-700 font-bold">
+                    <span>Amount Paid:</span>
+                    <span>₹{(bill.totals?.paid || bill.paid).toLocaleString("en-IN")}</span>
+                  </div>
+                  {Number(bill.totals?.due || bill.due) > 0 && (
+                    <div className="flex justify-between text-rose-600 font-extrabold">
+                      <span>Balance Due:</span>
+                      <span>₹{(bill.totals?.due || bill.due).toLocaleString("en-IN")}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4 items-end">
+                <div>
+                  <p className="font-bold text-[10px] text-slate-500 uppercase">Terms & Conditions:</p>
+                  <p className="text-[9px] text-slate-500 whitespace-pre-line mt-1">{business.terms}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-xs text-slate-900">For SRI RAM ENTERPRISES</p>
+                  <div className="h-12"></div>
+                  <p className="text-[10px] font-semibold text-slate-600">Authorised Signatory</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function AllBillsView({ bills, onSelectBill, onBack }) {
+      const [search, setSearch] = useState("");
+      const [filterType, setFilterType] = useState("ALL");
+
+      const filtered = bills.filter(b => {
+        const matchesSearch = 
+          (b.invoiceNo?.toLowerCase() || "").includes(search.toLowerCase()) ||
+          (b.customerName?.toLowerCase() || b.customer?.name?.toLowerCase() || "").includes(search.toLowerCase()) ||
+          (b.mobile || b.customer?.mobile || "").includes(search);
+
+        const matchesType = filterType === "ALL" || b.billType === filterType;
+        return matchesSearch && matchesType;
+      });
+
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button onClick={onBack} className="text-xs font-bold text-blue-900 flex items-center space-x-1">
+              <i data-lucide="arrow-left" className="w-4 h-4"></i>
+              <span>Dashboard</span>
+            </button>
+            <h2 className="font-bold text-lg text-slate-800">All Registered Invoices</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input 
+              type="text" 
+              placeholder="Search by Invoice, Customer or Mobile..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="sm:col-span-2 p-2.5 bg-white border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-900"
+            />
+            <select 
+              value={filterType} 
+              onChange={(e) => setFilterType(e.target.value)}
+              className="p-2.5 bg-white border rounded-xl text-sm"
+            >
+              <option value="ALL">All Categories</option>
+              <option value="MOBILE">Mobile Sales</option>
+              <option value="ACCESSORIES">Accessories</option>
+              <option value="REPAIRING">Repairing</option>
+            </select>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+            {filtered.map((b, i) => (
+              <div key={i} onClick={() => onSelectBill(b)} className="p-4 hover:bg-slate-50 cursor-pointer flex justify-between items-center">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-blue-900">{b.invoiceNo}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">{b.billType}</span>
+                  </div>
+                  <p className="font-semibold text-slate-800 text-sm mt-0.5">{b.customer?.name || b.customerName} ({b.customer?.mobile || b.mobile})</p>
+                  <p className="text-xs text-slate-400">{b.billDate}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-black text-slate-900">₹{(b.totals?.grand || b.grandTotal).toLocaleString("en-IN")}</p>
+                  {(Number(b.totals?.due || b.due) > 0) ? (
+                    <span className="text-xs text-rose-600 font-bold">Due: ₹{b.totals?.due || b.due}</span>
+                  ) : (
+                    <span className="text-xs text-emerald-600 font-bold">Fully Paid</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div className="p-8 text-center text-slate-400 text-sm">No matching invoices found.</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function DuesView({ bills, gasUrl, onRefresh, onBack }) {
+      const [selectedBill, setSelectedBill] = useState(null);
+      const [payAmount, setPayAmount] = useState("");
+      const [payMode, setPayMode] = useState("Cash");
+      const [loading, setLoading] = useState(false);
+
+      const dueBills = bills.filter(b => Number(b.totals?.due || b.due) > 0);
+
+      const handleClearDue = async () => {
+        if (!payAmount || Number(payAmount) <= 0) return alert("कृपया सही राशि दर्ज करें।");
+        setLoading(true);
+
+        if (gasUrl) {
+          try {
+            await fetch(gasUrl, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: JSON.stringify({
+                action: "savePayment",
+                paymentData: {
+                  invoiceNo: selectedBill.invoiceNo,
+                  customerName: selectedBill.customer?.name || selectedBill.customerName,
+                  amount: Number(payAmount),
+                  paymentMode: payMode,
+                  paymentDate: new Date().toISOString().split("T")[0]
+                }
+              })
+            });
+            onRefresh();
+          } catch (e) {
+            alert("Error syncing to server");
+          }
+        } else {
+          selectedBill.paid = Number(selectedBill.paid || selectedBill.totals?.paid) + Number(payAmount);
+          selectedBill.due = Math.max(0, Number(selectedBill.due || selectedBill.totals?.due) - Number(payAmount));
+        }
+
+        setLoading(false);
+        setSelectedBill(null);
+        setPayAmount("");
+        alert("Payment Recorded Successfully!");
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button onClick={onBack} className="text-xs font-bold text-blue-900 flex items-center space-x-1">
+              <i data-lucide="arrow-left" className="w-4 h-4"></i>
+              <span>Dashboard</span>
+            </button>
+            <h2 className="font-bold text-lg text-slate-800">Customer Due Balance Ledger</h2>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+            {dueBills.map((b, i) => (
+              <div key={i} className="p-4 flex justify-between items-center">
+                <div>
+                  <p className="font-bold text-blue-900 text-sm">{b.invoiceNo}</p>
+                  <p className="font-bold text-slate-800 text-sm mt-0.5">{b.customer?.name || b.customerName}</p>
+                  <p className="text-xs text-slate-500">Mobile: {b.customer?.mobile || b.mobile}</p>
+                </div>
+                <div className="text-right space-y-1">
+                  <p className="font-extrabold text-rose-600">Due: ₹{b.totals?.due || b.due}</p>
+                  <button 
+                    onClick={() => { setSelectedBill(b); setPayAmount(b.totals?.due || b.due); }}
+                    className="px-3 py-1 bg-emerald-600 text-white font-bold text-xs rounded-lg hover:bg-emerald-500"
+                  >
+                    Clear Due
+                  </button>
+                </div>
+              </div>
+            ))}
+            {dueBills.length === 0 && (
+              <div className="p-8 text-center text-slate-400 text-sm">No pending dues. All bills are fully paid!</div>
+            )}
+          </div>
+
+          {selectedBill && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-white max-w-sm w-full p-5 rounded-2xl shadow-xl space-y-4">
+                <h3 className="font-bold text-base text-slate-800">Clear Due: {selectedBill.invoiceNo}</h3>
+                <p className="text-xs text-slate-500">{selectedBill.customer?.name || selectedBill.customerName}</p>
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Payment Amount (₹)</label>
+                  <input 
+                    type="number" 
+                    value={payAmount} 
+                    onChange={(e) => setPayAmount(e.target.value)}
+                    className="w-full mt-1 p-2.5 border rounded-lg font-bold text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Payment Mode</label>
+                  <select 
+                    value={payMode} 
+                    onChange={(e) => setPayMode(e.target.value)}
+                    className="w-full mt-1 p-2 border rounded-lg text-sm"
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                  </select>
+                </div>
+                <div className="flex space-x-2 pt-2">
+                  <button onClick={() => setSelectedBill(null)} className="flex-1 py-2 bg-slate-200 font-bold text-xs rounded-lg">Cancel</button>
+                  <button onClick={handleClearDue} disabled={loading} className="flex-1 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg">
+                    {loading ? "Saving..." : "Confirm Payment"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ReportsView({ bills, onBack }) {
+      const [filter, setFilter] = useState("THIS_MONTH");
+
+      const today = new Date();
+      const currentMonthStr = today.toISOString().substring(0, 7);
+
+      const filtered = bills.filter(b => {
+        if (filter === "TODAY") return b.billDate === today.toISOString().split("T")[0];
+        if (filter === "THIS_MONTH") return (b.billDate || "").startsWith(currentMonthStr);
+        return true;
+      });
+
+      const totalSales = filtered.reduce((acc, b) => acc + (Number(b.totals?.grand || b.grandTotal) || 0), 0);
+      const totalCollected = filtered.reduce((acc, b) => acc + (Number(b.totals?.paid || b.paid) || 0), 0);
+      const totalDue = filtered.reduce((acc, b) => acc + (Number(b.totals?.due || b.due) || 0), 0);
+
+      const exportCSV = () => {
+        let csv = "Invoice No,Date,Customer,Mobile,Type,Total,Paid,Due\n";
+        filtered.forEach(b => {
+          csv += `"${b.invoiceNo}","${b.billDate}","${b.customer?.name || b.customerName}","${b.customer?.mobile || b.mobile}","${b.billType}",${b.totals?.grand || b.grandTotal},${b.totals?.paid || b.paid},${b.totals?.due || b.due}\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `SRE-Sales-Report-${filter}.csv`;
+        a.click();
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button onClick={onBack} className="text-xs font-bold text-blue-900 flex items-center space-x-1">
+              <i data-lucide="arrow-left" className="w-4 h-4"></i>
+              <span>Dashboard</span>
+            </button>
+            <h2 className="font-bold text-lg text-slate-800">Sales Reports</h2>
+          </div>
+
+          <div className="flex justify-between items-center bg-white p-3 rounded-xl border">
+            <div className="flex space-x-1">
+              {["TODAY", "THIS_MONTH", "ALL"].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filter === f ? "bg-blue-900 text-white" : "bg-slate-100 text-slate-600"}`}
+                >
+                  {f.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+            <button onClick={exportCSV} className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center space-x-1">
+              <i data-lucide="download" className="w-3.5 h-3.5"></i>
+              <span>Export CSV</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white p-4 rounded-xl border">
+              <p className="text-xs text-slate-500 font-bold uppercase">Total Turnover</p>
+              <p className="text-xl font-black text-blue-900 mt-1">₹{totalSales.toLocaleString("en-IN")}</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl border">
+              <p className="text-xs text-slate-500 font-bold uppercase">Cash Collected</p>
+              <p className="text-xl font-black text-emerald-600 mt-1">₹{totalCollected.toLocaleString("en-IN")}</p>
+            </div>
+            <div className="bg-white p-4 rounded-xl border">
+              <p className="text-xs text-slate-500 font-bold uppercase">Total Due</p>
+              <p className="text-xl font-black text-rose-600 mt-1">₹{totalDue.toLocaleString("en-IN")}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function SettingsView({ business, setBusiness, gasUrl, setGasUrl, onBack }) {
+      const [form, setForm] = useState({ ...business });
+      const [url, setUrl] = useState(gasUrl);
+
+      const save = () => {
+        setBusiness(form);
+        setGasUrl(url);
+        alert("Settings Saved Successfully!");
+        onBack();
+      };
+
+      return (
+        <div className="space-y-4 max-w-xl mx-auto bg-white p-5 rounded-2xl border border-slate-200">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h2 className="font-bold text-lg text-slate-800">Business & Cloud Settings</h2>
+            <button onClick={onBack} className="text-xs font-bold text-slate-500">Back</button>
+          </div>
+
+          <div className="space-y-3 text-xs font-bold text-slate-600">
+            <div>
+              <label>Business Name</label>
+              <input 
+                type="text" value={form.name} 
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full mt-1 p-2 bg-slate-50 border rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label>Address</label>
+              <input 
+                type="text" value={form.address} 
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                className="w-full mt-1 p-2 bg-slate-50 border rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label>GSTIN</label>
+              <input 
+                type="text" value={form.gstin} 
+                onChange={(e) => setForm({ ...form, gstin: e.target.value })}
+                className="w-full mt-1 p-2 bg-slate-50 border rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label>Google Apps Script Web App URL (Cloud Backend)</label>
+              <input 
+                type="text" 
+                placeholder="https://script.google.com/macros/s/.../exec"
+                value={url} 
+                onChange={(e) => setUrl(e.target.value)}
+                className="w-full mt-1 p-2 bg-slate-50 border rounded-lg text-sm font-mono"
+              />
+            </div>
+          </div>
+
+          <button onClick={save} className="w-full py-3 bg-blue-900 text-white font-bold rounded-xl text-sm hover:bg-blue-800">
+            SAVE SETTINGS
+          </button>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
