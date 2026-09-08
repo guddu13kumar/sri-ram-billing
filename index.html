@@ -173,39 +173,40 @@
         </div>
       </div>
 
-      <!-- PAYMENT SECTION (BUTTONS FOR FINANCE & DUES + DROPDOWN FOR OTHERS) -->
+      <!-- PAYMENT SECTION (1ST METHOD - SINGLE ROW LAYOUT) -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
-        <label class="text-xs font-bold text-slate-700 block uppercase">Payment Mode (भुगतान का माध्यम) *</label>
+        <!-- SINGLE ROW: 1ST METHOD DROPDOWN & TOTAL PAID AMOUNT -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+          <div>
+            <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
+              1st Method (भुगतान माध्यम चुनें) *
+            </label>
+            <select id="pay-mode-dropdown" onchange="updatePaymentFields()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 shadow-sm focus:border-blue-900 focus:ring-1 focus:ring-blue-900">
+              <option value="Cash">💵 Cash</option>
+              <option value="QR">📲 QR</option>
+              <option value="Card Swipe">💳 Card Swipe</option>
+              <option value="Finance">🏦 Finance / EMI</option>
+              <option value="Dues">📝 Dues / Udhar (बकाया)</option>
+              <option value="Cash + QR">💵 Cash + 📲 QR</option>
+              <option value="Card Swipe + QR">💳 Card Swipe + 📲 QR</option>
+              <option value="Card Swipe + Cash">💳 Card Swipe + 💵 Cash</option>
+              <option value="Card Swipe + QR + Cash">💳 Card + 📲 QR + 💵 Cash</option>
+            </select>
+          </div>
 
-        <!-- SPECIAL ACTION BUTTONS FOR FINANCE & DUES -->
-        <div class="grid grid-cols-2 gap-2 pb-1">
-          <button type="button" id="btn-mode-finance" onclick="setSpecialMode('Finance')" class="py-2.5 px-3 bg-white border-2 border-blue-900 text-blue-950 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-blue-50 transition">
-            <span>🏦 Finance / EMI</span>
-          </button>
-          <button type="button" id="btn-mode-dues" onclick="setSpecialMode('Dues')" class="py-2.5 px-3 bg-white border-2 border-rose-600 text-rose-700 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-rose-50 transition">
-            <span>📝 Dues / Udhar (बकाया)</span>
-          </button>
+          <div>
+            <label class="text-xs font-bold text-slate-700 block uppercase mb-1">
+              कुल जमा राशि (Total Amount Paid ₹) *
+            </label>
+            <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full p-2.5 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-sm shadow-sm" />
+          </div>
         </div>
 
-        <!-- REGULAR MODES DROPDOWN -->
-        <div id="regular-dropdown-box">
-          <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">या अन्य पेमेंट माध्यम चुनें:</label>
-          <select id="pay-mode-dropdown" onchange="onDropdownChange()" class="w-full p-2.5 bg-white border rounded-lg text-sm font-bold text-slate-800">
-            <option value="Cash">💵 Cash</option>
-            <option value="QR">📲 QR</option>
-            <option value="Cash + QR">💵 Cash + 📲 QR</option>
-            <option value="Card Swipe">💳 Card Swipe</option>
-            <option value="Card Swipe + QR">💳 Card Swipe + 📲 QR</option>
-            <option value="Card Swipe + Cash">💳 Card Swipe + 💵 Cash</option>
-            <option value="Card Swipe + QR + Cash">💳 Card + 📲 QR + 💵 Cash</option>
-          </select>
-        </div>
-
-        <!-- FINANCE SUB-SECTION WITH COMPLETE DOWN PAYMENT MODES -->
+        <!-- FINANCE DETAILS (Appears when Finance is selected) -->
         <div id="finance-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 hidden">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-black text-blue-950 uppercase">🏦 Finance Details (फाइनेंस की जानकारी)</h4>
-            <span class="text-[10px] text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded">Active Mode</span>
+            <span class="text-[10px] text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded">Finance Mode Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
@@ -222,9 +223,8 @@
             </div>
           </div>
 
-          <!-- FULL DOWN PAYMENT METHOD DROPDOWN -->
           <div>
-            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Method)</label>
+            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Payment Method)</label>
             <select id="fin-dp-mode" onchange="onFinDpModeChange()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR</option>
@@ -236,7 +236,6 @@
             </select>
           </div>
 
-          <!-- SPLIT BOXES FOR FINANCE DOWN PAYMENT -->
           <div id="fin-split-container" class="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
             <div id="fin-split-box-cash" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP Cash (₹)</label>
@@ -253,11 +252,11 @@
           </div>
         </div>
 
-        <!-- DUES SUB-SECTION WITH PAYMENT OPTIONS -->
+        <!-- DUES DETAILS (Appears when Dues is selected) -->
         <div id="dues-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-rose-50/60 p-3.5 rounded-xl border border-rose-200 hidden">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-black text-rose-950 uppercase">📝 Dues / Udhar (बकाया विवरण)</h4>
-            <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded">Active Mode</span>
+            <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded">Udhar Mode Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -265,7 +264,7 @@
               <input type="number" id="dues-partial-amt" placeholder="टोकन राशि (अन्यथा खाली रखें)" oninput="handleDuesInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">जमा राशि का माध्यम (Payment Mode)</label>
+              <label class="text-[10px] font-bold text-slate-600 uppercase">जमा राशि का माध्यम (Token Payment Method)</label>
               <select id="dues-pay-mode" onchange="onDuesModeChange()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
                 <option value="Cash">💵 Cash</option>
                 <option value="QR">📲 QR</option>
@@ -278,7 +277,6 @@
             </div>
           </div>
 
-          <!-- SPLIT BOXES FOR DUES TOKEN -->
           <div id="dues-split-container" class="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
             <div id="dues-split-box-cash" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">Token Cash (₹)</label>
@@ -309,11 +307,6 @@
             <label class="text-[10px] font-bold text-slate-500 uppercase">Card Swipe Amount (₹)</label>
             <input type="number" id="split-card" placeholder="कार्ड राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
-        </div>
-
-        <div class="pt-2">
-          <label class="text-xs font-bold text-slate-700">कुल जमा राशि (Total Amount Paid ₹)</label>
-          <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
         </div>
       </div>
 
@@ -434,7 +427,6 @@
     let activeInvoiceData = null;
     let billsCache = JSON.parse(localStorage.getItem("sre_bills_cache") || "[]");
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
-    let selectedSpecialMode = null; // "Finance" | "Dues" | null
 
     function showPopup(type, title, details, btnText = "OK", btnAction = closePopup) {
       const modal = document.getElementById("popup-modal");
@@ -539,9 +531,7 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("pay-paid").value = "";
 
-      selectedSpecialMode = null;
       document.getElementById("pay-mode-dropdown").value = "Cash";
-      updateButtonStyles();
       updatePaymentFields();
 
       const container = document.getElementById("items-container");
@@ -654,46 +644,8 @@
       imeiBox.appendChild(grid);
     }
 
-    // SPECIAL MODE BUTTON HANDLERS (Finance & Dues)
-    function setSpecialMode(mode) {
-      if (selectedSpecialMode === mode) {
-        selectedSpecialMode = null; // toggle off
-      } else {
-        selectedSpecialMode = mode;
-      }
-      updateButtonStyles();
-      updatePaymentFields();
-    }
-
-    function onDropdownChange() {
-      selectedSpecialMode = null; // Dropdown overrides button
-      updateButtonStyles();
-      updatePaymentFields();
-    }
-
-    function updateButtonStyles() {
-      const finBtn = document.getElementById("btn-mode-finance");
-      const duesBtn = document.getElementById("btn-mode-dues");
-
-      if (selectedSpecialMode === "Finance") {
-        finBtn.className = "py-2.5 px-3 bg-blue-900 text-white font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-md";
-        duesBtn.className = "py-2.5 px-3 bg-white border-2 border-rose-600 text-rose-700 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-rose-50";
-      } else if (selectedSpecialMode === "Dues") {
-        duesBtn.className = "py-2.5 px-3 bg-rose-600 text-white font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-md";
-        finBtn.className = "py-2.5 px-3 bg-white border-2 border-blue-900 text-blue-950 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-blue-50";
-      } else {
-        finBtn.className = "py-2.5 px-3 bg-white border-2 border-blue-900 text-blue-950 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-blue-50";
-        duesBtn.className = "py-2.5 px-3 bg-white border-2 border-rose-600 text-rose-700 font-black rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-sm hover:bg-rose-50";
-      }
-    }
-
-    function getEffectivePaymentMode() {
-      if (selectedSpecialMode) return selectedSpecialMode;
-      return document.getElementById("pay-mode-dropdown").value;
-    }
-
     function updatePaymentFields() {
-      const mode = getEffectivePaymentMode();
+      const mode = document.getElementById("pay-mode-dropdown").value;
       const splitBox = document.getElementById("split-inputs-container");
       const boxCash = document.getElementById("split-box-cash");
       const boxQr = document.getElementById("split-box-qr");
@@ -736,7 +688,7 @@
       recalcTotals();
     }
 
-    // FINANCE DOWN PAYMENT LOGIC (ALL 7 COMBINATIONS)
+    // FINANCE DOWN PAYMENT LOGIC
     function onFinDpModeChange() {
       const mode = document.getElementById("fin-dp-mode").value;
       const splitBox = document.getElementById("fin-split-container");
@@ -960,7 +912,7 @@
 
       if (imeiValidationError) return;
 
-      const effectiveMode = getEffectivePaymentMode();
+      const effectiveMode = document.getElementById("pay-mode-dropdown").value;
       let financeDetails = null;
       let duesDetails = null;
 
@@ -1034,7 +986,7 @@
             showPopup("success", "सफलतापूर्वक सेव हुआ!", [
               `✓ इनवॉइस: ${billPayload.invoiceNo}`,
               `✓ ग्राहक: ${name} (${address})`,
-              `✓ मोड: ${effectiveMode}`,
+              `✓ 1st Method: ${effectiveMode}`,
               `✓ कुल बिल: ₹${grand} (जमा: ₹${paid})`
             ], "इनवॉइस देखें", () => {
               closePopup();
