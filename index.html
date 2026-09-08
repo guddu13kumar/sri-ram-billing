@@ -116,7 +116,7 @@
         </div>
       </div>
 
-      <!-- CUSTOMER DETAILS (NAME, PHONE & ADDRESS) -->
+      <!-- CUSTOMER DETAILS (NAME, PHONE & ADDRESS - ALL REQUIRED) -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border">
         <div>
           <label class="text-xs font-bold text-slate-600">Customer Name *</label>
@@ -127,8 +127,8 @@
           <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का नंबर" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-600">Customer Address</label>
-          <input type="text" id="cust-address" placeholder="पता / City (जैसे: Sector-4, Bokaro)" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
+          <label class="text-xs font-bold text-slate-600">Customer Address *</label>
+          <input type="text" id="cust-address" placeholder="पूरा पता (उदा: GB-15, Sec-4, Bokaro)" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm" />
         </div>
       </div>
 
@@ -137,14 +137,14 @@
         <h3 class="font-bold text-sm text-amber-900">🔧 Device & Repair Specs (रिपेयर विवरण)</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input type="text" id="rep-product" placeholder="Device Name (उदा: Vivo Y20, Redmi Note 12)" class="p-2 bg-white border rounded-lg text-sm" />
-          <input type="text" id="rep-imei" placeholder="Device IMEI / Serial No." class="p-2 bg-white border rounded-lg text-sm" />
+          <input type="text" id="rep-imei" maxlength="15" placeholder="Device IMEI (15 अंक)" oninput="this.value=this.value.replace(/\\D/g,'')" class="p-2 bg-white border rounded-lg text-sm font-mono" />
         </div>
         <textarea id="rep-complaint" rows="2" placeholder="Complaint / समस्या..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
         <textarea id="rep-work" rows="2" placeholder="Work Done / किया गया काम..." class="w-full p-2 bg-white border rounded-lg text-sm"></textarea>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="text-xs font-bold text-slate-600">Labour Charge (₹)</label>
-            <input type="number" id="rep-labour" value="0" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold" />
+            <input type="number" id="rep-labour" placeholder="राशि भरें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold" />
           </div>
           <div>
             <label class="text-xs font-bold text-slate-600">Labour GST %</label>
@@ -155,14 +155,14 @@
         </div>
       </div>
 
-      <!-- ITEMS SECTION (PRODUCT NAME, DYNAMIC IMEI, GST SLAB) -->
+      <!-- ITEMS SECTION (BLANK INPUTS, STRICT 15 DIGIT IMEI) -->
       <div class="space-y-3">
         <h3 id="items-title" class="font-bold text-sm text-slate-800">Products / Handsets</h3>
         <div id="items-container" class="space-y-3"></div>
         <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ अन्य आइटम जोड़ें</button>
       </div>
 
-      <!-- PAYMENT MODES (RADIO BUTTONS) -->
+      <!-- PAYMENT SECTION (RADIO BUTTONS) -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
         <label class="text-xs font-bold text-slate-700 block uppercase">Payment Mode (भुगतान का प्रकार चुनें)</label>
         
@@ -202,21 +202,21 @@
         <div id="split-inputs-container" class="pt-2 border-t mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 hidden">
           <div id="split-box-cash" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
-            <input type="number" id="split-cash" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-cash" placeholder="कैश राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
           <div id="split-box-qr" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">QR Amount (₹)</label>
-            <input type="number" id="split-qr" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-qr" placeholder="QR राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
           <div id="split-box-card" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Card Swipe Amount (₹)</label>
-            <input type="number" id="split-card" value="0" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+            <input type="number" id="split-card" placeholder="कार्ड राशि भरें" oninput="handleSplitInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
           </div>
         </div>
 
         <div class="pt-2">
           <label class="text-xs font-bold text-slate-700">कुल जमा राशि (Total Amount Paid ₹)</label>
-          <input type="number" id="pay-paid" value="0" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
+          <input type="number" id="pay-paid" placeholder="जमा की गई राशि भरें" oninput="recalcTotals()" class="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
         </div>
       </div>
 
@@ -268,7 +268,7 @@
             <p class="font-bold text-slate-400 text-[9px]">CUSTOMER:</p>
             <p id="inv-cust-name" class="font-bold"></p>
             <p id="inv-cust-phone" class="text-slate-500"></p>
-            <p id="inv-cust-address" class="text-slate-500 text-[10px]"></p>
+            <p id="inv-cust-address" class="text-slate-700 text-[10px] font-medium"></p>
           </div>
           <div class="text-right">
             <p id="inv-pay-mode" class="text-slate-800 font-bold">Mode: Cash</p>
@@ -281,7 +281,7 @@
           <thead>
             <tr class="bg-slate-100 text-[9px] uppercase border-y">
               <th class="p-1.5 text-left">Item / Product Name</th>
-              <th class="p-1.5 text-left">IMEI / Serial Details</th>
+              <th class="p-1.5 text-left">IMEI Details (15 Digit)</th>
               <th class="p-1.5 text-center">Qty</th>
               <th class="p-1.5 text-center">GST</th>
               <th class="p-1.5 text-right">Rate</th>
@@ -427,7 +427,7 @@
       document.getElementById("cust-name").value = "";
       document.getElementById("cust-phone").value = "";
       document.getElementById("cust-address").value = "";
-      document.getElementById("pay-paid").value = "0";
+      document.getElementById("pay-paid").value = "";
 
       const cashRadio = document.querySelector('input[name="pay-mode-radio"][value="Cash"]');
       if (cashRadio) cashRadio.checked = true;
@@ -465,7 +465,6 @@
         document.getElementById("items-title").innerText = type === "MOBILE" ? "Mobile Handset Details" : "Accessories Details";
       }
       
-      // Update existing item rows for type change
       document.querySelectorAll(".item-row").forEach(r => renderItemImeis(r));
       recalcTotals();
     }
@@ -489,11 +488,11 @@
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">Rate (₹) *</label>
-            <input type="number" value="0" oninput="recalcTotals()" class="item-rate w-full p-2 border rounded text-xs bg-white font-bold" />
+            <input type="number" placeholder="कीमत लिखें" oninput="recalcTotals()" class="item-rate w-full p-2 border rounded text-xs bg-white font-bold" />
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">Discount (₹)</label>
-            <input type="number" value="0" oninput="recalcTotals()" class="item-disc w-full p-2 border rounded text-xs bg-white" />
+            <input type="number" placeholder="छूट (यदि हो)" oninput="recalcTotals()" class="item-disc w-full p-2 border rounded text-xs bg-white" />
           </div>
           <div>
             <label class="text-[10px] text-slate-500 font-bold uppercase">GST Slab</label>
@@ -507,7 +506,7 @@
           </div>
         </div>
 
-        <!-- DYNAMIC IMEI CONTAINER (Opens based on Qty for MOBILE) -->
+        <!-- DYNAMIC IMEI CONTAINER (Strict 15 Digits, No limit overflow) -->
         <div class="item-imeis-box space-y-1.5 pt-1"></div>
       `;
       container.appendChild(row);
@@ -538,7 +537,7 @@
       for (let i = 1; i <= qty; i++) {
         const div = document.createElement("div");
         div.innerHTML = `
-          <input type="text" placeholder="IMEI ${i} (15 अंक) *" class="item-imei-input w-full p-1.5 border rounded text-xs bg-white font-mono" />
+          <input type="text" maxlength="15" placeholder="IMEI ${i} (ठीक 15 अंक) *" oninput="this.value=this.value.replace(/\\D/g,'')" class="item-imei-input w-full p-1.5 border rounded text-xs bg-white font-mono" />
         `;
         grid.appendChild(div);
       }
@@ -579,11 +578,22 @@
     function handleSplitInput() {
       const mode = getSelectedPayMode();
       let total = 0;
-      if (mode.includes("Cash")) total += Number(document.getElementById("split-cash").value) || 0;
-      if (mode.includes("QR")) total += Number(document.getElementById("split-qr").value) || 0;
-      if (mode.includes("Card")) total += Number(document.getElementById("split-card").value) || 0;
+      let hasValue = false;
 
-      document.getElementById("pay-paid").value = total;
+      if (mode.includes("Cash")) {
+        const val = document.getElementById("split-cash").value;
+        if (val !== "") { total += Number(val); hasValue = true; }
+      }
+      if (mode.includes("QR")) {
+        const val = document.getElementById("split-qr").value;
+        if (val !== "") { total += Number(val); hasValue = true; }
+      }
+      if (mode.includes("Card")) {
+        const val = document.getElementById("split-card").value;
+        if (val !== "") { total += Number(val); hasValue = true; }
+      }
+
+      document.getElementById("pay-paid").value = hasValue ? total : "";
       recalcTotals();
     }
 
@@ -603,7 +613,8 @@
       }
 
       grand = Math.max(0, Math.round(grand));
-      const paid = Math.min(grand, Number(document.getElementById("pay-paid").value) || 0);
+      const paidVal = document.getElementById("pay-paid").value;
+      const paid = paidVal === "" ? 0 : Math.min(grand, Number(paidVal) || 0);
       const due = Math.max(0, grand - paid);
 
       document.getElementById("total-grand").innerText = "₹" + grand.toLocaleString("en-IN");
@@ -617,28 +628,40 @@
       const phone = document.getElementById("cust-phone").value.trim();
       const address = document.getElementById("cust-address").value.trim();
 
-      if (!name) return showPopup("error", "डेटा अधूरा है", ["कृपया Customer Name भरें।"]);
+      // STRICT VALIDATIONS
+      if (!name) return showPopup("error", "डेटा अधूरा है", ["कृपया Customer Name अवश्य भरें।"]);
       if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "गलत नंबर", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
+      if (!address) return showPopup("error", "पता अनिवार्य है", ["कृपया Customer Address अवश्य भरें।"]);
 
       const { grand, paid, due } = recalcTotals();
-      if (grand <= 0) return showPopup("error", "गलत राशि", ["बिल की कुल राशि 0 से अधिक होनी चाहिए।"]);
+      if (grand <= 0) return showPopup("error", "गलत राशि", ["बिल की कुल राशि 0 से अधिक होनी चाहिए। कृपया सही Rate भरें।"]);
 
-      const invoiceNo = document.getElementById("form-invoice-no").innerText;
-      const billDate = new Date().toISOString().split("T")[0];
-      const secureToken = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-
-      const encodedGas = gasUrl ? encodeURIComponent(gasUrl) : "";
-      const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}?gas=${encodedGas}`;
-
+      // VALIDATE IMEI CODES (MUST BE 15 DIGITS)
+      let imeiValidationError = false;
       const items = [];
-      document.querySelectorAll(".item-row").forEach(r => {
+      document.querySelectorAll(".item-row").forEach((r, idx) => {
+        const pName = r.querySelector(".item-product-name").value.trim();
+        if (!pName) {
+          showPopup("error", "प्रोडक्ट नाम लिखें", [`लाइन #${idx+1} में Product Name खाली है।`]);
+          imeiValidationError = true;
+          return;
+        }
+
         const imeis = [];
-        r.querySelectorAll(".item-imei-input").forEach(inp => {
-          if (inp.value.trim()) imeis.push(inp.value.trim());
-        });
+        if (currentBillType === "MOBILE") {
+          r.querySelectorAll(".item-imei-input").forEach((inp, iIdx) => {
+            const val = inp.value.trim();
+            if (val.length !== 15) {
+              showPopup("error", "गलत IMEI नंबर", [`आइटम #${idx+1} का IMEI ${iIdx+1} ठीक 15 अंकों का होना चाहिए (अभी ${val.length} अंक हैं)।`]);
+              imeiValidationError = true;
+              return;
+            }
+            imeis.push(val);
+          });
+        }
 
         items.push({
-          productName: r.querySelector(".item-product-name").value.trim() || "Item",
+          productName: pName,
           brand: "",
           imei1: imeis.join(", "),
           quantity: Number(r.querySelector(".item-qty").value) || 1,
@@ -647,6 +670,15 @@
           gstRate: Number(r.querySelector(".item-gst").value) || 18
         });
       });
+
+      if (imeiValidationError) return;
+
+      const invoiceNo = document.getElementById("form-invoice-no").innerText;
+      const billDate = new Date().toISOString().split("T")[0];
+      const secureToken = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+
+      const encodedGas = gasUrl ? encodeURIComponent(gasUrl) : "";
+      const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}?gas=${encodedGas}`;
 
       const repairDetails = currentBillType === "REPAIRING" ? {
         brand: document.getElementById("rep-product").value.trim(),
@@ -692,8 +724,8 @@
           if (d.success) {
             showPopup("success", "सफलतापूर्वक सेव हुआ!", [
               `✓ इनवॉइस: ${billPayload.invoiceNo}`,
+              `✓ ग्राहक: ${name} (${address})`,
               `✓ Google Sheets में डेटा सुरक्षित हो गया`,
-              `✓ भुगतान मोड: ${selectedMode}`,
               `✓ कुल बिल: ₹${grand} (जमा: ₹${paid})`
             ], "इनवॉइस देखें", () => {
               closePopup();
