@@ -56,8 +56,15 @@
       });
 
       const [activeBill, setActiveBill] = useState(null);
-      const [loading, setLoading] = useState(false);
-      const [statusMsg, setStatusMsg] = useState("");
+
+      // Dedicated Modal Popup State
+      const [popup, setPopup] = useState({
+        show: false,
+        type: "info", // progress, success, error, info
+        title: "",
+        details: [],
+        actionBtn: null
+      });
 
       const [invoiceNo, setInvoiceNo] = useState("SRE-2026-00001");
       const [billDate, setBillDate] = useState(new Date().toISOString().split("T")[0]);
@@ -83,15 +90,35 @@
         amountPaid: 0, mode: "Cash", reference: "", notes: ""
       });
 
-      // Public Bill View check for QR scanner
+      const showPopup = (type, title, details, actionBtn = null) => {
+        setPopup({
+          show: true,
+          type,
+          title,
+          details: Array.isArray(details) ? details : [details],
+          actionBtn
+        });
+      };
+
+      const closePopup = () => {
+        setPopup(prev => ({ ...prev, show: false }));
+      };
+
+      // Safe Cloud Fetch Handler (Resolves CORS & 302 Redirects cleanly)
+      const safeCloudFetch = async (url, options = {}) => {
+        return fetch(url, {
+          redirect: "follow",
+          ...options
+        });
+      };
+
+      // URL Hash Observer for QR Invoices
       useEffect(() => {
         const checkHash = () => {
           const hash = window.location.hash;
           if (hash.includes("#/bill/")) {
             const token = hash.split("#/bill/")[1];
-            if (token) {
-              loadPublicBill(token);
-            }
+            if (token) loadPublicBill(token);
           }
         };
         checkHash();
@@ -100,36 +127,44 @@
       }, [gasUrl]);
 
       const loadPublicBill = async (token) => {
-        setLoading(true);
-        setStatusMsg("Loading Invoice from Cloud...");
-        
-        // 1. Check local cache
+        showPopup("progress", "QR इनवॉइस लोड हो रहा है...", [
+          "1. टोकन सत्यापित किया जा रहा है...",
+          "2. Google Sheet डेटाबेस से बिल प्राप्त किया जा रहा है..."
+        ]);
+
         const local = bills.find(b => b.secureToken === token);
         if (local) {
           setActiveBill(local);
+          closePopup();
           setView("public-view");
-          setLoading(false);
           return;
         }
 
-        // 2. Fetch from Google Sheet via Apps Script
         if (gasUrl) {
           try {
-            const res = await fetch(`${gasUrl}?action=getPublicBill&token=${encodeURIComponent(token)}`);
+            const res = await safeCloudFetch(`${gasUrl}?action=getPublicBill&token=${encodeURIComponent(token)}`);
             const d = await res.json();
             if (d.success && d.bill) {
               setActiveBill(d.bill);
+              closePopup();
               setView("public-view");
             } else {
-              alert("Invoice not found on Google Sheets.");
+              showPopup("error", "इनवॉइस नहीं मिला", [
+                "एरर: " + (d.error || "यह इनवॉइस Google Sheets में मौजूद नहीं है या टोकन अमान्य है।")
+              ]);
             }
           } catch (e) {
-            alert("Error connecting to Google Sheets.");
+            showPopup("error", "कनेक्शन एरर", [
+              "Google Apps Script से संपर्क नहीं हो सका।",
+              "विवरण: " + e.message
+            ]);
           }
         } else {
-          alert("Invoice link requires Google Cloud Backend setup.");
+          showPopup("error", "क्लाउड URL गायब है", [
+            "इस डिवाइस में Google Apps Script URL सेट नहीं है।",
+            "कृपया पहले Settings में जाकर URL कॉन्फ़िगर करें।"
+          ]);
         }
-        setLoading(false);
       };
 
       useEffect(() => {
@@ -148,7 +183,7 @@
 
       const fetchServerInvoiceNo = async () => {
         try {
-          const res = await fetch(`${gasUrl}?action=getNextInvoiceNumber`);
+          const res = await safeCloudFetch(`${gasUrl}?action=getNextInvoiceNumber`);
           const d = await res.json();
           if (d.success) setInvoiceNo(d.invoiceNo);
         } catch (e) {}
@@ -156,7 +191,7 @@
 
       const syncBillsFromServer = async () => {
         try {
-          const res = await fetch(`${gasUrl}?action=getBills`);
+          const res = await safeCloudFetch(`${gasUrl}?action=getBills`);
           const d = await res.json();
           if (d.success) {
             setBills(d.bills);
@@ -234,13 +269,22 @@
       const totals = calculateTotals();
 
       const handleSaveBill = async () => {
-        if (!customer.name.trim()) return alert("कृपया Customer Name दर्ज करें।");
-        if (!/^[6-9]\d{9}$/.test(customer.mobile.trim())) {
-          return alert("कृपया वैध 10 अंकों का मोबाइल नंबर दर्ज करें।");
+        if (!customer.name.trim()) {
+          showPopup("error", "डेटा अधूरा है", ["कृपया Customer Name भरें।"]);
+          return;
         }
-
-        setLoading(true);
-        setStatusMsg("Generating Invoice & QR...");
+        if (!/^[6-9]\d{9}$/.test(customer.mobile.trim())) {
+          showPopup("error", "गलत मोबाइल नंबर", ["कृपया 10 अंकों का वैध भारतीय मोबाइल नंबर दर्ज करें।"]);
+          return;
+        }
+        if (billType !== "REPAIRING" && items.some(i => (Number(i.rate) || 0) <= 0)) {
+          showPopup("error", "कीमत दर्ज करें", ["कृपया सभी आइटम का सही Rate (कीमत) भरें।"]);
+          return;
+        }
+        if (billType === "REPAIRING" && (Number(repairDetails.labourCharge) <= 0 && items.every(i => Number(i.rate) <= 0))) {
+          showPopup("error", "राशि दर्ज करें", ["कृपया लेबर चार्ज या स्पेयर पार्ट्स की सही कीमत भरें।"]);
+          return;
+        }
 
         const secureToken = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
         const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}`;
@@ -260,30 +304,77 @@
           frontendDomain: `${window.location.origin}${window.location.pathname}`
         };
 
+        // Cache Locally
         const updatedBills = [billPayload, ...bills];
         setBills(updatedBills);
         localStorage.setItem("sre_bills_cache", JSON.stringify(updatedBills));
+        setActiveBill(billPayload);
 
         if (gasUrl) {
-          setStatusMsg("Syncing with Google Sheets & Drive...");
+          showPopup("progress", "डेटा Google Sheets में सुरक्षित हो रहा है...", [
+            "• Bills शीट में इनवॉइस दर्ज किया जा रहा है...",
+            "• Bill Items शीट में पार्ट्स/हैंडसेट रिकॉर्ड हो रहे हैं...",
+            "• Customer लेजर में बैलेंस सिंक हो रहा है..."
+          ]);
+
           try {
-            const res = await fetch(gasUrl, {
+            const res = await safeCloudFetch(gasUrl, {
               method: "POST",
-              headers: { "Content-Type": "text/plain" },
               body: JSON.stringify({ action: "createBill", billData: billPayload })
             });
             const d = await res.json();
+
             if (d.success) {
-              billPayload.pdfUrl = d.pdfUrl;
+              showPopup("success", "सफलतापूर्वक सेव हुआ!", [
+                `✓ इनवॉइस नंबर: ${billPayload.invoiceNo}`,
+                `✓ Google Sheet के 'Bills' और 'Bill Items' में दर्ज हुआ`,
+                `✓ ग्राहक: ${billPayload.customer.name}`,
+                `✓ कुल राशि: ₹${totals.grand} (जमा: ₹${totals.paid})`
+              ], {
+                text: "इनवॉइस देखें / PDF निकालें",
+                onClick: () => {
+                  closePopup();
+                  setView("after-save");
+                }
+              });
+            } else {
+              showPopup("error", "Google Sheets में त्रुटि", [
+                "शीट एरर: " + (d.error || "अज्ञात समस्या"),
+                "नोट: बिल आपके डिवाइस मेमोरी में सुरक्षित हो चुका है।"
+              ], {
+                text: "लोकल इनवॉइस देखें",
+                onClick: () => {
+                  closePopup();
+                  setView("after-save");
+                }
+              });
             }
           } catch (e) {
-            console.warn("Drive sync queued offline");
+            showPopup("error", "क्लाउड नेटवर्क एरर", [
+              "Google Apps Script से संपर्क नहीं हो सका।",
+              "विवरण: " + e.message,
+              "चेक करें कि Apps Script में Deploy Access 'Anyone' है या नहीं।",
+              "चिंता न करें, बिल आपके लोकल ऐप में सुरक्षित है।"
+            ], {
+              text: "लोकल इनवॉइस देखें",
+              onClick: () => {
+                closePopup();
+                setView("after-save");
+              }
+            });
           }
+        } else {
+          showPopup("info", "लोकल मोड में सेव हुआ", [
+            `✓ इनवॉइस: ${billPayload.invoiceNo} फोन में सेव हो गया।`,
+            "⚠ Google Sheets URL सेट नहीं है, इसलिए क्लाउड बैकअप नहीं हुआ।"
+          ], {
+            text: "इनवॉइस देखें",
+            onClick: () => {
+              closePopup();
+              setView("after-save");
+            }
+          });
         }
-
-        setActiveBill(billPayload);
-        setLoading(false);
-        setView("after-save");
       };
 
       const resetForm = (type) => {
@@ -302,7 +393,63 @@
       };
 
       return (
-        <div className="min-h-screen pb-12 flex flex-col">
+        <div className="min-h-screen pb-12 flex flex-col relative">
+          {/* CENTER POPUP MODAL */}
+          {popup.show && (
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+                <div className={`p-4 flex items-center justify-between text-white ${
+                  popup.type === "success" ? "bg-emerald-600" :
+                  popup.type === "error" ? "bg-rose-600" :
+                  popup.type === "progress" ? "bg-blue-600" : "bg-indigo-600"
+                }`}>
+                  <div className="flex items-center space-x-2">
+                    {popup.type === "progress" ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <span className="font-black text-lg">
+                        {popup.type === "success" ? "✓" : popup.type === "error" ? "✕" : "ℹ"}
+                      </span>
+                    )}
+                    <h3 className="font-bold text-base">{popup.title}</h3>
+                  </div>
+                  {popup.type !== "progress" && (
+                    <button onClick={closePopup} className="text-white hover:opacity-75 text-xl font-bold">✕</button>
+                  )}
+                </div>
+
+                <div className="p-5 space-y-2 text-sm text-slate-700 bg-slate-50/50">
+                  {popup.details.map((item, index) => (
+                    <p key={index} className="leading-relaxed flex items-start space-x-2">
+                      <span className="text-slate-400">•</span>
+                      <span>{item}</span>
+                    </p>
+                  ))}
+                </div>
+
+                <div className="p-3 bg-white border-t flex justify-end">
+                  {popup.actionBtn ? (
+                    <button 
+                      onClick={popup.actionBtn.onClick}
+                      className="px-5 py-2.5 bg-blue-900 text-white font-bold rounded-xl text-xs hover:bg-blue-800 transition"
+                    >
+                      {popup.actionBtn.text}
+                    </button>
+                  ) : popup.type !== "progress" ? (
+                    <button 
+                      onClick={closePopup}
+                      className="px-5 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition"
+                    >
+                      समझ गया / OK
+                    </button>
+                  ) : (
+                    <span className="text-xs text-slate-400 font-semibold italic p-1">प्रतीक्षा करें...</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {view !== "public-view" && (
             <header className="bg-blue-900 text-white shadow-md sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setView("dashboard")}>
@@ -319,14 +466,7 @@
           )}
 
           <main className="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5">
-            {loading && (
-              <div className="p-8 text-center text-slate-600 font-bold">
-                <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-900 border-t-transparent rounded-full mb-2"></div>
-                <p>{statusMsg || "Loading..."}</p>
-              </div>
-            )}
-
-            {!loading && view === "dashboard" && (
+            {view === "dashboard" && (
               <DashboardView 
                 bills={bills} 
                 onNewBill={resetForm} 
@@ -337,7 +477,7 @@
               />
             )}
 
-            {!loading && view === "new-bill" && (
+            {view === "new-bill" && (
               <NewBillForm 
                 billType={billType} setBillType={setBillType} invoiceNo={invoiceNo}
                 billDate={billDate} setBillDate={setBillDate} taxTreatment={taxTreatment}
@@ -345,12 +485,12 @@
                 items={items} addItem={addItem} removeItem={removeItem} updateItem={updateItem}
                 repairDetails={repairDetails} setRepairDetails={setRepairDetails}
                 payment={payment} setPayment={setPayment} totals={totals}
-                onSave={handleSaveBill} loading={loading} statusMsg={statusMsg}
+                onSave={handleSaveBill}
                 onCancel={() => setView("dashboard")}
               />
             )}
 
-            {!loading && (view === "after-save" || view === "public-view") && activeBill && (
+            {(view === "after-save" || view === "public-view") && activeBill && (
               <AfterSaveView 
                 bill={activeBill} 
                 business={business} 
@@ -359,7 +499,7 @@
               />
             )}
 
-            {!loading && view === "all-bills" && (
+            {view === "all-bills" && (
               <AllBillsView 
                 bills={bills} 
                 onSelectBill={(b) => { setActiveBill(b); setView("after-save"); }} 
@@ -367,20 +507,21 @@
               />
             )}
 
-            {!loading && view === "dues" && (
-              <DuesView bills={bills} gasUrl={gasUrl} onRefresh={syncBillsFromServer} onBack={() => setView("dashboard")} />
+            {view === "dues" && (
+              <DuesView bills={bills} gasUrl={gasUrl} onRefresh={syncBillsFromServer} onBack={() => setView("dashboard")} showPopup={showPopup} safeCloudFetch={safeCloudFetch} />
             )}
 
-            {!loading && view === "reports" && (
+            {view === "reports" && (
               <ReportsView bills={bills} onBack={() => setView("dashboard")} />
             )}
 
-            {!loading && view === "settings" && (
+            {view === "settings" && (
               <SettingsView 
                 business={business} 
                 setBusiness={(b) => { setBusiness(b); localStorage.setItem("sre_business", JSON.stringify(b)); }}
                 gasUrl={gasUrl}
                 setGasUrl={(u) => { setGasUrl(u); localStorage.setItem("sre_gas_url", u); }}
+                showPopup={showPopup}
                 onBack={() => setView("dashboard")} 
               />
             )}
@@ -419,37 +560,42 @@
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <button onClick={() => onNewBill("MOBILE")} className="flex flex-col items-center justify-center p-4 bg-blue-900 text-white rounded-xl shadow hover:bg-blue-800 transition">
+            <button onClick={() => onNewBill("MOBILE")} className="flex flex-col items-center justify-center p-4 bg-blue-900 text-white rounded-xl shadow hover:bg-blue-800 transition active:scale-95">
               <i data-lucide="smartphone" className="w-7 h-7 mb-1 text-amber-400"></i>
               <span className="font-bold text-sm">Mobile Sale</span>
             </button>
-            <button onClick={() => onNewBill("ACCESSORIES")} className="flex flex-col items-center justify-center p-4 bg-indigo-900 text-white rounded-xl shadow hover:bg-indigo-800 transition">
+            <button onClick={() => onNewBill("ACCESSORIES")} className="flex flex-col items-center justify-center p-4 bg-indigo-900 text-white rounded-xl shadow hover:bg-indigo-800 transition active:scale-95">
               <i data-lucide="headphones" className="w-7 h-7 mb-1 text-amber-400"></i>
               <span className="font-bold text-sm">Accessories</span>
             </button>
-            <button onClick={() => onNewBill("REPAIRING")} className="flex flex-col items-center justify-center p-4 bg-slate-900 text-white rounded-xl shadow hover:bg-slate-800 transition">
+            <button onClick={() => onNewBill("REPAIRING")} className="flex flex-col items-center justify-center p-4 bg-slate-900 text-white rounded-xl shadow hover:bg-slate-800 transition active:scale-95">
               <i data-lucide="wrench" className="w-7 h-7 mb-1 text-amber-400"></i>
               <span className="font-bold text-sm">Repairing</span>
             </button>
           </div>
 
           <div className="flex space-x-2 overflow-x-auto pb-1">
-            <button onClick={onViewBills} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50">All Invoices</button>
-            <button onClick={onViewDues} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50">Due Ledger</button>
-            <button onClick={onViewReports} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50">Sales Reports</button>
+            <button onClick={onViewBills} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">All Invoices</button>
+            <button onClick={onViewDues} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">Due Ledger</button>
+            <button onClick={onViewReports} className="px-4 py-2 bg-white rounded-lg shadow-sm border text-sm font-semibold hover:bg-slate-50 whitespace-nowrap">Sales Reports</button>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border divide-y overflow-hidden">
             <div className="p-4 border-b font-bold text-slate-800">Recent Invoices</div>
             {bills.slice(0, 5).map((b, i) => (
-              <div key={i} onClick={() => onSelectBill(b)} className="p-4 hover:bg-slate-50 cursor-pointer flex justify-between">
+              <div key={i} onClick={() => onSelectBill(b)} className="p-4 hover:bg-slate-50 cursor-pointer flex justify-between items-center">
                 <div>
                   <p className="font-bold text-blue-900">{b.invoiceNo}</p>
                   <p className="text-sm text-slate-700">{b.customer?.name || b.customerName}</p>
+                  <span className="text-xs text-slate-400">{b.billDate}</span>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">₹{(b.totals?.grand || b.grandTotal).toLocaleString("en-IN")}</p>
-                  <span className="text-xs text-slate-500">{b.billDate}</span>
+                  {(Number(b.totals?.due || b.due) > 0) ? (
+                    <span className="text-xs text-rose-600 font-bold">Due: ₹{b.totals?.due || b.due}</span>
+                  ) : (
+                    <span className="text-xs text-emerald-600 font-bold">Paid</span>
+                  )}
                 </div>
               </div>
             ))}
@@ -463,56 +609,116 @@
       taxTreatment, setTaxTreatment, customer, setCustomer,
       items, addItem, removeItem, updateItem,
       repairDetails, setRepairDetails, payment, setPayment,
-      totals, onSave, loading, statusMsg, onCancel
+      totals, onSave, onCancel
     }) {
       useEffect(() => { lucide.createIcons(); }, [items, billType]);
       return (
-        <div className="bg-white rounded-xl shadow p-4 sm:p-6 space-y-4">
+        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-5 border border-slate-200">
           <div className="flex justify-between items-center border-b pb-3">
-            <h2 className="text-xl font-bold text-slate-800">{invoiceNo} ({billType})</h2>
+            <div>
+              <span className="text-xs font-bold text-blue-900 uppercase">NEW INVOICE</span>
+              <h2 className="text-xl font-black text-slate-800">{invoiceNo}</h2>
+            </div>
             <div className="flex bg-slate-100 p-1 rounded-lg">
               {["MOBILE", "ACCESSORIES", "REPAIRING"].map(t => (
-                <button key={t} onClick={() => setBillType(t)} className={`px-3 py-1 rounded text-xs font-bold ${billType === t ? "bg-blue-900 text-white" : ""}`}>{t}</button>
+                <button key={t} type="button" onClick={() => setBillType(t)} className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${billType === t ? "bg-blue-900 text-white shadow" : "text-slate-600"}`}>{t}</button>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input type="text" placeholder="Customer Name *" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} className="p-2.5 border rounded-lg text-sm" />
-            <input type="tel" maxLength="10" placeholder="Mobile Number (10 digits) *" value={customer.mobile} onChange={(e) => setCustomer({ ...customer, mobile: e.target.value.replace(/\D/g, "") })} className="p-2.5 border rounded-lg text-sm" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border">
+            <div>
+              <label className="text-xs font-bold text-slate-600">Customer Name *</label>
+              <input type="text" placeholder="नाम लिखें" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} className="w-full mt-1 p-2.5 bg-white border rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-600">Mobile Number *</label>
+              <input type="tel" maxLength="10" placeholder="10 अंकों का नंबर" value={customer.mobile} onChange={(e) => setCustomer({ ...customer, mobile: e.target.value.replace(/\D/g, "") })} className="w-full mt-1 p-2.5 bg-white border rounded-lg text-sm" />
+            </div>
           </div>
 
-          {items.map((item, idx) => (
-            <div key={idx} className="p-3 bg-slate-50 rounded-xl border space-y-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <input type="text" placeholder="Brand (Samsung)" value={item.brand} onChange={(e) => updateItem(idx, "brand", e.target.value)} className="p-2 border rounded text-xs bg-white" />
-                <input type="text" placeholder="Model Name (Galaxy A56)" value={item.productName} onChange={(e) => updateItem(idx, "productName", e.target.value)} className="p-2 border rounded text-xs bg-white" />
-                {billType === "MOBILE" && <input type="text" placeholder="IMEI 1 (15 digits)" value={item.imei1} onChange={(e) => updateItem(idx, "imei1", e.target.value)} className="p-2 border rounded text-xs bg-white" />}
+          {/* Device Details for REPAIRING */}
+          {billType === "REPAIRING" && (
+            <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3">
+              <h3 className="font-bold text-sm text-amber-900 flex items-center space-x-1.5">
+                <i data-lucide="wrench" className="w-4 h-4 text-amber-700"></i>
+                <span>Device & Repair Specs (रिपेयर विवरण)</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input type="text" placeholder="Device Brand (Vivo, Samsung)" value={repairDetails.brand} onChange={(e) => setRepairDetails({ ...repairDetails, brand: e.target.value })} className="p-2.5 bg-white border rounded-lg text-sm" />
+                <input type="text" placeholder="Device Model (Y20, Note 12)" value={repairDetails.model} onChange={(e) => setRepairDetails({ ...repairDetails, model: e.target.value })} className="p-2.5 bg-white border rounded-lg text-sm" />
+                <input type="text" placeholder="Device IMEI / Serial No." value={repairDetails.imei} onChange={(e) => setRepairDetails({ ...repairDetails, imei: e.target.value })} className="p-2.5 bg-white border rounded-lg text-sm" />
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                <input type="number" min="1" placeholder="Qty" value={item.quantity} onChange={(e) => updateItem(idx, "quantity", Number(e.target.value))} className="p-2 border rounded text-xs bg-white" />
-                <input type="number" placeholder="Rate (₹)" value={item.rate} onChange={(e) => updateItem(idx, "rate", Number(e.target.value))} className="p-2 border rounded text-xs bg-white font-bold" />
-                <input type="number" placeholder="Discount" value={item.discount} onChange={(e) => updateItem(idx, "discount", Number(e.target.value))} className="p-2 border rounded text-xs bg-white" />
+              <textarea rows="2" placeholder="Complaint / Customer Problem..." value={repairDetails.complaint} onChange={(e) => setRepairDetails({ ...repairDetails, complaint: e.target.value })} className="w-full p-2.5 bg-white border rounded-lg text-sm" />
+              <textarea rows="2" placeholder="Repairing Work Done / Details..." value={repairDetails.workDone} onChange={(e) => setRepairDetails({ ...repairDetails, workDone: e.target.value })} className="w-full p-2.5 bg-white border rounded-lg text-sm" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Labour Charge (₹)</label>
+                  <input type="number" value={repairDetails.labourCharge} onChange={(e) => setRepairDetails({ ...repairDetails, labourCharge: Number(e.target.value) })} className="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600">Labour GST %</label>
+                  <select value={repairDetails.gstRate} onChange={(e) => setRepairDetails({ ...repairDetails, gstRate: Number(e.target.value) })} className="w-full mt-1 p-2 bg-white border rounded-lg text-sm">
+                    {[0, 5, 12, 18, 28].map(r => <option key={r} value={r}>{r}%</option>)}
+                  </select>
+                </div>
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Items / Spares */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-sm text-slate-800">
+              {billType === "REPAIRING" ? "Spare Parts / Replacements" : "Products / Handsets"}
+            </h3>
+            {items.map((item, idx) => (
+              <div key={idx} className="p-3.5 bg-slate-50 rounded-xl border relative space-y-3">
+                {items.length > 1 && (
+                  <button type="button" onClick={() => removeItem(idx)} className="absolute top-2 right-2 text-rose-500 text-xs font-bold p-1">हटाएं ✕</button>
+                )}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <input type="text" placeholder="Brand (e.g. Samsung)" value={item.brand} onChange={(e) => updateItem(idx, "brand", e.target.value)} className="p-2 border rounded text-xs bg-white" />
+                  <input type="text" placeholder={billType === "REPAIRING" ? "Part (Display, Battery)" : "Model (Galaxy A56)"} value={item.productName} onChange={(e) => updateItem(idx, "productName", e.target.value)} className="p-2 border rounded text-xs bg-white" />
+                  {billType === "MOBILE" && (
+                    <input type="text" placeholder="IMEI 1 (15 अंक)" value={item.imei1} onChange={(e) => updateItem(idx, "imei1", e.target.value)} className="p-2 border rounded text-xs bg-white" />
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2 items-center">
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Qty</label>
+                    <input type="number" min="1" value={item.quantity} onChange={(e) => updateItem(idx, "quantity", Number(e.target.value))} className="w-full p-2 border rounded text-xs bg-white font-bold" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Rate (₹)</label>
+                    <input type="number" value={item.rate} onChange={(e) => updateItem(idx, "rate", Number(e.target.value))} className="w-full p-2 border rounded text-xs bg-white font-bold" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase">Discount (₹)</label>
+                    <input type="number" value={item.discount} onChange={(e) => updateItem(idx, "discount", Number(e.target.value))} className="w-full p-2 border rounded text-xs bg-white" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button type="button" onClick={addItem} className="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg">+ अन्य आइटम जोड़ें</button>
 
           <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border">
             <div>
-              <label className="text-xs font-bold text-slate-600">Amount Paid (₹)</label>
-              <input type="number" value={payment.amountPaid} onChange={(e) => setPayment({ ...payment, amountPaid: Number(e.target.value) })} className="w-full mt-1 p-2 border rounded-lg font-bold" />
+              <label className="text-xs font-bold text-slate-600">जमा राशि (Amount Paid ₹)</label>
+              <input type="number" value={payment.amountPaid} onChange={(e) => setPayment({ ...payment, amountPaid: Number(e.target.value) })} className="w-full mt-1 p-2.5 border rounded-lg font-bold text-emerald-700 bg-white" />
             </div>
             <div>
               <label className="text-xs font-bold text-slate-600">Payment Mode</label>
-              <select value={payment.mode} onChange={(e) => setPayment({ ...payment, mode: e.target.value })} className="w-full mt-1 p-2 border rounded-lg">
-                <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+              <select value={payment.mode} onChange={(e) => setPayment({ ...payment, mode: e.target.value })} className="w-full mt-1 p-2.5 border rounded-lg bg-white text-sm">
+                <option value="Cash">Cash</option><option value="UPI">UPI / QR</option><option value="Card">Card</option>
               </select>
             </div>
           </div>
 
           <div className="bg-blue-900 text-white p-4 rounded-xl flex justify-between items-center">
             <div>
-              <p className="text-xs text-blue-200">Total Bill Amount</p>
+              <p className="text-xs text-blue-200">Total Invoice Amount</p>
               <p className="text-2xl font-black text-amber-400">₹{totals.grand.toLocaleString("en-IN")}</p>
             </div>
             <div className="text-right">
@@ -522,9 +728,9 @@
           </div>
 
           <div className="flex space-x-2">
-            <button onClick={onCancel} className="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-sm">Cancel</button>
-            <button onClick={onSave} disabled={loading} className="flex-[2] py-3 bg-emerald-600 text-white font-bold rounded-xl text-sm hover:bg-emerald-500">
-              {loading ? "Saving..." : "SAVE & GENERATE BILL"}
+            <button type="button" onClick={onCancel} className="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-sm">रद्द करें</button>
+            <button type="button" onClick={onSave} className="flex-[2] py-3 bg-emerald-600 text-white font-black rounded-xl text-sm hover:bg-emerald-500 shadow-lg active:scale-95 transition">
+              SAVE & GENERATE BILL (सेव करें)
             </button>
           </div>
         </div>
@@ -597,10 +803,18 @@
               </div>
             </div>
 
+            {bill.billType === "REPAIRING" && bill.repairDetails && (
+              <div className="py-2 bg-slate-50 border-b px-2 space-y-0.5 my-2">
+                <p className="font-bold text-slate-800">Device: {bill.repairDetails.brand} {bill.repairDetails.model} ({bill.repairDetails.imei || "N/A"})</p>
+                <p className="text-slate-600">Issue: {bill.repairDetails.complaint}</p>
+                <p className="text-slate-600">Work Done: {bill.repairDetails.workDone}</p>
+              </div>
+            )}
+
             <table className="w-full my-3 border-collapse">
               <thead>
                 <tr className="bg-slate-100 text-[9px] uppercase border-y">
-                  <th className="p-1.5 text-left">Item</th>
+                  <th className="p-1.5 text-left">Item / Service</th>
                   <th className="p-1.5 text-left">IMEI/Serial</th>
                   <th className="p-1.5 text-center">Qty</th>
                   <th className="p-1.5 text-right">Rate</th>
@@ -617,6 +831,14 @@
                     <td className="p-1.5 text-right font-bold">₹{((it.quantity || 1) * (it.rate || 0) - (it.discount || 0)).toLocaleString("en-IN")}</td>
                   </tr>
                 ))}
+                {bill.billType === "REPAIRING" && Number(bill.repairDetails?.labourCharge) > 0 && (
+                  <tr className="border-b">
+                    <td colSpan="2" className="p-1.5 font-bold">Repair Labour & Service Charge</td>
+                    <td className="p-1.5 text-center">1</td>
+                    <td className="p-1.5 text-right">₹{bill.repairDetails.labourCharge}</td>
+                    <td className="p-1.5 text-right font-bold">₹{bill.repairDetails.labourCharge}</td>
+                  </tr>
+                )}
               </tbody>
             </table>
 
@@ -684,11 +906,11 @@
       );
     }
 
-    function SettingsView({ business, setBusiness, gasUrl, setGasUrl, onBack }) {
+    function SettingsView({ business, setBusiness, gasUrl, setGasUrl, onBack, showPopup }) {
       const [url, setUrl] = useState(gasUrl);
       const save = () => {
         setGasUrl(url);
-        alert("Settings Saved!");
+        showPopup("success", "Settings Saved", ["Google Apps Script URL सफलतापूर्वक अपडेट हो गया है।"]);
         onBack();
       };
       return (
@@ -698,7 +920,7 @@
             <label className="text-xs font-bold text-slate-600">Google Apps Script Web App URL</label>
             <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://script.google.com/macros/s/.../exec" className="w-full mt-1 p-2 border rounded-lg text-xs font-mono" />
           </div>
-          <button onClick={save} className="w-full py-2.5 bg-blue-900 text-white font-bold rounded-xl text-xs">SAVE</button>
+          <button onClick={save} className="w-full py-2.5 bg-blue-900 text-white font-bold rounded-xl text-xs">SAVE SETTINGS</button>
         </div>
       );
     }
