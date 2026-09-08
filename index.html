@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="google" content="notranslate" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>SRI RAM ENTERPRISES - POS & Billing</title>
-  <meta name="theme-color" content="#0f172a" />
+  <title>SRI RAM ENTERPRISES - Billing & POS</title>
+  <meta name="theme-color" content="#004aad" />
   <link rel="manifest" href="./manifest.json" />
 
   <!-- Tailwind CSS & Engine Libraries -->
@@ -15,28 +15,40 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .thank-you-font { font-family: 'Caveat', cursive; }
+    
+    /* Strict Receipt Print Dimensions */
     @media print {
       body * { visibility: hidden; }
       #invoice-capture, #invoice-capture * { visibility: visible; }
-      #invoice-capture { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+      #invoice-capture { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100% !important; 
+        margin: 0 !important; 
+        padding: 12mm !important;
+        box-shadow: none !important; 
+        border: none !important; 
+      }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-blue-900 selection:text-white">
 
-  <!-- HEADER -->
-  <header id="main-header" class="bg-slate-950 text-white sticky top-0 z-30 px-3.5 sm:px-6 py-2.5 shadow-md border-b border-slate-800 flex items-center justify-between">
+  <!-- TOP APP HEADER -->
+  <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-3.5 sm:px-6 py-2.5 shadow-md flex items-center justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
-      <div class="bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-black px-2 py-1 rounded-lg text-xs shadow-sm tracking-wider">SRE</div>
+      <div class="border-2 border-white rounded-full w-8 h-8 flex items-center justify-center font-black text-xs">SRE</div>
       <div>
-        <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none text-slate-100">SRI RAM ENTERPRISES</h1>
-        <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Sector-4, B.S. City • Point of Sale</p>
+        <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none text-white">SRI RAM ENTERPRISES</h1>
+        <p class="text-[9px] sm:text-[10px] text-blue-100 font-medium mt-0.5">Mobile • Accessories • Repairing</p>
       </div>
     </div>
     <div class="flex items-center space-x-2">
-      <button onclick="showView('settings')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-bold border border-slate-700 flex items-center space-x-1 transition">
+      <button onclick="showView('settings')" class="px-2.5 py-1 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-[11px] font-bold border border-blue-400 flex items-center space-x-1 transition">
         <span>⚙️</span>
         <span class="hidden sm:inline">Settings</span>
       </button>
@@ -46,7 +58,7 @@
   <!-- NOTIFICATION POPUP -->
   <div id="popup-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
     <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-      <div id="popup-header" class="p-3.5 flex items-center justify-between text-white bg-blue-600">
+      <div id="popup-header" class="p-3.5 flex items-center justify-between text-white bg-[#004aad]">
         <div class="flex items-center space-x-2">
           <span id="popup-icon" class="font-black text-sm">ℹ</span>
           <h3 id="popup-title" class="font-bold text-xs">Notification</h3>
@@ -55,13 +67,13 @@
       </div>
       <div id="popup-body" class="p-4 space-y-1.5 text-xs text-slate-700 bg-slate-50/50 font-medium"></div>
       <div id="popup-footer" class="p-2.5 bg-white border-t flex justify-end">
-        <button id="popup-btn" onclick="closePopup()" class="px-4 py-1.5 bg-slate-900 text-white font-bold rounded-lg text-xs shadow hover:bg-slate-800 transition">OK</button>
+        <button id="popup-btn" onclick="closePopup()" class="px-4 py-1.5 bg-[#004aad] text-white font-bold rounded-lg text-xs shadow hover:bg-blue-800 transition">OK</button>
       </div>
     </div>
   </div>
 
-  <!-- MAIN WRAPPER -->
-  <main class="flex-1 w-full max-w-6xl mx-auto p-2.5 sm:p-4 md:p-6">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4 md:p-6">
 
     <!-- VIEW 1: DASHBOARD -->
     <div id="view-dashboard" class="space-y-3 sm:space-y-4">
@@ -72,7 +84,7 @@
         </div>
         <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Today's Sales</span>
-          <p id="dash-today-sales" class="text-xl sm:text-2xl font-black text-blue-900 mt-0.5">₹0</p>
+          <p id="dash-today-sales" class="text-xl sm:text-2xl font-black text-[#004aad] mt-0.5">₹0</p>
         </div>
         <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Collection</span>
@@ -85,7 +97,7 @@
       </div>
 
       <div class="grid grid-cols-3 gap-2 sm:gap-3">
-        <button onclick="startNewBill('MOBILE')" class="flex flex-col sm:flex-row items-center justify-center p-3 bg-gradient-to-br from-blue-900 to-blue-950 text-white rounded-xl shadow hover:shadow-md active:scale-95 transition sm:space-x-2">
+        <button onclick="startNewBill('MOBILE')" class="flex flex-col sm:flex-row items-center justify-center p-3 bg-gradient-to-br from-[#004aad] to-blue-900 text-white rounded-xl shadow hover:shadow-md active:scale-95 transition sm:space-x-2">
           <span class="text-lg">📱</span>
           <span class="font-bold text-xs mt-1 sm:mt-0">Mobile Sale</span>
         </button>
@@ -102,7 +114,7 @@
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-3.5 py-2.5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <h2 class="font-black text-xs uppercase tracking-wider text-slate-700">Recent Invoices</h2>
-          <span class="text-[10px] text-slate-400">Cloud & Local Storage</span>
+          <span class="text-[10px] text-slate-400">Cloud & Local Memory</span>
         </div>
         <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-[420px] overflow-y-auto"></div>
       </div>
@@ -112,11 +124,11 @@
     <div id="view-new-bill" class="bg-white rounded-2xl shadow-md p-3.5 sm:p-5 space-y-3 sm:space-y-4 border border-slate-200 hidden">
       <div class="flex flex-wrap gap-2 justify-between items-center border-b pb-2.5">
         <div>
-          <span class="text-[9px] font-black text-blue-900 tracking-wider uppercase">NEW INVOICE</span>
+          <span class="text-[9px] font-black text-[#004aad] tracking-wider uppercase">NEW INVOICE</span>
           <h2 id="form-invoice-no" class="text-base sm:text-lg font-black text-slate-900">SRE-2026-00001</h2>
         </div>
         <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200" id="bill-type-pills">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-900 text-white shadow">MOBILE</button>
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#004aad] text-white shadow">MOBILE</button>
           <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-600">ACCESSORIES</button>
           <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-600">REPAIRING</button>
         </div>
@@ -126,15 +138,15 @@
       <div id="standard-cust-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-200">
         <div>
           <label id="lbl-cust-name" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Name *</label>
-          <input type="text" id="cust-name" placeholder="ग्राहक का नाम लिखें" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
+          <input type="text" id="cust-name" placeholder="ग्राहक का नाम लिखें" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#004aad] outline-none" />
         </div>
         <div>
           <label id="lbl-cust-phone" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile Number *</label>
-          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
+          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#004aad] outline-none" />
         </div>
         <div>
           <label id="lbl-cust-address" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Address *</label>
-          <input type="text" id="cust-address" placeholder="पूरा पता लिखें (उदा: GB-15, Sec-4)" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
+          <input type="text" id="cust-address" placeholder="पूरा पता लिखें (उदा: GB-15, Sec-4)" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-[#004aad] outline-none" />
         </div>
       </div>
 
@@ -168,20 +180,9 @@
       <div id="standard-items-section" class="space-y-2">
         <div class="flex justify-between items-center">
           <h3 id="items-title" class="font-black text-xs text-slate-800 uppercase tracking-wider">Products / Handsets</h3>
-          <button type="button" onclick="addNewItemRow()" class="text-[11px] font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition">+ Add Item</button>
+          <button type="button" onclick="addNewItemRow()" class="text-[11px] font-bold text-[#004aad] bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition">+ Add Item</button>
         </div>
         <div id="items-container" class="space-y-2"></div>
-      </div>
-
-      <!-- LIVE GST SUMMARY IN FORM -->
-      <div id="form-gst-live-summary" class="p-2.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1 text-xs text-blue-950 hidden">
-        <p class="font-bold text-[9px] uppercase tracking-wider text-blue-900">GST Breakdown</p>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-blue-200/80 text-[11px]">
-          <div><span class="text-slate-500">Taxable:</span> <span id="live-taxable" class="font-bold">₹0</span></div>
-          <div><span class="text-slate-500">CGST:</span> <span id="live-cgst" class="font-bold">₹0</span></div>
-          <div><span class="text-slate-500">SGST:</span> <span id="live-sgst" class="font-bold">₹0</span></div>
-          <div><span class="text-slate-500">Total GST:</span> <span id="live-total-gst" class="font-bold text-blue-900">₹0</span></div>
-        </div>
       </div>
 
       <!-- PAYMENT MODULE -->
@@ -189,7 +190,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label class="text-[9px] sm:text-[10px] font-black text-slate-600 block uppercase tracking-wider mb-1">Primary Mode *</label>
-            <select id="pay-primary-dropdown" onchange="onPrimaryModeChange()" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 shadow-sm outline-none focus:border-blue-900">
+            <select id="pay-primary-dropdown" onchange="onPrimaryModeChange()" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 shadow-sm outline-none focus:border-[#004aad]">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR</option>
               <option value="Card Swipe">💳 Card Swipe</option>
@@ -212,7 +213,7 @@
         <!-- FINANCE MODULE -->
         <div id="finance-inputs-container" class="pt-2.5 border-t border-slate-200 space-y-2 bg-blue-50/60 p-3 rounded-xl border border-blue-200 hidden">
           <div class="flex justify-between items-center">
-            <h4 class="text-xs font-black text-blue-950 uppercase tracking-wide">🏦 Finance Setup</h4>
+            <h4 class="text-xs font-black text-[#004aad] uppercase tracking-wide">🏦 Finance Setup</h4>
             <span class="text-[9px] text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded">Finance Active</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -255,7 +256,7 @@
               <input type="number" id="fin-dp" placeholder="डाउनपेमेंट राशि लिखें" oninput="handleFinanceInput()" class="w-full mt-0.5 p-1 bg-transparent text-base font-black text-emerald-700 outline-none" />
             </div>
             <div class="bg-white p-2.5 rounded-lg border border-blue-300">
-              <label class="text-[9px] font-black text-blue-900 uppercase block tracking-wider">Company Loan Amount (कंपनी से आएगा ₹)</label>
+              <label class="text-[9px] font-black text-[#004aad] uppercase block tracking-wider">Company Loan Amount (कंपनी से आएगा ₹)</label>
               <input type="number" id="fin-loan" placeholder="₹0" readonly class="w-full mt-0.5 p-1 bg-transparent text-base font-black text-blue-950 outline-none" />
             </div>
           </div>
@@ -300,19 +301,9 @@
               <input type="number" id="dues-split-card" placeholder="कार्ड टोकन लिखें" oninput="calcDuesSplit()" class="w-full mt-0.5 p-1.5 bg-white border border-rose-300 rounded-lg text-xs font-bold" />
             </div>
           </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-            <div class="bg-white p-2.5 rounded-lg border border-emerald-300">
-              <label class="text-[9px] font-black text-emerald-800 uppercase block tracking-wider">Advance / Token Paid</label>
-              <p id="dues-disp-paid" class="mt-0.5 text-base font-black text-emerald-700">₹0</p>
-            </div>
-            <div class="bg-white p-2.5 rounded-lg border border-rose-300">
-              <label class="text-[9px] font-black text-rose-900 uppercase block tracking-wider">Remaining Balance Due</label>
-              <p id="dues-disp-due" class="mt-0.5 text-base font-black text-rose-600">₹0</p>
-            </div>
-          </div>
         </div>
 
+        <!-- PRIMARY SPLIT INPUTS -->
         <div id="split-inputs-container" class="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
           <div id="split-box-cash" class="hidden">
             <label class="text-[9px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
@@ -328,16 +319,18 @@
           </div>
         </div>
 
+        <!-- TOTAL PAID BOX -->
         <div id="regular-paid-container" class="pt-1.5 border-t border-slate-200">
           <label class="text-[9px] sm:text-[10px] font-black text-slate-600 uppercase tracking-wider block mb-0.5">Total Amount Paid (₹) *</label>
           <input type="number" id="pay-paid" placeholder="कुल जमा राशि दर्ज करें" oninput="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg font-black text-emerald-700 bg-white text-xs sm:text-sm shadow-sm outline-none" />
         </div>
       </div>
 
-      <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-3 sm:p-4 rounded-xl flex justify-between items-center shadow-md">
+      <!-- INVOICE SUMMARY BANNER -->
+      <div class="bg-gradient-to-r from-[#004aad] to-blue-950 text-white p-3 sm:p-4 rounded-xl flex justify-between items-center shadow-md">
         <div>
-          <span class="text-[9px] text-blue-200 font-bold uppercase tracking-wider block">Total Amount</span>
-          <p id="total-grand" class="text-xl sm:text-2xl font-black text-amber-400 leading-none mt-1">₹0</p>
+          <span class="text-[9px] text-blue-200 font-bold uppercase tracking-wider block">Total Bill Amount</span>
+          <p id="total-grand" class="text-xl sm:text-2xl font-black text-amber-300 leading-none mt-1">₹0</p>
         </div>
         <div class="text-right">
           <span class="text-[9px] text-blue-200 font-bold uppercase tracking-wider block">Balance Due</span>
@@ -347,17 +340,17 @@
 
       <div class="flex space-x-2 pt-0.5">
         <button type="button" onclick="showView('dashboard')" class="flex-1 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-300 transition">Cancel</button>
-        <button type="button" onclick="saveCurrentBill()" class="flex-[2] py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition">
+        <button type="button" onclick="saveCurrentBill()" class="flex-[2] py-2.5 bg-[#004aad] hover:bg-blue-800 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition">
           SAVE & GENERATE BILL
         </button>
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE DISPLAY (PROFESSIONAL SHOWROOM LAYOUT) -->
-    <div id="view-invoice" class="space-y-3.5 hidden">
-      <div class="flex justify-between items-center bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200 shadow-sm">
+    <!-- VIEW 3: INVOICE VIEW (EXACT IMAGE REPLICA) -->
+    <div id="view-invoice" class="space-y-3 hidden">
+      <div class="flex justify-between items-center bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm">
         <div class="flex space-x-2">
-          <button onclick="downloadInvoicePDF()" class="px-3.5 py-1.5 bg-blue-950 hover:bg-slate-900 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
+          <button onclick="downloadInvoicePDF()" class="px-3.5 py-1.5 bg-[#004aad] hover:bg-blue-800 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
             <span>📥</span>
             <span>DOWNLOAD PDF</span>
           </button>
@@ -369,118 +362,151 @@
         <button id="btn-back-dash" onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 hover:text-slate-900">← Back</button>
       </div>
 
-      <!-- PREMIUM INVOICE TEMPLATE (BOXED, CRISP, CLEAN A4 LOOK) -->
+      <!-- EXACT IMAGE MATCH INVOICE TEMPLATE -->
       <div class="w-full flex justify-center overflow-x-auto pb-6">
-        <div id="invoice-capture" class="w-full max-w-[820px] bg-white p-6 sm:p-8 border border-slate-300 shadow-lg text-xs text-slate-800 leading-normal box-border rounded-sm">
+        <div id="invoice-capture" class="w-full max-w-[650px] bg-white p-5 sm:p-7 border-2 border-[#004aad] shadow-xl text-xs text-slate-900 box-border leading-tight">
           
-          <!-- TOP HEADER SECTION -->
-          <div class="border-b-2 border-blue-950 pb-4 flex justify-between items-start">
-            <div>
-              <h1 class="text-xl sm:text-2xl font-black text-blue-950 tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
-              <p class="text-[10.5px] text-slate-600 font-medium mt-0.5">GB-15, City Centre, Sector-4, B.S. City, Jharkhand - 827004</p>
-              <div class="flex flex-wrap gap-x-4 gap-y-0.5 mt-1.5 text-[11px] font-semibold text-slate-700">
-                <span>GSTIN: <strong class="text-blue-950 font-black">20APOPK6864K1ZH</strong></span>
-                <span>Contact: <strong class="text-slate-900 font-bold">+91 9334765000</strong></span>
+          <!-- STORE HEADER (EXACT PHOTO LAYOUT) -->
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <!-- SRE EMBLEM -->
+            <div class="w-16 h-16 border-2 border-[#004aad] rounded-full flex flex-col items-center justify-center p-1 text-center shrink-0">
+              <span class="text-[7px] font-bold text-[#004aad] tracking-tighter uppercase leading-none">ENTERPRISES</span>
+              <span class="text-base font-black text-[#004aad] tracking-tight leading-none my-0.5">SRE</span>
+              <span class="text-[7px] font-bold text-[#004aad] tracking-tighter uppercase leading-none">SINCE 2004</span>
+            </div>
+
+            <!-- TITLE & DETAILS -->
+            <div class="text-center flex-1 px-2">
+              <h1 class="text-xl sm:text-2xl font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
+              <p class="text-xs font-bold text-[#004aad] tracking-wide my-0.5">Mobile • Accessories • Repairing</p>
+              <p class="text-[9.5px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
+              <p class="text-[10px] font-bold text-slate-800 mt-0.5">Contact : 9334765000, 9334237111, 9335136000</p>
+              <p class="text-[10px] font-black text-slate-900 mt-0.5">GSTIN : 20APOPK6864K1ZH</p>
+            </div>
+            
+            <div class="w-12 shrink-0"></div>
+          </div>
+
+          <!-- SOLID BLUE TAX INVOICE STRIP -->
+          <div class="bg-[#004aad] text-white font-black text-center py-1 text-sm tracking-widest uppercase my-2">
+            TAX INVOICE
+          </div>
+
+          <!-- CUSTOMER & INVOICE FIELDS (DOTTED UNDERLINES) -->
+          <div class="space-y-1.5 py-1 text-[11px] font-semibold text-slate-800">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center flex-1 mr-4">
+                <span class="font-bold whitespace-nowrap">Invoice No. :&nbsp;</span>
+                <span id="inv-no-display" class="font-black text-slate-950 border-b border-dotted border-slate-500 flex-1 px-1">SRE-2026-00001</span>
+              </div>
+              <div class="flex items-center w-36">
+                <span class="font-bold whitespace-nowrap">Date :&nbsp;</span>
+                <span id="inv-date-display" class="font-bold text-slate-950 border-b border-dotted border-slate-500 flex-1 px-1 text-center"></span>
               </div>
             </div>
-            <div class="text-right">
-              <span class="bg-blue-950 text-white font-black px-2.5 py-1 text-[10px] tracking-widest uppercase inline-block rounded-sm">TAX INVOICE</span>
-              <p id="inv-no-display" class="font-black text-sm sm:text-base text-slate-900 mt-2">SRE-2026-00001</p>
-              <p class="text-slate-500 text-[10.5px] font-semibold mt-0.5">Date: <span id="inv-date-display" class="text-slate-800 font-bold"></span></p>
+
+            <div class="flex items-center">
+              <span class="font-bold whitespace-nowrap">Name :&nbsp;</span>
+              <span id="inv-cust-name" class="font-black text-slate-950 border-b border-dotted border-slate-500 flex-1 px-1"></span>
+            </div>
+
+            <div class="flex items-center">
+              <span class="font-bold whitespace-nowrap">Address :&nbsp;</span>
+              <span id="inv-cust-address" class="font-medium text-slate-900 border-b border-dotted border-slate-500 flex-1 px-1"></span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <div class="flex items-center flex-1 mr-4">
+                <span class="font-bold whitespace-nowrap">GSTIN :&nbsp;</span>
+                <span class="border-b border-dotted border-slate-500 flex-1 px-1 text-slate-600 font-mono text-[10px]">-</span>
+              </div>
+              <div class="flex items-center w-48">
+                <span class="font-bold whitespace-nowrap">Ph. :&nbsp;</span>
+                <span id="inv-cust-phone" class="font-bold text-slate-950 border-b border-dotted border-slate-500 flex-1 px-1 font-mono text-[11px]"></span>
+              </div>
             </div>
           </div>
 
-          <!-- CUSTOMER & PAYMENT DETAILS GRID -->
-          <div class="grid grid-cols-2 gap-4 py-3.5 border-b border-slate-200">
-            <div class="bg-slate-50/80 p-3 rounded-lg border border-slate-200">
-              <span class="text-[9.5px] font-black text-blue-950 uppercase tracking-wider block mb-1">Billed To (Customer):</span>
-              <p id="inv-cust-name" class="font-extrabold text-[13px] text-slate-900 leading-tight"></p>
-              <p id="inv-cust-phone" class="text-slate-600 font-mono text-[11px] mt-0.5"></p>
-              <p id="inv-cust-address" class="text-slate-600 text-[10.5px] mt-0.5 leading-snug"></p>
-            </div>
-            <div class="bg-slate-50/80 p-3 rounded-lg border border-slate-200 flex flex-col justify-between text-right">
-              <div>
-                <span class="text-[9.5px] font-black text-blue-950 uppercase tracking-wider block mb-1">Payment Breakdown:</span>
-                <p id="inv-pay-mode" class="font-extrabold text-[12px] text-slate-900"></p>
-              </div>
-              <div>
-                <div id="inv-fin-box" class="text-[10px] text-blue-950 font-bold leading-tight mt-1 hidden"></div>
-                <div id="inv-dues-box" class="text-[10px] text-rose-700 font-bold leading-tight mt-1 hidden"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- REPAIR NOTE -->
-          <div id="inv-rep-box" class="py-2.5 bg-amber-50/70 border border-amber-200 px-3 my-3 rounded-lg hidden"></div>
-
-          <!-- MAIN PRODUCTS / ITEMS TABLE -->
-          <div class="my-3 overflow-x-auto">
-            <table class="w-full border-collapse text-left border border-slate-200">
+          <!-- BLUE BORDERED ITEMS GRID TABLE (EXACT ROWS & LOOK) -->
+          <div class="mt-2">
+            <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
               <thead>
-                <tr class="bg-slate-100 text-[10px] uppercase border-b border-slate-300 text-slate-700 font-black">
-                  <th class="p-2 border-r border-slate-200">#</th>
-                  <th class="p-2 border-r border-slate-200">Item / Product Name</th>
-                  <th class="p-2 border-r border-slate-200">IMEI / Serial / Remarks</th>
-                  <th class="p-2 border-r border-slate-200 text-center">Qty</th>
-                  <th class="p-2 border-r border-slate-200 text-center">GST %</th>
-                  <th class="p-2 border-r border-slate-200 text-right">Rate (₹)</th>
-                  <th class="p-2 text-right">Amount (₹)</th>
+                <tr class="bg-[#004aad] text-white text-center font-black">
+                  <th class="border border-[#004aad] p-1 w-10">S.No</th>
+                  <th class="border border-[#004aad] p-1 w-44">Brand / Product</th>
+                  <th class="border border-[#004aad] p-1">Model / IMEI</th>
+                  <th class="border border-[#004aad] p-1 w-12">Qty.</th>
+                  <th class="border border-[#004aad] p-1 w-16">Rate</th>
+                  <th class="border border-[#004aad] p-1 w-20">Amount</th>
                 </tr>
               </thead>
-              <tbody id="inv-items-tbody" class="divide-y divide-slate-200 text-[11px]"></tbody>
+              <tbody id="inv-items-tbody" class="divide-y divide-[#004aad] font-medium text-slate-900">
+                <!-- Dynamically populated up to 8 rows -->
+              </tbody>
             </table>
           </div>
 
-          <!-- GST TAX BREAKDOWN TABLE (Appears when GST > 0) -->
-          <div id="inv-gst-breakdown" class="my-3 bg-slate-50/70 border border-slate-200 rounded-lg p-2.5 hidden">
-            <div class="text-[9.5px] font-black text-slate-500 uppercase tracking-wider mb-1.5">Tax Summary Breakdown (GST Rules):</div>
-            <div class="grid grid-cols-4 gap-2 text-center text-[10.5px]">
-              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">Taxable Value</span> <strong id="inv-taxable-val">₹0</strong></div>
-              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">CGST</span> <strong id="inv-cgst-val">₹0</strong></div>
-              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">SGST</span> <strong id="inv-sgst-val">₹0</strong></div>
-              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">Total Tax</span> <strong id="inv-tot-gst-val" class="text-blue-950 font-black">₹0</strong></div>
+          <!-- BOTTOM SECTION: THANK YOU, QR CODE & CALCULATION BOX -->
+          <div class="flex items-start justify-between mt-2 pt-1 border-t-2 border-[#004aad]">
+            
+            <!-- LEFT: CURSIVE THANK YOU & SCANNER QR -->
+            <div class="flex flex-col items-start justify-between pt-1 pl-2 space-y-2">
+              <div>
+                <p class="thank-you-font text-3xl sm:text-4xl text-[#004aad] -rotate-6 leading-tight">
+                  Thank You<br />for your Business!
+                </p>
+              </div>
+              
+              <!-- CRISP SCANNER QR -->
+              <div class="flex items-center space-x-2 pt-2">
+                <div id="inv-qrcode-container" class="w-16 h-16 border border-[#004aad] p-0.5 bg-white flex items-center justify-center"></div>
+                <div class="text-[8px] text-slate-500 leading-tight">
+                  <span class="font-bold text-[#004aad] block">DIGITAL VERIFIED</span>
+                  Scan with Camera<br />to verify invoice.
+                </div>
+              </div>
             </div>
+
+            <!-- RIGHT: EXACT BLUE TOTAL BOX -->
+            <div class="w-56 border-2 border-[#004aad] text-[10.5px] font-bold bg-white">
+              <div class="flex justify-between p-1 border-b border-[#004aad]">
+                <span class="pl-1">Subtotal</span>
+                <span id="inv-calc-subtotal" class="font-black pr-1">₹0</span>
+              </div>
+              <div class="flex justify-between p-1 border-b border-[#004aad]">
+                <span class="pl-1">Discount</span>
+                <span id="inv-calc-discount" class="pr-1">₹0</span>
+              </div>
+              <div class="flex justify-between p-1 border-b border-[#004aad]">
+                <span class="pl-1">CGST <span id="inv-cgst-pct">9%</span></span>
+                <span id="inv-cgst-val" class="pr-1">₹0</span>
+              </div>
+              <div class="flex justify-between p-1 border-b border-[#004aad]">
+                <span class="pl-1">SGST <span id="inv-sgst-pct">9%</span></span>
+                <span id="inv-sgst-val" class="pr-1">₹0</span>
+              </div>
+              <div class="flex justify-between p-1 border-b border-[#004aad] text-slate-400">
+                <span class="pl-1">IGST ___%</span>
+                <span class="pr-1">-</span>
+              </div>
+              <!-- SOLID BLUE GRAND TOTAL STRIP (ONLY TOTAL, NO PAID/DUE) -->
+              <div class="bg-[#004aad] text-white flex justify-between items-center p-1 font-black text-xs">
+                <span class="pl-1 tracking-wider uppercase">Grand Total</span>
+                <span id="inv-tot-grand" class="pr-1 text-sm font-black">₹0</span>
+              </div>
+            </div>
+
           </div>
 
-          <!-- INVOICE TOTALS & ULTRA-CRISP SCANNER QR CODE -->
-          <div class="flex justify-between items-end pt-3 border-t-2 border-slate-900 mt-4">
-            <!-- QR CODE BOX -->
-            <div class="flex items-center space-x-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-              <div id="inv-qrcode-container" class="w-[84px] h-[84px] bg-white border border-slate-300 p-1 flex items-center justify-center"></div>
-              <div class="text-left space-y-0.5">
-                <span class="text-[10px] font-black text-slate-800 uppercase block tracking-wider">Digital Verification</span>
-                <p class="text-[9px] text-slate-500 leading-tight">Scan this QR to view,<br />verify or download invoice<br />online on any device.</p>
-              </div>
+          <!-- SIGNATURES (EXACT PHOTO BOTTOM) -->
+          <div class="flex justify-between items-end mt-7 pt-2 text-[10px] font-bold text-slate-800">
+            <div class="border-t border-slate-400 pt-1 w-40 text-center">
+              Customer's Signature
             </div>
-
-            <!-- NET TOTALS BOX -->
-            <div class="text-right space-y-1 min-w-[200px]">
-              <div class="flex justify-between text-xs py-0.5 border-b border-slate-200">
-                <span class="text-slate-500 font-semibold">Grand Total:</span>
-                <strong id="inv-tot-grand" class="text-sm font-black text-slate-900">₹0</strong>
-              </div>
-              <div class="flex justify-between text-xs py-0.5 border-b border-slate-200">
-                <span class="text-emerald-700 font-semibold">Amount Paid:</span>
-                <strong id="inv-tot-paid" class="text-xs font-black text-emerald-700">₹0</strong>
-              </div>
-              <div class="flex justify-between text-xs py-0.5">
-                <span class="text-rose-600 font-bold">Balance Due:</span>
-                <strong id="inv-tot-due" class="text-xs font-black text-rose-600">₹0</strong>
-              </div>
-            </div>
-          </div>
-
-          <!-- TERMS & SIGNATURE -->
-          <div class="mt-6 pt-3 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
-            <div class="space-y-0.5">
-              <p class="font-bold text-slate-700 uppercase">Terms & Conditions:</p>
-              <p>• Goods once sold will not be returned or replaced without warranty terms.</p>
-              <p>• Warranty directly handled by respective brand authorized service centers.</p>
-            </div>
-            <div class="text-center">
-              <div class="h-8"></div>
-              <p class="border-t border-slate-400 pt-1 font-bold text-slate-800 uppercase tracking-wider">Authorized Signatory</p>
-              <p class="text-[8px] text-slate-400">SRI RAM ENTERPRISES</p>
+            <div class="text-right">
+              <span class="text-[#004aad] font-black text-[11px] block">For SRI RAM ENTERPRISES</span>
+              <div class="h-6"></div>
+              <span class="border-t border-slate-400 pt-1 inline-block w-40 text-center">Authorized Signatory</span>
             </div>
           </div>
 
@@ -493,11 +519,11 @@
       <h2 class="font-bold text-xs uppercase tracking-wider text-slate-700">Backend & Cloud Settings</h2>
       <div>
         <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Google Apps Script Web App URL</label>
-        <input type="text" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono outline-none focus:border-blue-900" />
+        <input type="text" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono outline-none focus:border-[#004aad]" />
       </div>
       <div class="flex space-x-2 pt-1">
         <button onclick="showView('dashboard')" class="flex-1 py-1.5 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs">Back</button>
-        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-slate-900 text-white font-bold rounded-lg text-xs">SAVE SETTINGS</button>
+        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-[#004aad] text-white font-bold rounded-lg text-xs">SAVE SETTINGS</button>
       </div>
     </div>
 
@@ -520,7 +546,7 @@
       header.className = `p-3.5 flex items-center justify-between text-white ${
         type === "success" ? "bg-emerald-600" :
         type === "error" ? "bg-rose-600" :
-        type === "progress" ? "bg-blue-600" : "bg-slate-900"
+        type === "progress" ? "bg-blue-600" : "bg-[#004aad]"
       }`;
 
       icon.innerHTML = type === "progress" ? '<div class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></div>' :
@@ -590,7 +616,7 @@
       listElem.innerHTML = billsCache.slice(0, 15).map(b => `
         <div onclick='openSavedInvoice("${b.secureToken}")' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center transition">
           <div>
-            <p class="font-bold text-blue-950 text-xs">${b.invoiceNo}</p>
+            <p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p>
             <p class="text-xs text-slate-700 font-medium">${b.customer?.name || b.customerName || "Customer"}</p>
             <span class="text-[9px] text-slate-400">${b.billDate}</span>
           </div>
@@ -641,7 +667,7 @@
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
         const btn = document.getElementById(`pill-${t}`);
         if (t === type) {
-          btn.className = "px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-900 text-white shadow";
+          btn.className = "px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#004aad] text-white shadow";
         } else {
           btn.className = "px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-600";
         }
@@ -924,6 +950,7 @@
       let grand = 0;
       let totalTaxable = 0;
       let totalGstAmt = 0;
+      let totalDiscount = 0;
       let hasAnyGst = false;
 
       if (currentBillType === "REPAIRING") {
@@ -938,6 +965,7 @@
           const disc = Number(r.querySelector(".item-disc")?.value) || 0;
           const gstRate = Number(r.querySelector(".item-gst")?.value) || 0;
 
+          totalDiscount += disc;
           const lineTotal = (q * rate) - disc;
           grand += lineTotal;
 
@@ -958,8 +986,6 @@
       let paid = 0;
       if (secVal === "Dues") {
         paid = Math.min(grand, Number(document.getElementById("dues-partial-amt").value) || 0);
-        document.getElementById("dues-disp-paid").innerText = "₹" + paid.toLocaleString("en-IN");
-        document.getElementById("dues-disp-due").innerText = "₹" + Math.max(0, grand - paid).toLocaleString("en-IN");
       } else if (secVal === "Finance") {
         paid = Math.min(grand, Number(document.getElementById("fin-dp").value) || 0);
       } else {
@@ -969,21 +995,10 @@
 
       const due = Math.max(0, grand - paid);
 
-      const liveGstBox = document.getElementById("form-gst-live-summary");
-      if (hasAnyGst && totalGstAmt > 0 && currentBillType !== "REPAIRING") {
-        liveGstBox.classList.remove("hidden");
-        document.getElementById("live-taxable").innerText = "₹" + totalTaxable.toFixed(2);
-        document.getElementById("live-cgst").innerText = "₹" + (totalGstAmt / 2).toFixed(2);
-        document.getElementById("live-sgst").innerText = "₹" + (totalGstAmt / 2).toFixed(2);
-        document.getElementById("live-total-gst").innerText = "₹" + totalGstAmt.toFixed(2);
-      } else {
-        liveGstBox.classList.add("hidden");
-      }
-
       document.getElementById("total-grand").innerText = "₹" + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "₹" + due.toLocaleString("en-IN");
 
-      return { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst };
+      return { grand, paid, due, totalTaxable, totalGstAmt, totalDiscount, hasAnyGst };
     }
 
     async function saveCurrentBill() {
@@ -1022,7 +1037,7 @@
         if (!address) return showPopup("error", "Address Required", ["कृपया Customer Address अवश्य भरें।"]);
       }
 
-      const { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst } = recalcTotals();
+      const { grand, paid, due, totalTaxable, totalGstAmt, totalDiscount, hasAnyGst } = recalcTotals();
       if (grand <= 0) return showPopup("error", "Invalid Amount", ["बिल राशि 0 से अधिक होनी चाहिए।"]);
 
       let items = [];
@@ -1036,7 +1051,7 @@
         items = [{
           productName: pName,
           brand: "",
-          imei1: issue ? `Issue: ${issue}` : "Repair & Service",
+          imei1: issue ? `Issue: ${issue}` : "Service/Repair",
           quantity: 1,
           rate: charge,
           discount: 0,
@@ -1048,7 +1063,7 @@
           model: "",
           imei: "",
           complaint: issue,
-          workDone: "Repaired",
+          workDone: "Repair Done",
           labourCharge: charge,
           gstRate: 0
         };
@@ -1116,7 +1131,6 @@
       const billDate = new Date().toISOString().split("T")[0];
       const secureToken = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
 
-      // 100% RELIABLE SCAN URL: Clean Query Parameter (NO HASH CONFUSION)
       const encodedGas = gasUrl ? encodeURIComponent(gasUrl) : "";
       const baseUrl = window.location.origin + window.location.pathname;
       const publicUrl = `${baseUrl}?billToken=${encodeURIComponent(secureToken)}${encodedGas ? '&gas=' + encodedGas : ''}`;
@@ -1131,7 +1145,7 @@
         payment: { mode: effectiveMode, amountPaid: paid, dueAmount: due },
         finance: financeDetails,
         duesData: duesDetails,
-        totals: { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst },
+        totals: { grand, paid, due, totalTaxable, totalGstAmt, totalDiscount, hasAnyGst },
         secureToken,
         publicUrl
       };
@@ -1156,7 +1170,7 @@
             showPopup("success", "Saved Successfully!", [
               `✓ Invoice: ${billPayload.invoiceNo}`,
               `✓ Mode: ${effectiveMode}`,
-              `✓ Total: ₹${grand} (Paid: ₹${paid})`
+              `✓ Total: ₹${grand}`
             ], "View Invoice", () => {
               closePopup();
               displayInvoice(billPayload);
@@ -1193,102 +1207,75 @@
     function displayInvoice(bill, isPublic = false) {
       activeInvoiceData = bill;
 
+      // Invoice Top Meta
       document.getElementById("inv-no-display").innerText = bill.invoiceNo;
       document.getElementById("inv-date-display").innerText = bill.billDate;
-      document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName || "Customer";
+      document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName || "Cash Customer";
       document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile || "-";
-      document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `${bill.customer?.address || bill.address}` : "";
-      
-      const payMode = bill.payment?.mode || bill.paymentMode || "Cash";
-      document.getElementById("inv-pay-mode").innerText = "Payment: " + payMode;
+      document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `${bill.customer?.address || bill.address}` : "-";
 
-      // Finance Info
-      const finBox = document.getElementById("inv-fin-box");
-      if (bill.finance && payMode === "Finance") {
-        finBox.classList.remove("hidden");
-        finBox.innerHTML = `
-          <span>Finance Co: <strong class="text-blue-950">${bill.finance.company}</strong></span><br />
-          <span>DP: ₹${Number(bill.finance.downPayment).toLocaleString("en-IN")} (${bill.finance.dpMode || "Cash"}) | Loan: ₹${Number(bill.finance.loanAmount).toLocaleString("en-IN")}</span>
-        `;
-      } else {
-        finBox.classList.add("hidden");
-      }
-
-      // Dues Info
-      const duesBox = document.getElementById("inv-dues-box");
-      if (bill.duesData && payMode === "Dues" && Number(bill.duesData.tokenPaid) > 0) {
-        duesBox.classList.remove("hidden");
-        duesBox.innerHTML = `
-          <span>Advance Paid: ₹${Number(bill.duesData.tokenPaid).toLocaleString("en-IN")} (${bill.duesData.tokenMode || "Cash"})</span>
-        `;
-      } else {
-        duesBox.classList.add("hidden");
-      }
-
-      // Repair Note
-      const repBox = document.getElementById("inv-rep-box");
-      if (bill.billType === "REPAIRING" && bill.repairDetails && bill.repairDetails.complaint) {
-        repBox.classList.remove("hidden");
-        repBox.innerHTML = `
-          <span class="font-bold text-amber-950 uppercase text-[10px] block">Service / Repair Issue Details:</span>
-          <p class="text-slate-700 text-xs font-medium mt-0.5">${bill.repairDetails.complaint}</p>
-        `;
-      } else {
-        repBox.classList.add("hidden");
-      }
-
-      // Items Table
-      let hasAnyGst = false;
+      // Items Table Population (Fixed grid look up to 8 rows)
       const tbody = document.getElementById("inv-items-tbody");
-      tbody.innerHTML = (bill.items || []).map((it, i) => {
-        if (Number(it.gstRate) > 0) hasAnyGst = true;
-        const lineTotal = ((it.quantity || 1) * (it.rate || 0) - (it.discount || 0));
-        return `
-          <tr class="${i % 2 === 1 ? 'bg-slate-50/50' : 'bg-white'}">
-            <td class="p-2 border-r border-slate-200 text-slate-400 font-bold">${i + 1}</td>
-            <td class="p-2 border-r border-slate-200 font-extrabold text-slate-900">${it.productName || it.partName || "Product"}</td>
-            <td class="p-2 border-r border-slate-200 font-mono text-[10px] text-slate-600">${it.imei1 || "-"}</td>
-            <td class="p-2 border-r border-slate-200 text-center font-bold">${it.quantity || 1}</td>
-            <td class="p-2 border-r border-slate-200 text-center font-semibold text-slate-600">${it.gstRate || 0}%</td>
-            <td class="p-2 border-r border-slate-200 text-right font-medium">₹${(it.rate || 0).toLocaleString("en-IN")}</td>
-            <td class="p-2 text-right font-black text-slate-900">₹${lineTotal.toLocaleString("en-IN")}</td>
-          </tr>
-        `;
-      }).join("");
+      tbody.innerHTML = "";
 
-      // GST Breakdown Box
-      const gstBox = document.getElementById("inv-gst-breakdown");
-      const totGstAmt = Number(bill.totals?.totalGstAmt) || 0;
-      const totTaxable = Number(bill.totals?.totalTaxable) || 0;
+      const rawItems = bill.items || [];
+      const totalDisplayRows = Math.max(rawItems.length, 6); // Keep minimum 6 rows for box look
 
-      if ((hasAnyGst || bill.totals?.hasAnyGst) && totGstAmt > 0 && bill.billType !== "REPAIRING") {
-        gstBox.classList.remove("hidden");
-        document.getElementById("inv-taxable-val").innerText = "₹" + totTaxable.toFixed(2);
-        document.getElementById("inv-cgst-val").innerText = "₹" + (totGstAmt / 2).toFixed(2);
-        document.getElementById("inv-sgst-val").innerText = "₹" + (totGstAmt / 2).toFixed(2);
-        document.getElementById("inv-tot-gst-val").innerText = "₹" + totGstAmt.toFixed(2);
-      } else {
-        gstBox.classList.add("hidden");
+      for (let i = 0; i < totalDisplayRows; i++) {
+        const it = rawItems[i];
+        if (it) {
+          const lineTotal = ((it.quantity || 1) * (it.rate || 0) - (it.discount || 0));
+          tbody.innerHTML += `
+            <tr class="h-6">
+              <td class="border border-[#004aad] p-1 text-center font-bold">${i + 1}</td>
+              <td class="border border-[#004aad] p-1 font-bold text-slate-900">${it.productName || it.partName || ""}</td>
+              <td class="border border-[#004aad] p-1 font-mono text-[9px] text-slate-700">${it.imei1 || "-"}</td>
+              <td class="border border-[#004aad] p-1 text-center font-bold">${it.quantity || 1}</td>
+              <td class="border border-[#004aad] p-1 text-right">₹${(it.rate || 0).toLocaleString("en-IN")}</td>
+              <td class="border border-[#004aad] p-1 text-right font-black">₹${lineTotal.toLocaleString("en-IN")}</td>
+            </tr>
+          `;
+        } else {
+          // Empty placeholder rows to look identical to printed pad
+          tbody.innerHTML += `
+            <tr class="h-6 text-transparent select-none">
+              <td class="border border-[#004aad] p-1 text-center">${i + 1}</td>
+              <td class="border border-[#004aad] p-1">-</td>
+              <td class="border border-[#004aad] p-1">-</td>
+              <td class="border border-[#004aad] p-1">-</td>
+              <td class="border border-[#004aad] p-1">-</td>
+              <td class="border border-[#004aad] p-1">-</td>
+            </tr>
+          `;
+        }
       }
 
-      const grand = bill.totals?.grand || bill.grandTotal || 0;
-      const paid = bill.totals?.paid || bill.paid || 0;
-      const due = bill.totals?.due || bill.due || 0;
+      // Calculations Right Block
+      const grand = Number(bill.totals?.grand || bill.grandTotal) || 0;
+      const discount = Number(bill.totals?.totalDiscount) || 0;
+      const totalGst = Number(bill.totals?.totalGstAmt) || 0;
+      const subtotal = grand + discount - totalGst;
 
-      document.getElementById("inv-tot-grand").innerText = "₹" + Number(grand).toLocaleString("en-IN");
-      document.getElementById("inv-tot-paid").innerText = "₹" + Number(paid).toLocaleString("en-IN");
-      document.getElementById("inv-tot-due").innerText = "₹" + Number(due).toLocaleString("en-IN");
+      document.getElementById("inv-calc-subtotal").innerText = "₹" + subtotal.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+      document.getElementById("inv-calc-discount").innerText = discount > 0 ? "₹" + discount.toLocaleString("en-IN") : "₹0";
+      
+      const halfGst = totalGst / 2;
+      document.getElementById("inv-cgst-val").innerText = halfGst > 0 ? "₹" + halfGst.toFixed(2) : "₹0";
+      document.getElementById("inv-sgst-val").innerText = halfGst > 0 ? "₹" + halfGst.toFixed(2) : "₹0";
 
-      // CLEAN STANDALONE SCANNER QR CODE (NO CLOUDY API, ULTRA CRISP)
+      // GRAND TOTAL (ONLY TOTAL AMOUNT)
+      document.getElementById("inv-tot-grand").innerText = "₹" + grand.toLocaleString("en-IN");
+
+      // CLEAN STANDALONE SCANNER QR CODE
       const qrTargetUrl = bill.publicUrl || `${window.location.origin}${window.location.pathname}?billToken=${encodeURIComponent(bill.secureToken)}`;
       const qrContainer = document.getElementById("inv-qrcode-container");
       qrContainer.innerHTML = "";
       
       new QRCode(qrContainer, {
         text: qrTargetUrl,
-        width: 80,
-        height: 80,
-        colorDark: "#020617",
+        width: 64,
+        height: 64,
+        colorDark: "#004aad",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
@@ -1302,34 +1289,24 @@
       if (b) displayInvoice(b);
     }
 
-    // 100% RELIABLE SCAN DETECTOR (Supports ?billToken=... & old hash #/bill/...)
+    // 100% RELIABLE SCAN DETECTOR
     async function checkUrlForBill() {
       const urlParams = new URLSearchParams(window.location.search);
       let token = urlParams.get("billToken");
       let queryGas = urlParams.get("gas") ? decodeURIComponent(urlParams.get("gas")) : "";
 
-      // Fallback for old hash format
       if (!token && window.location.hash.includes("#/bill/")) {
         const fullTokenStr = window.location.hash.split("#/bill/")[1];
         if (fullTokenStr) {
-          if (fullTokenStr.includes("?")) {
-            const parts = fullTokenStr.split("?");
-            token = parts[0];
-            const searchParams = new URLSearchParams(parts[1]);
-            queryGas = searchParams.get("gas") ? decodeURIComponent(searchParams.get("gas")) : "";
-          } else {
-            token = fullTokenStr;
-          }
+          token = fullTokenStr.includes("?") ? fullTokenStr.split("?")[0] : fullTokenStr;
         }
       }
 
       if (!token) return;
 
-      // 1. Check local cache
       const local = billsCache.find(x => x.secureToken === token);
       if (local) return displayInvoice(local, true);
 
-      // 2. Fetch live from Google Sheets
       const targetGas = queryGas || gasUrl;
       if (targetGas) {
         showPopup("progress", "Loading Digital Invoice...", [
@@ -1353,26 +1330,21 @@
             "Could not connect to database: " + e.message
           ]);
         }
-      } else {
-        showPopup("error", "Verification Link Missing", [
-          "Google Apps Script connection URL not present in this QR.",
-          "Please verify from store counter."
-        ]);
       }
     }
 
-    // HIGH QUALITY 300-DPI A4 PDF EXPORT (NEVER MISSES QR CODE)
+    // HIGH QUALITY CRISP PDF EXPORT
     async function downloadInvoicePDF() {
       const elem = document.getElementById("invoice-capture");
-      showPopup("progress", "Generating HD PDF...", ["Optimizing resolution for print & save..."]);
+      showPopup("progress", "Generating PDF...", ["Please wait a moment..."]);
 
       try {
         const canvas = await html2canvas(elem, {
-          scale: 3, // 300 DPI ultra-high sharpness
+          scale: 3,
           useCORS: true,
           logging: false,
           backgroundColor: "#ffffff",
-          windowWidth: 840
+          windowWidth: 700
         });
 
         const imgData = canvas.toDataURL("image/png", 1.0);
@@ -1382,9 +1354,8 @@
         const pdfWidth = 210;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // Auto page fitting
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, Math.min(297, pdfHeight));
-        pdf.save(`SRE_Invoice_${activeInvoiceData?.invoiceNo || "Bill"}.pdf`);
+        pdf.save(`SRE_Bill_${activeInvoiceData?.invoiceNo || "Invoice"}.pdf`);
         closePopup();
       } catch (err) {
         showPopup("error", "PDF Failed", [err.message]);
@@ -1395,7 +1366,7 @@
       if (!activeInvoiceData) return;
       const phone = (activeInvoiceData.customer?.mobile || "").replace(/\D/g, "");
       const formatted = phone.startsWith("91") ? phone : "91" + phone;
-      const text = encodeURIComponent(`नमस्ते ${activeInvoiceData.customer?.name || "Customer"}, आपका SRI RAM ENTERPRISES का बिल तैयार है। यहाँ ऑनलाइन देखें व डाउनलोड करें: ${activeInvoiceData.publicUrl}`);
+      const text = encodeURIComponent(`नमस्ते ${activeInvoiceData.customer?.name || "Customer"}, आपका SRI RAM ENTERPRISES का बिल तैयार है: ${activeInvoiceData.publicUrl}`);
       window.open(`https://wa.me/${formatted}?text=${text}`, "_blank");
     }
 
