@@ -40,7 +40,7 @@
     </div>
   </header>
 
-  <!-- POPUP NOTIFICATION MODAL -->
+  <!-- POPUP MODAL -->
   <div id="popup-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
     <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
       <div id="popup-header" class="p-3.5 flex items-center justify-between text-white bg-blue-600">
@@ -119,44 +119,53 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-200">
+      <!-- STANDARD CUSTOMER DETAILS (FOR MOBILE & ACCESSORIES) -->
+      <div id="standard-cust-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 bg-slate-50/70 p-3 rounded-xl border border-slate-200">
         <div>
-          <label class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Name *</label>
+          <label id="lbl-cust-name" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Name *</label>
           <input type="text" id="cust-name" placeholder="ग्राहक का नाम लिखें" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
         </div>
         <div>
-          <label class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile Number *</label>
+          <label id="lbl-cust-phone" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile Number *</label>
           <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
         </div>
         <div>
-          <label class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Address *</label>
+          <label id="lbl-cust-address" class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Address *</label>
           <input type="text" id="cust-address" placeholder="पूरा पता लिखें (उदा: GB-15, Sec-4)" class="w-full mt-1 p-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-900 outline-none" />
         </div>
       </div>
 
-      <div id="repair-section" class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-2 hidden">
-        <h3 class="font-bold text-xs text-amber-950 uppercase tracking-wider">🔧 Device & Repair Specs</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <input type="text" id="rep-product" placeholder="डिवाइस का नाम (उदा: Vivo Y20, Note 12)" class="p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none" />
-          <input type="text" id="rep-imei" maxlength="15" placeholder="डिवाइस IMEI (15 अंक)" oninput="this.value=this.value.replace(/\\D/g,'')" class="p-2 bg-white border border-amber-200 rounded-lg text-xs font-mono outline-none" />
+      <!-- MINIMAL REPAIRING SECTION (ONLY 4 CLEAN INPUTS) -->
+      <div id="repair-simple-box" class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
+        <div class="flex justify-between items-center">
+          <h3 class="font-black text-xs text-amber-950 uppercase tracking-wider">🔧 Quick Repair Details</h3>
+          <span class="text-[9px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded">Fast Entry</span>
         </div>
-        <textarea id="rep-complaint" rows="2" placeholder="कस्टमर की समस्या या कंप्लेंट..." class="w-full p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none"></textarea>
-        <textarea id="rep-work" rows="2" placeholder="किया गया काम या सर्विस विवरण..." class="w-full p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none"></textarea>
-        <div class="grid grid-cols-2 gap-2">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
-            <label class="text-[9px] font-bold text-slate-600 uppercase">Labour Charge (₹)</label>
-            <input type="number" id="rep-labour" placeholder="लेबर चार्ज लिखें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs font-bold outline-none" />
+            <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Customer Mobile Number *</label>
+            <input type="tel" id="rep-cust-phone" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs font-semibold focus:border-amber-500 outline-none" />
           </div>
           <div>
-            <label class="text-[9px] font-bold text-slate-600 uppercase">Labour GST %</label>
-            <select id="rep-gst" onchange="recalcTotals()" class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs font-bold outline-none">
-              <option value="18">18%</option><option value="12">12%</option><option value="5">5%</option><option value="28">28%</option><option value="0">0%</option>
-            </select>
+            <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Product Name / Description *</label>
+            <input type="text" id="rep-product-name" placeholder="डिवाइस / पार्ट नाम (उदा: Vivo Y20 Folder)" class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs font-semibold focus:border-amber-500 outline-none" />
           </div>
+        </div>
+
+        <div>
+          <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Issue / Complaint</label>
+          <textarea id="rep-issue-desc" rows="2" placeholder="समस्या क्या है (उदा: Display broken, Charging problem)..." class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <div class="max-w-xs">
+          <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Repair Charge Amount (₹) *</label>
+          <input type="number" id="rep-charge-amount" placeholder="रिपेयरिंग चार्ज लिखें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border border-amber-300 rounded-lg text-xs font-black text-slate-900 outline-none focus:border-amber-500" />
         </div>
       </div>
 
-      <div class="space-y-2">
+      <!-- STANDARD ITEMS SECTION (FOR MOBILE & ACCESSORIES) -->
+      <div id="standard-items-section" class="space-y-2">
         <div class="flex justify-between items-center">
           <h3 id="items-title" class="font-black text-xs text-slate-800 uppercase tracking-wider">Products / Handsets</h3>
           <button type="button" onclick="addNewItemRow()" class="text-[11px] font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition">+ Add Item</button>
@@ -164,6 +173,7 @@
         <div id="items-container" class="space-y-2"></div>
       </div>
 
+      <!-- LIVE GST SUMMARY -->
       <div id="form-gst-live-summary" class="p-2.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1 text-xs text-blue-950 hidden">
         <p class="font-bold text-[9px] uppercase tracking-wider text-blue-900">GST Breakdown</p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-blue-200/80 text-[11px]">
@@ -257,6 +267,7 @@
             <h4 class="text-xs font-black text-rose-950 uppercase tracking-wide">📝 Dues / Udhar Setup</h4>
             <span class="text-[9px] text-rose-800 font-bold bg-rose-100 px-1.5 py-0.5 rounded">Udhar Active</span>
           </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <label class="text-[9px] font-bold text-slate-600 uppercase">Token / Advance Method</label>
@@ -343,7 +354,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE DISPLAY & PDF READY -->
+    <!-- VIEW 3: INVOICE DISPLAY -->
     <div id="view-invoice" class="space-y-3 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm">
         <div class="flex space-x-2">
@@ -353,7 +364,6 @@
         <button id="btn-back-dash" onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 hover:text-slate-900">← Back</button>
       </div>
 
-      <!-- INVOICE SHEET (OPTIMIZED FOR MOBILE, DESKTOP & PRINT) -->
       <div class="w-full flex justify-center overflow-x-auto pb-4">
         <div id="invoice-capture" class="w-full max-w-[800px] bg-white p-4 sm:p-7 border border-slate-300 shadow-sm text-xs text-slate-800 leading-tight box-border">
           
@@ -390,8 +400,8 @@
             <table class="w-full border-collapse text-left">
               <thead>
                 <tr class="bg-slate-100 text-[9px] uppercase border-y border-slate-300 text-slate-600">
-                  <th class="p-1.5 font-bold">Item / Product Name</th>
-                  <th class="p-1.5 font-bold">IMEI Details</th>
+                  <th class="p-1.5 font-bold">Item / Product / Service</th>
+                  <th class="p-1.5 font-bold">IMEI / Remarks</th>
                   <th class="p-1.5 font-bold text-center">Qty</th>
                   <th class="p-1.5 font-bold text-center">GST</th>
                   <th class="p-1.5 font-bold text-right">Rate</th>
@@ -411,7 +421,6 @@
             </div>
           </div>
 
-          <!-- FOOTER: GUARANTEED LOCAL SVG QR CODE + TOTALS -->
           <div class="flex justify-between items-center pt-3 border-t-2 border-slate-900 mt-3">
             <div class="flex flex-col items-center">
               <div id="inv-qrcode-container" class="w-20 h-20 bg-white border border-slate-200 p-1 flex items-center justify-center"></div>
@@ -550,9 +559,14 @@
     function startNewBill(type) {
       currentBillType = type;
       changeBillType(type);
+
       document.getElementById("cust-name").value = "";
       document.getElementById("cust-phone").value = "";
       document.getElementById("cust-address").value = "";
+      document.getElementById("rep-cust-phone").value = "";
+      document.getElementById("rep-product-name").value = "";
+      document.getElementById("rep-issue-desc").value = "";
+      document.getElementById("rep-charge-amount").value = "";
       document.getElementById("pay-paid").value = "";
 
       document.getElementById("pay-primary-dropdown").value = "Cash";
@@ -587,15 +601,40 @@
         }
       });
 
-      const repSec = document.getElementById("repair-section");
+      const standardCust = document.getElementById("standard-cust-box");
+      const standardItems = document.getElementById("standard-items-section");
+      const repairBox = document.getElementById("repair-simple-box");
+
+      const lblName = document.getElementById("lbl-cust-name");
+      const lblPhone = document.getElementById("lbl-cust-phone");
+      const lblAddr = document.getElementById("lbl-cust-address");
+
       if (type === "REPAIRING") {
-        repSec.classList.remove("hidden");
-        document.getElementById("items-title").innerText = "Spare Parts / Replacements";
+        // SUPER CLEAN REPAIR LAYOUT
+        standardCust.classList.add("hidden");
+        standardItems.classList.add("hidden");
+        repairBox.classList.remove("hidden");
       } else {
-        repSec.classList.add("hidden");
-        document.getElementById("items-title").innerText = type === "MOBILE" ? "Mobile Handset Details" : "Accessories Details";
+        // MOBILE OR ACCESSORIES LAYOUT
+        standardCust.classList.remove("hidden");
+        standardItems.classList.remove("hidden");
+        repairBox.classList.add("hidden");
+
+        if (type === "ACCESSORIES") {
+          // OPTIONAL DETAILS FOR ACCESSORIES
+          lblName.innerText = "Customer Name (Optional)";
+          lblPhone.innerText = "Mobile Number (Optional)";
+          lblAddr.innerText = "Customer Address (Optional)";
+          document.getElementById("items-title").innerText = "Accessories Items";
+        } else {
+          // MANDATORY DETAILS FOR MOBILE
+          lblName.innerText = "Customer Name *";
+          lblPhone.innerText = "Mobile Number *";
+          lblAddr.innerText = "Customer Address *";
+          document.getElementById("items-title").innerText = "Mobile Handsets";
+        }
       }
-      
+
       document.querySelectorAll(".item-row").forEach(r => renderItemImeis(r));
       recalcTotals();
     }
@@ -845,38 +884,32 @@
       let totalGstAmt = 0;
       let hasAnyGst = false;
 
-      const rows = document.querySelectorAll(".item-row");
-      rows.forEach(r => {
-        const q = Number(r.querySelector(".item-qty")?.value) || 1;
-        const rate = Number(r.querySelector(".item-rate")?.value) || 0;
-        const disc = Number(r.querySelector(".item-disc")?.value) || 0;
-        const gstRate = Number(r.querySelector(".item-gst")?.value) || 0;
-
-        const lineTotal = (q * rate) - disc;
-        grand += lineTotal;
-
-        if (gstRate > 0) {
-          hasAnyGst = true;
-          const taxable = lineTotal / (1 + (gstRate / 100));
-          totalTaxable += taxable;
-          totalGstAmt += (lineTotal - taxable);
-        } else {
-          totalTaxable += lineTotal;
-        }
-      });
-
       if (currentBillType === "REPAIRING") {
-        const lab = Number(document.getElementById("rep-labour").value) || 0;
-        const labGst = Number(document.getElementById("rep-gst").value) || 0;
-        grand += lab;
-        if (labGst > 0) {
-          hasAnyGst = true;
-          const lTax = lab / (1 + (labGst / 100));
-          totalTaxable += lTax;
-          totalGstAmt += (lab - lTax);
-        } else {
-          totalTaxable += lab;
-        }
+        // ULTRA FAST REPAIR CALCULATION
+        const repCharge = Number(document.getElementById("rep-charge-amount").value) || 0;
+        grand = repCharge;
+        totalTaxable = repCharge;
+      } else {
+        // MOBILE & ACCESSORIES ITEMS
+        const rows = document.querySelectorAll(".item-row");
+        rows.forEach(r => {
+          const q = Number(r.querySelector(".item-qty")?.value) || 1;
+          const rate = Number(r.querySelector(".item-rate")?.value) || 0;
+          const disc = Number(r.querySelector(".item-disc")?.value) || 0;
+          const gstRate = Number(r.querySelector(".item-gst")?.value) || 0;
+
+          const lineTotal = (q * rate) - disc;
+          grand += lineTotal;
+
+          if (gstRate > 0) {
+            hasAnyGst = true;
+            const taxable = lineTotal / (1 + (gstRate / 100));
+            totalTaxable += taxable;
+            totalGstAmt += (lineTotal - taxable);
+          } else {
+            totalTaxable += lineTotal;
+          }
+        });
       }
 
       grand = Math.max(0, Math.round(grand));
@@ -897,7 +930,7 @@
       const due = Math.max(0, grand - paid);
 
       const liveGstBox = document.getElementById("form-gst-live-summary");
-      if (hasAnyGst && totalGstAmt > 0) {
+      if (hasAnyGst && totalGstAmt > 0 && currentBillType !== "REPAIRING") {
         liveGstBox.classList.remove("hidden");
         document.getElementById("live-taxable").innerText = "₹" + totalTaxable.toFixed(2);
         document.getElementById("live-cgst").innerText = "₹" + (totalGstAmt / 2).toFixed(2);
@@ -914,52 +947,110 @@
     }
 
     async function saveCurrentBill() {
-      const name = document.getElementById("cust-name").value.trim();
-      const phone = document.getElementById("cust-phone").value.trim();
-      const address = document.getElementById("cust-address").value.trim();
+      let name = "";
+      let phone = "";
+      let address = "";
 
-      if (!name) return showPopup("error", "Incomplete Form", ["Please enter customer name."]);
-      if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["Please enter a valid 10-digit mobile number."]);
-      if (!address) return showPopup("error", "Address Required", ["Please enter customer address."]);
+      if (currentBillType === "REPAIRING") {
+        // REPAIRING VALIDATION: Only Phone & Product Name & Charge
+        phone = document.getElementById("rep-cust-phone").value.trim();
+        name = "Repair Customer";
+        address = "Bokaro";
+
+        const pName = document.getElementById("rep-product-name").value.trim();
+        const charge = Number(document.getElementById("rep-charge-amount").value) || 0;
+
+        if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
+        if (!pName) return showPopup("error", "Product Required", ["कृपया Product Name / Description अवश्य भरें।"]);
+        if (charge <= 0) return showPopup("error", "Charge Required", ["कृपया सही रिपेयर चार्ज राशि दर्ज करें।"]);
+      } 
+      else if (currentBillType === "ACCESSORIES") {
+        // ACCESSORIES: Customer details optional!
+        name = document.getElementById("cust-name").value.trim() || "Cash Customer";
+        phone = document.getElementById("cust-phone").value.trim();
+        address = document.getElementById("cust-address").value.trim() || "Local";
+
+        if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+          return showPopup("error", "Invalid Mobile", ["यदि मोबाइल नंबर दे रहे हैं तो ठीक 10 अंकों का होना चाहिए।"]);
+        }
+      } 
+      else {
+        // MOBILE SALE: Strict validation
+        name = document.getElementById("cust-name").value.trim();
+        phone = document.getElementById("cust-phone").value.trim();
+        address = document.getElementById("cust-address").value.trim();
+
+        if (!name) return showPopup("error", "Customer Name", ["कृपया Customer Name अवश्य भरें।"]);
+        if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
+        if (!address) return showPopup("error", "Address Required", ["कृपया Customer Address अवश्य भरें।"]);
+      }
 
       const { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst } = recalcTotals();
-      if (grand <= 0) return showPopup("error", "Invalid Amount", ["Total invoice amount must be greater than 0. Please enter rate."]);
+      if (grand <= 0) return showPopup("error", "Invalid Amount", ["बिल राशि 0 से अधिक होनी चाहिए।"]);
 
-      let imeiValidationError = false;
-      const items = [];
-      document.querySelectorAll(".item-row").forEach((r, idx) => {
-        const pName = r.querySelector(".item-product-name").value.trim();
-        if (!pName) {
-          showPopup("error", "Product Name Required", [`Product Name is empty in row #${idx+1}.`]);
-          imeiValidationError = true;
-          return;
-        }
+      let items = [];
+      let repairDetails = null;
 
-        const imeis = [];
-        if (currentBillType === "MOBILE") {
-          r.querySelectorAll(".item-imei-input").forEach((inp, iIdx) => {
-            const val = inp.value.trim();
-            if (val.length !== 15) {
-              showPopup("error", "Invalid IMEI", [`Row #${idx+1} IMEI ${iIdx+1} must be exactly 15 digits (currently ${val.length} digits).`]);
-              imeiValidationError = true;
-              return;
-            }
-            imeis.push(val);
-          });
-        }
+      if (currentBillType === "REPAIRING") {
+        const pName = document.getElementById("rep-product-name").value.trim();
+        const issue = document.getElementById("rep-issue-desc").value.trim();
+        const charge = Number(document.getElementById("rep-charge-amount").value) || 0;
 
-        items.push({
+        items = [{
           productName: pName,
           brand: "",
-          imei1: imeis.join(", "),
-          quantity: Number(r.querySelector(".item-qty").value) || 1,
-          rate: Number(r.querySelector(".item-rate").value) || 0,
-          discount: Number(r.querySelector(".item-disc").value) || 0,
-          gstRate: Number(r.querySelector(".item-gst").value) || 0
-        });
-      });
+          imei1: issue ? `Issue: ${issue}` : "Service/Repair",
+          quantity: 1,
+          rate: charge,
+          discount: 0,
+          gstRate: 0
+        }];
 
-      if (imeiValidationError) return;
+        repairDetails = {
+          brand: pName,
+          model: "",
+          imei: "",
+          complaint: issue,
+          workDone: "Repair Done",
+          labourCharge: charge,
+          gstRate: 0
+        };
+      } else {
+        let imeiValidationError = false;
+        document.querySelectorAll(".item-row").forEach((r, idx) => {
+          const pName = r.querySelector(".item-product-name").value.trim();
+          if (!pName) {
+            showPopup("error", "Product Name", [`Row #${idx+1} में Product Name खाली है।`]);
+            imeiValidationError = true;
+            return;
+          }
+
+          const imeis = [];
+          if (currentBillType === "MOBILE") {
+            r.querySelectorAll(".item-imei-input").forEach((inp, iIdx) => {
+              const val = inp.value.trim();
+              if (val.length !== 15) {
+                showPopup("error", "Invalid IMEI", [`Row #${idx+1} का IMEI ${iIdx+1} ठीक 15 अंकों का होना चाहिए।`]);
+                imeiValidationError = true;
+                return;
+              }
+              imeis.push(val);
+            });
+          }
+
+          items.push({
+            productName: pName,
+            brand: "",
+            imei1: imeis.join(", "),
+            quantity: Number(r.querySelector(".item-qty").value) || 1,
+            rate: Number(r.querySelector(".item-rate").value) || 0,
+            discount: Number(r.querySelector(".item-disc").value) || 0,
+            gstRate: Number(r.querySelector(".item-gst").value) || 0
+          });
+        });
+
+        if (imeiValidationError) return;
+      }
 
       const secVal = document.getElementById("pay-secondary-dropdown").value;
       const primVal = document.getElementById("pay-primary-dropdown").value;
@@ -970,9 +1061,7 @@
 
       if (effectiveMode === "Finance") {
         const finComp = document.getElementById("fin-company").value.trim();
-        if (!finComp) {
-          return showPopup("error", "Finance Company Required", ["Please enter finance company name."]);
-        }
+        if (!finComp) return showPopup("error", "Finance Company", ["कृपया Finance Company Name दर्ज करें।"]);
         financeDetails = {
           company: finComp,
           downPayment: Number(document.getElementById("fin-dp").value) || 0,
@@ -992,16 +1081,6 @@
 
       const encodedGas = gasUrl ? encodeURIComponent(gasUrl) : "";
       const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}?gas=${encodedGas}`;
-
-      const repairDetails = currentBillType === "REPAIRING" ? {
-        brand: document.getElementById("rep-product").value.trim(),
-        model: "",
-        imei: document.getElementById("rep-imei").value.trim(),
-        complaint: document.getElementById("rep-complaint").value.trim(),
-        workDone: document.getElementById("rep-work").value.trim(),
-        labourCharge: Number(document.getElementById("rep-labour").value) || 0,
-        gstRate: Number(document.getElementById("rep-gst").value) || 0
-      } : null;
 
       const billPayload = {
         invoiceNo,
@@ -1024,7 +1103,7 @@
       if (gasUrl) {
         showPopup("progress", "Saving to Google Sheets...", [
           "• Recording invoice in Bills sheet...",
-          "• Logging handset / parts in Bill Items..."
+          "• Logging details in Bill Items..."
         ]);
 
         try {
@@ -1037,7 +1116,6 @@
           if (d.success) {
             showPopup("success", "Saved Successfully!", [
               `✓ Invoice: ${billPayload.invoiceNo}`,
-              `✓ Customer: ${name} (${address})`,
               `✓ Mode: ${effectiveMode}`,
               `✓ Total: ₹${grand} (Paid: ₹${paid})`
             ], "View Invoice", () => {
@@ -1078,8 +1156,8 @@
 
       document.getElementById("inv-no-display").innerText = bill.invoiceNo;
       document.getElementById("inv-date-display").innerText = bill.billDate;
-      document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName;
-      document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile;
+      document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName || "Customer";
+      document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile || "-";
       document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `Address: ${bill.customer?.address || bill.address}` : "";
       
       const payMode = bill.payment?.mode || bill.paymentMode || "Cash";
@@ -1107,12 +1185,10 @@
       }
 
       const repBox = document.getElementById("inv-rep-box");
-      if (bill.billType === "REPAIRING" && bill.repairDetails) {
+      if (bill.billType === "REPAIRING" && bill.repairDetails && bill.repairDetails.complaint) {
         repBox.classList.remove("hidden");
         repBox.innerHTML = `
-          <p class="font-bold text-slate-800">Device: ${bill.repairDetails.brand || ""} (${bill.repairDetails.imei || "N/A"})</p>
-          <p class="text-slate-600">Issue: ${bill.repairDetails.complaint || "N/A"}</p>
-          <p class="text-slate-600">Work Done: ${bill.repairDetails.workDone || "N/A"}</p>
+          <p class="font-bold text-slate-800">Issue: ${bill.repairDetails.complaint}</p>
         `;
       } else {
         repBox.classList.add("hidden");
@@ -1134,24 +1210,11 @@
         `;
       }).join("");
 
-      if (bill.billType === "REPAIRING" && Number(bill.repairDetails?.labourCharge) > 0) {
-        if (Number(bill.repairDetails?.gstRate) > 0) hasAnyGst = true;
-        tbody.innerHTML += `
-          <tr class="border-b">
-            <td colspan="2" class="p-1.5 font-bold">Repair Labour & Service Charge</td>
-            <td class="p-1.5 text-center">1</td>
-            <td class="p-1.5 text-center">${bill.repairDetails.gstRate || 0}%</td>
-            <td class="p-1.5 text-right">₹${bill.repairDetails.labourCharge}</td>
-            <td class="p-1.5 text-right font-bold">₹${bill.repairDetails.labourCharge}</td>
-          </tr>
-        `;
-      }
-
       const gstBox = document.getElementById("inv-gst-breakdown");
       const totGstAmt = Number(bill.totals?.totalGstAmt) || 0;
       const totTaxable = Number(bill.totals?.totalTaxable) || 0;
 
-      if ((hasAnyGst || bill.totals?.hasAnyGst) && totGstAmt > 0) {
+      if ((hasAnyGst || bill.totals?.hasAnyGst) && totGstAmt > 0 && bill.billType !== "REPAIRING") {
         gstBox.classList.remove("hidden");
         document.getElementById("inv-taxable-val").innerText = totTaxable.toFixed(2);
         document.getElementById("inv-cgst-val").innerText = (totGstAmt / 2).toFixed(2);
@@ -1169,7 +1232,7 @@
       document.getElementById("inv-tot-paid").innerText = "Paid: ₹" + Number(paid).toLocaleString("en-IN");
       document.getElementById("inv-tot-due").innerText = Number(due) > 0 ? `Due: ₹${Number(due).toLocaleString("en-IN")}` : "";
 
-      // 100% RELIABLE LOCAL CANVAS QR CODE (WORKS ALWAYS IN PDF & PRINT)
+      // 100% RELIABLE LOCAL QR CODE CANVAS (PRESERVES IN PDF)
       const qrTargetUrl = bill.publicUrl || `${window.location.origin}${window.location.pathname}#/bill/${bill.secureToken}`;
       const qrContainer = document.getElementById("inv-qrcode-container");
       qrContainer.innerHTML = "";
@@ -1234,16 +1297,11 @@
               "Could not reach Apps Script: " + e.message
             ]);
           }
-        } else {
-          showPopup("error", "Server Link Missing", [
-            "Cloud backend URL missing in this QR invoice.",
-            "Please contact the store."
-          ]);
         }
       }
     }
 
-    // PERFECT CRISP PDF DOWNLOAD (100% PRESERVES QR CODE)
+    // PERFECT CRISP PDF DOWNLOAD
     async function downloadInvoicePDF() {
       const elem = document.getElementById("invoice-capture");
       showPopup("progress", "Generating PDF...", ["Please wait a moment..."]);
