@@ -4,31 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="google" content="notranslate" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>SRI RAM ENTERPRISES - Billing & POS</title>
+  <title>SRI RAM ENTERPRISES - POS & Billing</title>
   <meta name="theme-color" content="#0f172a" />
   <link rel="manifest" href="./manifest.json" />
 
+  <!-- Tailwind CSS & Engine Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     @media print {
       body * { visibility: hidden; }
       #invoice-capture, #invoice-capture * { visibility: visible; }
-      #invoice-capture { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+      #invoice-capture { position: absolute; left: 0; top: 0; width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-blue-900 selection:text-white">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-blue-900 selection:text-white">
 
-  <!-- TOP HEADER -->
-  <header id="main-header" class="bg-slate-950 text-white sticky top-0 z-30 px-3 sm:px-6 py-2.5 shadow-md border-b border-slate-800 flex items-center justify-between">
+  <!-- HEADER -->
+  <header id="main-header" class="bg-slate-950 text-white sticky top-0 z-30 px-3.5 sm:px-6 py-2.5 shadow-md border-b border-slate-800 flex items-center justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
-      <div class="bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-black px-2 py-1 rounded-lg text-xs shadow-sm">SRE</div>
+      <div class="bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-black px-2 py-1 rounded-lg text-xs shadow-sm tracking-wider">SRE</div>
       <div>
-        <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none">SRI RAM ENTERPRISES</h1>
+        <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none text-slate-100">SRI RAM ENTERPRISES</h1>
         <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Sector-4, B.S. City • Point of Sale</p>
       </div>
     </div>
@@ -40,7 +43,7 @@
     </div>
   </header>
 
-  <!-- POPUP MODAL -->
+  <!-- NOTIFICATION POPUP -->
   <div id="popup-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
     <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
       <div id="popup-header" class="p-3.5 flex items-center justify-between text-white bg-blue-600">
@@ -57,25 +60,25 @@
     </div>
   </div>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 w-full max-w-6xl mx-auto p-2 sm:p-4 md:p-6">
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 w-full max-w-6xl mx-auto p-2.5 sm:p-4 md:p-6">
 
     <!-- VIEW 1: DASHBOARD -->
     <div id="view-dashboard" class="space-y-3 sm:space-y-4">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Today's Bills</span>
           <p id="dash-today-count" class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">0</p>
         </div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Today's Sales</span>
           <p id="dash-today-sales" class="text-xl sm:text-2xl font-black text-blue-900 mt-0.5">₹0</p>
         </div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Collection</span>
           <p id="dash-today-paid" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">₹0</p>
         </div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
           <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Due</span>
           <p id="dash-total-due" class="text-xl sm:text-2xl font-black text-rose-600 mt-0.5">₹0</p>
         </div>
@@ -135,13 +138,12 @@
         </div>
       </div>
 
-      <!-- MINIMAL REPAIRING SECTION (ONLY 4 CLEAN INPUTS) -->
+      <!-- MINIMAL REPAIRING SECTION -->
       <div id="repair-simple-box" class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="flex justify-between items-center">
           <h3 class="font-black text-xs text-amber-950 uppercase tracking-wider">🔧 Quick Repair Details</h3>
           <span class="text-[9px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded">Fast Entry</span>
         </div>
-        
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Customer Mobile Number *</label>
@@ -152,19 +154,17 @@
             <input type="text" id="rep-product-name" placeholder="डिवाइस / पार्ट नाम (उदा: Vivo Y20 Folder)" class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs font-semibold focus:border-amber-500 outline-none" />
           </div>
         </div>
-
         <div>
           <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Issue / Complaint</label>
-          <textarea id="rep-issue-desc" rows="2" placeholder="समस्या क्या है (उदा: Display broken, Charging problem)..." class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none focus:border-amber-500"></textarea>
+          <textarea id="rep-issue-desc" rows="2" placeholder="समस्या क्या है (उदा: Display broken, Not charging)..." class="w-full mt-1 p-2 bg-white border border-amber-200 rounded-lg text-xs outline-none focus:border-amber-500"></textarea>
         </div>
-
         <div class="max-w-xs">
           <label class="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wider">Repair Charge Amount (₹) *</label>
           <input type="number" id="rep-charge-amount" placeholder="रिपेयरिंग चार्ज लिखें" oninput="recalcTotals()" class="w-full mt-1 p-2 bg-white border border-amber-300 rounded-lg text-xs font-black text-slate-900 outline-none focus:border-amber-500" />
         </div>
       </div>
 
-      <!-- STANDARD ITEMS SECTION (FOR MOBILE & ACCESSORIES) -->
+      <!-- STANDARD ITEMS SECTION -->
       <div id="standard-items-section" class="space-y-2">
         <div class="flex justify-between items-center">
           <h3 id="items-title" class="font-black text-xs text-slate-800 uppercase tracking-wider">Products / Handsets</h3>
@@ -173,7 +173,7 @@
         <div id="items-container" class="space-y-2"></div>
       </div>
 
-      <!-- LIVE GST SUMMARY -->
+      <!-- LIVE GST SUMMARY IN FORM -->
       <div id="form-gst-live-summary" class="p-2.5 bg-blue-50/70 border border-blue-200 rounded-xl space-y-1 text-xs text-blue-950 hidden">
         <p class="font-bold text-[9px] uppercase tracking-wider text-blue-900">GST Breakdown</p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-blue-200/80 text-[11px]">
@@ -267,7 +267,6 @@
             <h4 class="text-xs font-black text-rose-950 uppercase tracking-wide">📝 Dues / Udhar Setup</h4>
             <span class="text-[9px] text-rose-800 font-bold bg-rose-100 px-1.5 py-0.5 rounded">Udhar Active</span>
           </div>
-
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <label class="text-[9px] font-bold text-slate-600 uppercase">Token / Advance Method</label>
@@ -354,88 +353,135 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE DISPLAY -->
-    <div id="view-invoice" class="space-y-3 hidden">
-      <div class="flex justify-between items-center bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm">
+    <!-- VIEW 3: INVOICE DISPLAY (PROFESSIONAL SHOWROOM LAYOUT) -->
+    <div id="view-invoice" class="space-y-3.5 hidden">
+      <div class="flex justify-between items-center bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200 shadow-sm">
         <div class="flex space-x-2">
-          <button onclick="downloadInvoicePDF()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg shadow">DOWNLOAD PDF</button>
-          <button id="btn-whatsapp" onclick="shareOnWhatsApp()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow">WHATSAPP</button>
+          <button onclick="downloadInvoicePDF()" class="px-3.5 py-1.5 bg-blue-950 hover:bg-slate-900 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
+            <span>📥</span>
+            <span>DOWNLOAD PDF</span>
+          </button>
+          <button id="btn-whatsapp" onclick="shareOnWhatsApp()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
+            <span>💬</span>
+            <span>WHATSAPP</span>
+          </button>
         </div>
         <button id="btn-back-dash" onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 hover:text-slate-900">← Back</button>
       </div>
 
-      <div class="w-full flex justify-center overflow-x-auto pb-4">
-        <div id="invoice-capture" class="w-full max-w-[800px] bg-white p-4 sm:p-7 border border-slate-300 shadow-sm text-xs text-slate-800 leading-tight box-border">
+      <!-- PREMIUM INVOICE TEMPLATE (BOXED, CRISP, CLEAN A4 LOOK) -->
+      <div class="w-full flex justify-center overflow-x-auto pb-6">
+        <div id="invoice-capture" class="w-full max-w-[820px] bg-white p-6 sm:p-8 border border-slate-300 shadow-lg text-xs text-slate-800 leading-normal box-border rounded-sm">
           
-          <div class="border-b-2 border-slate-900 pb-3 flex justify-between items-start">
+          <!-- TOP HEADER SECTION -->
+          <div class="border-b-2 border-blue-950 pb-4 flex justify-between items-start">
             <div>
-              <h1 class="text-lg sm:text-xl font-black text-blue-950 tracking-tight">SRI RAM ENTERPRISES</h1>
-              <p class="text-[9px] sm:text-[10px] text-slate-500 mt-0.5">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
-              <p class="text-[9px] sm:text-[10px] font-bold text-blue-900 mt-0.5">GSTIN: 20APOPK6864K1ZH • Mob: 9334765000</p>
+              <h1 class="text-xl sm:text-2xl font-black text-blue-950 tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
+              <p class="text-[10.5px] text-slate-600 font-medium mt-0.5">GB-15, City Centre, Sector-4, B.S. City, Jharkhand - 827004</p>
+              <div class="flex flex-wrap gap-x-4 gap-y-0.5 mt-1.5 text-[11px] font-semibold text-slate-700">
+                <span>GSTIN: <strong class="text-blue-950 font-black">20APOPK6864K1ZH</strong></span>
+                <span>Contact: <strong class="text-slate-900 font-bold">+91 9334765000</strong></span>
+              </div>
             </div>
             <div class="text-right">
-              <span class="bg-slate-900 text-white font-black px-2 py-0.5 text-[9px] tracking-wider uppercase inline-block">TAX INVOICE</span>
-              <p id="inv-no-display" class="font-black text-xs sm:text-sm text-slate-900 mt-1">SRE-2026-00001</p>
-              <p id="inv-date-display" class="text-slate-500 text-[10px] font-semibold mt-0.5"></p>
+              <span class="bg-blue-950 text-white font-black px-2.5 py-1 text-[10px] tracking-widest uppercase inline-block rounded-sm">TAX INVOICE</span>
+              <p id="inv-no-display" class="font-black text-sm sm:text-base text-slate-900 mt-2">SRE-2026-00001</p>
+              <p class="text-slate-500 text-[10.5px] font-semibold mt-0.5">Date: <span id="inv-date-display" class="text-slate-800 font-bold"></span></p>
             </div>
           </div>
 
-          <div class="py-2.5 border-b border-slate-200 flex justify-between items-start">
-            <div class="space-y-0.5">
-              <p class="font-black text-slate-400 text-[9px] uppercase tracking-wider">Customer Details:</p>
-              <p id="inv-cust-name" class="font-bold text-xs text-slate-900"></p>
-              <p id="inv-cust-phone" class="text-slate-600 text-[11px] font-mono"></p>
-              <p id="inv-cust-address" class="text-slate-700 text-[10px] font-medium"></p>
+          <!-- CUSTOMER & PAYMENT DETAILS GRID -->
+          <div class="grid grid-cols-2 gap-4 py-3.5 border-b border-slate-200">
+            <div class="bg-slate-50/80 p-3 rounded-lg border border-slate-200">
+              <span class="text-[9.5px] font-black text-blue-950 uppercase tracking-wider block mb-1">Billed To (Customer):</span>
+              <p id="inv-cust-name" class="font-extrabold text-[13px] text-slate-900 leading-tight"></p>
+              <p id="inv-cust-phone" class="text-slate-600 font-mono text-[11px] mt-0.5"></p>
+              <p id="inv-cust-address" class="text-slate-600 text-[10.5px] mt-0.5 leading-snug"></p>
             </div>
-            <div class="text-right space-y-0.5">
-              <p id="inv-pay-mode" class="text-slate-800 font-bold text-[11px]">Mode: Cash</p>
-              <div id="inv-fin-box" class="text-[10px] text-blue-900 font-semibold hidden"></div>
-              <div id="inv-dues-box" class="text-[10px] text-rose-700 font-semibold hidden"></div>
+            <div class="bg-slate-50/80 p-3 rounded-lg border border-slate-200 flex flex-col justify-between text-right">
+              <div>
+                <span class="text-[9.5px] font-black text-blue-950 uppercase tracking-wider block mb-1">Payment Breakdown:</span>
+                <p id="inv-pay-mode" class="font-extrabold text-[12px] text-slate-900"></p>
+              </div>
+              <div>
+                <div id="inv-fin-box" class="text-[10px] text-blue-950 font-bold leading-tight mt-1 hidden"></div>
+                <div id="inv-dues-box" class="text-[10px] text-rose-700 font-bold leading-tight mt-1 hidden"></div>
+              </div>
             </div>
           </div>
 
-          <div id="inv-rep-box" class="py-2 bg-slate-50 border-b border-slate-200 px-2.5 space-y-0.5 my-2 rounded hidden"></div>
+          <!-- REPAIR NOTE -->
+          <div id="inv-rep-box" class="py-2.5 bg-amber-50/70 border border-amber-200 px-3 my-3 rounded-lg hidden"></div>
 
-          <div class="my-2.5 overflow-x-auto">
-            <table class="w-full border-collapse text-left">
+          <!-- MAIN PRODUCTS / ITEMS TABLE -->
+          <div class="my-3 overflow-x-auto">
+            <table class="w-full border-collapse text-left border border-slate-200">
               <thead>
-                <tr class="bg-slate-100 text-[9px] uppercase border-y border-slate-300 text-slate-600">
-                  <th class="p-1.5 font-bold">Item / Product / Service</th>
-                  <th class="p-1.5 font-bold">IMEI / Remarks</th>
-                  <th class="p-1.5 font-bold text-center">Qty</th>
-                  <th class="p-1.5 font-bold text-center">GST</th>
-                  <th class="p-1.5 font-bold text-right">Rate</th>
-                  <th class="p-1.5 font-bold text-right">Amount</th>
+                <tr class="bg-slate-100 text-[10px] uppercase border-b border-slate-300 text-slate-700 font-black">
+                  <th class="p-2 border-r border-slate-200">#</th>
+                  <th class="p-2 border-r border-slate-200">Item / Product Name</th>
+                  <th class="p-2 border-r border-slate-200">IMEI / Serial / Remarks</th>
+                  <th class="p-2 border-r border-slate-200 text-center">Qty</th>
+                  <th class="p-2 border-r border-slate-200 text-center">GST %</th>
+                  <th class="p-2 border-r border-slate-200 text-right">Rate (₹)</th>
+                  <th class="p-2 text-right">Amount (₹)</th>
                 </tr>
               </thead>
-              <tbody id="inv-items-tbody" class="divide-y divide-slate-200"></tbody>
+              <tbody id="inv-items-tbody" class="divide-y divide-slate-200 text-[11px]"></tbody>
             </table>
           </div>
 
-          <div id="inv-gst-breakdown" class="my-2 p-2 bg-slate-50 border border-slate-200 rounded text-[10px] hidden">
-            <div class="flex justify-between font-bold border-b border-slate-200 pb-1 text-slate-700">
-              <span>Taxable Value: ₹<span id="inv-taxable-val">0</span></span>
-              <span>CGST: ₹<span id="inv-cgst-val">0</span></span>
-              <span>SGST: ₹<span id="inv-sgst-val">0</span></span>
-              <span>Total GST: ₹<span id="inv-tot-gst-val">0</span></span>
+          <!-- GST TAX BREAKDOWN TABLE (Appears when GST > 0) -->
+          <div id="inv-gst-breakdown" class="my-3 bg-slate-50/70 border border-slate-200 rounded-lg p-2.5 hidden">
+            <div class="text-[9.5px] font-black text-slate-500 uppercase tracking-wider mb-1.5">Tax Summary Breakdown (GST Rules):</div>
+            <div class="grid grid-cols-4 gap-2 text-center text-[10.5px]">
+              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">Taxable Value</span> <strong id="inv-taxable-val">₹0</strong></div>
+              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">CGST</span> <strong id="inv-cgst-val">₹0</strong></div>
+              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">SGST</span> <strong id="inv-sgst-val">₹0</strong></div>
+              <div class="p-1 bg-white rounded border border-slate-200"><span class="text-slate-500 text-[9px] block">Total Tax</span> <strong id="inv-tot-gst-val" class="text-blue-950 font-black">₹0</strong></div>
             </div>
           </div>
 
-          <div class="flex justify-between items-center pt-3 border-t-2 border-slate-900 mt-3">
-            <div class="flex flex-col items-center">
-              <div id="inv-qrcode-container" class="w-20 h-20 bg-white border border-slate-200 p-1 flex items-center justify-center"></div>
-              <span class="text-[8px] text-slate-500 font-bold mt-1">Scan to Verify Invoice</span>
+          <!-- INVOICE TOTALS & ULTRA-CRISP SCANNER QR CODE -->
+          <div class="flex justify-between items-end pt-3 border-t-2 border-slate-900 mt-4">
+            <!-- QR CODE BOX -->
+            <div class="flex items-center space-x-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+              <div id="inv-qrcode-container" class="w-[84px] h-[84px] bg-white border border-slate-300 p-1 flex items-center justify-center"></div>
+              <div class="text-left space-y-0.5">
+                <span class="text-[10px] font-black text-slate-800 uppercase block tracking-wider">Digital Verification</span>
+                <p class="text-[9px] text-slate-500 leading-tight">Scan this QR to view,<br />verify or download invoice<br />online on any device.</p>
+              </div>
             </div>
-            <div class="text-right space-y-1">
-              <p id="inv-tot-grand" class="text-sm sm:text-base font-black text-slate-900">Total: ₹0</p>
-              <p id="inv-tot-paid" class="text-xs font-bold text-emerald-700">Paid: ₹0</p>
-              <p id="inv-tot-due" class="text-xs font-bold text-rose-600">Due: ₹0</p>
+
+            <!-- NET TOTALS BOX -->
+            <div class="text-right space-y-1 min-w-[200px]">
+              <div class="flex justify-between text-xs py-0.5 border-b border-slate-200">
+                <span class="text-slate-500 font-semibold">Grand Total:</span>
+                <strong id="inv-tot-grand" class="text-sm font-black text-slate-900">₹0</strong>
+              </div>
+              <div class="flex justify-between text-xs py-0.5 border-b border-slate-200">
+                <span class="text-emerald-700 font-semibold">Amount Paid:</span>
+                <strong id="inv-tot-paid" class="text-xs font-black text-emerald-700">₹0</strong>
+              </div>
+              <div class="flex justify-between text-xs py-0.5">
+                <span class="text-rose-600 font-bold">Balance Due:</span>
+                <strong id="inv-tot-due" class="text-xs font-black text-rose-600">₹0</strong>
+              </div>
             </div>
           </div>
 
-          <div class="mt-4 pt-2 border-t border-dashed border-slate-200 flex justify-between text-[8px] text-slate-400">
-            <span>Thank you for your business!</span>
-            <span>Authorized Signatory</span>
+          <!-- TERMS & SIGNATURE -->
+          <div class="mt-6 pt-3 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
+            <div class="space-y-0.5">
+              <p class="font-bold text-slate-700 uppercase">Terms & Conditions:</p>
+              <p>• Goods once sold will not be returned or replaced without warranty terms.</p>
+              <p>• Warranty directly handled by respective brand authorized service centers.</p>
+            </div>
+            <div class="text-center">
+              <div class="h-8"></div>
+              <p class="border-t border-slate-400 pt-1 font-bold text-slate-800 uppercase tracking-wider">Authorized Signatory</p>
+              <p class="text-[8px] text-slate-400">SRI RAM ENTERPRISES</p>
+            </div>
           </div>
 
         </div>
@@ -610,24 +656,20 @@
       const lblAddr = document.getElementById("lbl-cust-address");
 
       if (type === "REPAIRING") {
-        // SUPER CLEAN REPAIR LAYOUT
         standardCust.classList.add("hidden");
         standardItems.classList.add("hidden");
         repairBox.classList.remove("hidden");
       } else {
-        // MOBILE OR ACCESSORIES LAYOUT
         standardCust.classList.remove("hidden");
         standardItems.classList.remove("hidden");
         repairBox.classList.add("hidden");
 
         if (type === "ACCESSORIES") {
-          // OPTIONAL DETAILS FOR ACCESSORIES
           lblName.innerText = "Customer Name (Optional)";
           lblPhone.innerText = "Mobile Number (Optional)";
           lblAddr.innerText = "Customer Address (Optional)";
           document.getElementById("items-title").innerText = "Accessories Items";
         } else {
-          // MANDATORY DETAILS FOR MOBILE
           lblName.innerText = "Customer Name *";
           lblPhone.innerText = "Mobile Number *";
           lblAddr.innerText = "Customer Address *";
@@ -885,12 +927,10 @@
       let hasAnyGst = false;
 
       if (currentBillType === "REPAIRING") {
-        // ULTRA FAST REPAIR CALCULATION
         const repCharge = Number(document.getElementById("rep-charge-amount").value) || 0;
         grand = repCharge;
         totalTaxable = repCharge;
       } else {
-        // MOBILE & ACCESSORIES ITEMS
         const rows = document.querySelectorAll(".item-row");
         rows.forEach(r => {
           const q = Number(r.querySelector(".item-qty")?.value) || 1;
@@ -952,7 +992,6 @@
       let address = "";
 
       if (currentBillType === "REPAIRING") {
-        // REPAIRING VALIDATION: Only Phone & Product Name & Charge
         phone = document.getElementById("rep-cust-phone").value.trim();
         name = "Repair Customer";
         address = "Bokaro";
@@ -965,7 +1004,6 @@
         if (charge <= 0) return showPopup("error", "Charge Required", ["कृपया सही रिपेयर चार्ज राशि दर्ज करें।"]);
       } 
       else if (currentBillType === "ACCESSORIES") {
-        // ACCESSORIES: Customer details optional!
         name = document.getElementById("cust-name").value.trim() || "Cash Customer";
         phone = document.getElementById("cust-phone").value.trim();
         address = document.getElementById("cust-address").value.trim() || "Local";
@@ -975,7 +1013,6 @@
         }
       } 
       else {
-        // MOBILE SALE: Strict validation
         name = document.getElementById("cust-name").value.trim();
         phone = document.getElementById("cust-phone").value.trim();
         address = document.getElementById("cust-address").value.trim();
@@ -999,7 +1036,7 @@
         items = [{
           productName: pName,
           brand: "",
-          imei1: issue ? `Issue: ${issue}` : "Service/Repair",
+          imei1: issue ? `Issue: ${issue}` : "Repair & Service",
           quantity: 1,
           rate: charge,
           discount: 0,
@@ -1011,7 +1048,7 @@
           model: "",
           imei: "",
           complaint: issue,
-          workDone: "Repair Done",
+          workDone: "Repaired",
           labourCharge: charge,
           gstRate: 0
         };
@@ -1079,8 +1116,10 @@
       const billDate = new Date().toISOString().split("T")[0];
       const secureToken = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
 
+      // 100% RELIABLE SCAN URL: Clean Query Parameter (NO HASH CONFUSION)
       const encodedGas = gasUrl ? encodeURIComponent(gasUrl) : "";
-      const publicUrl = `${window.location.origin}${window.location.pathname}#/bill/${secureToken}?gas=${encodedGas}`;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const publicUrl = `${baseUrl}?billToken=${encodeURIComponent(secureToken)}${encodedGas ? '&gas=' + encodedGas : ''}`;
 
       const billPayload = {
         invoiceNo,
@@ -1158,68 +1197,76 @@
       document.getElementById("inv-date-display").innerText = bill.billDate;
       document.getElementById("inv-cust-name").innerText = bill.customer?.name || bill.customerName || "Customer";
       document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile || "-";
-      document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `Address: ${bill.customer?.address || bill.address}` : "";
+      document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `${bill.customer?.address || bill.address}` : "";
       
       const payMode = bill.payment?.mode || bill.paymentMode || "Cash";
-      document.getElementById("inv-pay-mode").innerText = "Mode: " + payMode;
+      document.getElementById("inv-pay-mode").innerText = "Payment: " + payMode;
 
+      // Finance Info
       const finBox = document.getElementById("inv-fin-box");
       if (bill.finance && payMode === "Finance") {
         finBox.classList.remove("hidden");
         finBox.innerHTML = `
-          <p>Finance Co: <b>${bill.finance.company}</b></p>
-          <p>DP: ₹${Number(bill.finance.downPayment).toLocaleString("en-IN")} (${bill.finance.dpMode || "Cash"}) | Loan: ₹${Number(bill.finance.loanAmount).toLocaleString("en-IN")}</p>
+          <span>Finance Co: <strong class="text-blue-950">${bill.finance.company}</strong></span><br />
+          <span>DP: ₹${Number(bill.finance.downPayment).toLocaleString("en-IN")} (${bill.finance.dpMode || "Cash"}) | Loan: ₹${Number(bill.finance.loanAmount).toLocaleString("en-IN")}</span>
         `;
       } else {
         finBox.classList.add("hidden");
       }
 
+      // Dues Info
       const duesBox = document.getElementById("inv-dues-box");
       if (bill.duesData && payMode === "Dues" && Number(bill.duesData.tokenPaid) > 0) {
         duesBox.classList.remove("hidden");
         duesBox.innerHTML = `
-          <p>Advance/Token Paid: ₹${Number(bill.duesData.tokenPaid).toLocaleString("en-IN")} (${bill.duesData.tokenMode || "Cash"})</p>
+          <span>Advance Paid: ₹${Number(bill.duesData.tokenPaid).toLocaleString("en-IN")} (${bill.duesData.tokenMode || "Cash"})</span>
         `;
       } else {
         duesBox.classList.add("hidden");
       }
 
+      // Repair Note
       const repBox = document.getElementById("inv-rep-box");
       if (bill.billType === "REPAIRING" && bill.repairDetails && bill.repairDetails.complaint) {
         repBox.classList.remove("hidden");
         repBox.innerHTML = `
-          <p class="font-bold text-slate-800">Issue: ${bill.repairDetails.complaint}</p>
+          <span class="font-bold text-amber-950 uppercase text-[10px] block">Service / Repair Issue Details:</span>
+          <p class="text-slate-700 text-xs font-medium mt-0.5">${bill.repairDetails.complaint}</p>
         `;
       } else {
         repBox.classList.add("hidden");
       }
 
+      // Items Table
       let hasAnyGst = false;
       const tbody = document.getElementById("inv-items-tbody");
-      tbody.innerHTML = (bill.items || []).map(it => {
+      tbody.innerHTML = (bill.items || []).map((it, i) => {
         if (Number(it.gstRate) > 0) hasAnyGst = true;
+        const lineTotal = ((it.quantity || 1) * (it.rate || 0) - (it.discount || 0));
         return `
-          <tr class="border-b">
-            <td class="p-1.5 font-bold">${it.productName || it.partName || "Product"}</td>
-            <td class="p-1.5 font-mono text-[9px]">${it.imei1 || "-"}</td>
-            <td class="p-1.5 text-center">${it.quantity || 1}</td>
-            <td class="p-1.5 text-center">${it.gstRate || 0}%</td>
-            <td class="p-1.5 text-right">₹${it.rate || 0}</td>
-            <td class="p-1.5 text-right font-bold">₹${((it.quantity || 1) * (it.rate || 0) - (it.discount || 0)).toLocaleString("en-IN")}</td>
+          <tr class="${i % 2 === 1 ? 'bg-slate-50/50' : 'bg-white'}">
+            <td class="p-2 border-r border-slate-200 text-slate-400 font-bold">${i + 1}</td>
+            <td class="p-2 border-r border-slate-200 font-extrabold text-slate-900">${it.productName || it.partName || "Product"}</td>
+            <td class="p-2 border-r border-slate-200 font-mono text-[10px] text-slate-600">${it.imei1 || "-"}</td>
+            <td class="p-2 border-r border-slate-200 text-center font-bold">${it.quantity || 1}</td>
+            <td class="p-2 border-r border-slate-200 text-center font-semibold text-slate-600">${it.gstRate || 0}%</td>
+            <td class="p-2 border-r border-slate-200 text-right font-medium">₹${(it.rate || 0).toLocaleString("en-IN")}</td>
+            <td class="p-2 text-right font-black text-slate-900">₹${lineTotal.toLocaleString("en-IN")}</td>
           </tr>
         `;
       }).join("");
 
+      // GST Breakdown Box
       const gstBox = document.getElementById("inv-gst-breakdown");
       const totGstAmt = Number(bill.totals?.totalGstAmt) || 0;
       const totTaxable = Number(bill.totals?.totalTaxable) || 0;
 
       if ((hasAnyGst || bill.totals?.hasAnyGst) && totGstAmt > 0 && bill.billType !== "REPAIRING") {
         gstBox.classList.remove("hidden");
-        document.getElementById("inv-taxable-val").innerText = totTaxable.toFixed(2);
-        document.getElementById("inv-cgst-val").innerText = (totGstAmt / 2).toFixed(2);
-        document.getElementById("inv-sgst-val").innerText = (totGstAmt / 2).toFixed(2);
-        document.getElementById("inv-tot-gst-val").innerText = totGstAmt.toFixed(2);
+        document.getElementById("inv-taxable-val").innerText = "₹" + totTaxable.toFixed(2);
+        document.getElementById("inv-cgst-val").innerText = "₹" + (totGstAmt / 2).toFixed(2);
+        document.getElementById("inv-sgst-val").innerText = "₹" + (totGstAmt / 2).toFixed(2);
+        document.getElementById("inv-tot-gst-val").innerText = "₹" + totGstAmt.toFixed(2);
       } else {
         gstBox.classList.add("hidden");
       }
@@ -1228,20 +1275,20 @@
       const paid = bill.totals?.paid || bill.paid || 0;
       const due = bill.totals?.due || bill.due || 0;
 
-      document.getElementById("inv-tot-grand").innerText = "Total: ₹" + Number(grand).toLocaleString("en-IN");
-      document.getElementById("inv-tot-paid").innerText = "Paid: ₹" + Number(paid).toLocaleString("en-IN");
-      document.getElementById("inv-tot-due").innerText = Number(due) > 0 ? `Due: ₹${Number(due).toLocaleString("en-IN")}` : "";
+      document.getElementById("inv-tot-grand").innerText = "₹" + Number(grand).toLocaleString("en-IN");
+      document.getElementById("inv-tot-paid").innerText = "₹" + Number(paid).toLocaleString("en-IN");
+      document.getElementById("inv-tot-due").innerText = "₹" + Number(due).toLocaleString("en-IN");
 
-      // 100% RELIABLE LOCAL QR CODE CANVAS (PRESERVES IN PDF)
-      const qrTargetUrl = bill.publicUrl || `${window.location.origin}${window.location.pathname}#/bill/${bill.secureToken}`;
+      // CLEAN STANDALONE SCANNER QR CODE (NO CLOUDY API, ULTRA CRISP)
+      const qrTargetUrl = bill.publicUrl || `${window.location.origin}${window.location.pathname}?billToken=${encodeURIComponent(bill.secureToken)}`;
       const qrContainer = document.getElementById("inv-qrcode-container");
       qrContainer.innerHTML = "";
       
       new QRCode(qrContainer, {
         text: qrTargetUrl,
-        width: 76,
-        height: 76,
-        colorDark: "#000000",
+        width: 80,
+        height: 80,
+        colorDark: "#020617",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
@@ -1255,77 +1302,92 @@
       if (b) displayInvoice(b);
     }
 
-    async function checkHashForBill() {
-      const hash = window.location.hash;
-      if (hash.includes("#/bill/")) {
-        const fullTokenStr = hash.split("#/bill/")[1];
-        if (!fullTokenStr) return;
+    // 100% RELIABLE SCAN DETECTOR (Supports ?billToken=... & old hash #/bill/...)
+    async function checkUrlForBill() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let token = urlParams.get("billToken");
+      let queryGas = urlParams.get("gas") ? decodeURIComponent(urlParams.get("gas")) : "";
 
-        let token = fullTokenStr;
-        let queryGas = "";
-
-        if (fullTokenStr.includes("?")) {
-          const parts = fullTokenStr.split("?");
-          token = parts[0];
-          const searchParams = new URLSearchParams(parts[1]);
-          queryGas = searchParams.get("gas") ? decodeURIComponent(searchParams.get("gas")) : "";
-        }
-
-        const local = billsCache.find(x => x.secureToken === token);
-        if (local) return displayInvoice(local, true);
-
-        const targetGas = queryGas || gasUrl;
-        if (targetGas) {
-          showPopup("progress", "Loading QR Invoice...", [
-            "• Fetching bill from Google Sheets...",
-            "• Please wait 2 seconds..."
-          ]);
-
-          try {
-            const res = await fetch(`${targetGas}?action=getPublicBill&token=${encodeURIComponent(token)}`, { redirect: "follow" });
-            const d = await res.json();
-            if (d.success && d.bill) {
-              closePopup();
-              displayInvoice(d.bill, true);
-            } else {
-              showPopup("error", "Invoice Not Found", [
-                "This bill does not exist in Google Sheets or token is invalid."
-              ]);
-            }
-          } catch (e) {
-            showPopup("error", "Server Error", [
-              "Could not reach Apps Script: " + e.message
-            ]);
+      // Fallback for old hash format
+      if (!token && window.location.hash.includes("#/bill/")) {
+        const fullTokenStr = window.location.hash.split("#/bill/")[1];
+        if (fullTokenStr) {
+          if (fullTokenStr.includes("?")) {
+            const parts = fullTokenStr.split("?");
+            token = parts[0];
+            const searchParams = new URLSearchParams(parts[1]);
+            queryGas = searchParams.get("gas") ? decodeURIComponent(searchParams.get("gas")) : "";
+          } else {
+            token = fullTokenStr;
           }
         }
       }
+
+      if (!token) return;
+
+      // 1. Check local cache
+      const local = billsCache.find(x => x.secureToken === token);
+      if (local) return displayInvoice(local, true);
+
+      // 2. Fetch live from Google Sheets
+      const targetGas = queryGas || gasUrl;
+      if (targetGas) {
+        showPopup("progress", "Loading Digital Invoice...", [
+          "• Fetching verified record from Cloud...",
+          "• Please wait 2 seconds..."
+        ]);
+
+        try {
+          const res = await fetch(`${targetGas}?action=getPublicBill&token=${encodeURIComponent(token)}`, { redirect: "follow" });
+          const d = await res.json();
+          if (d.success && d.bill) {
+            closePopup();
+            displayInvoice(d.bill, true);
+          } else {
+            showPopup("error", "Invoice Not Found", [
+              "This bill does not exist in Google Sheets or token is expired."
+            ]);
+          }
+        } catch (e) {
+          showPopup("error", "Server Error", [
+            "Could not connect to database: " + e.message
+          ]);
+        }
+      } else {
+        showPopup("error", "Verification Link Missing", [
+          "Google Apps Script connection URL not present in this QR.",
+          "Please verify from store counter."
+        ]);
+      }
     }
 
-    // PERFECT CRISP PDF DOWNLOAD
+    // HIGH QUALITY 300-DPI A4 PDF EXPORT (NEVER MISSES QR CODE)
     async function downloadInvoicePDF() {
       const elem = document.getElementById("invoice-capture");
-      showPopup("progress", "Generating PDF...", ["Please wait a moment..."]);
+      showPopup("progress", "Generating HD PDF...", ["Optimizing resolution for print & save..."]);
 
       try {
         const canvas = await html2canvas(elem, {
-          scale: 2.5,
+          scale: 3, // 300 DPI ultra-high sharpness
           useCORS: true,
           logging: false,
-          backgroundColor: "#ffffff"
+          backgroundColor: "#ffffff",
+          windowWidth: 840
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/png", 1.0);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
 
         const pdfWidth = 210;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`SRE-${activeInvoiceData?.invoiceNo || "Invoice"}.pdf`);
+        // Auto page fitting
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, Math.min(297, pdfHeight));
+        pdf.save(`SRE_Invoice_${activeInvoiceData?.invoiceNo || "Bill"}.pdf`);
         closePopup();
       } catch (err) {
-        showPopup("error", "PDF Generation Failed", [err.message]);
+        showPopup("error", "PDF Failed", [err.message]);
       }
     }
 
@@ -1333,14 +1395,14 @@
       if (!activeInvoiceData) return;
       const phone = (activeInvoiceData.customer?.mobile || "").replace(/\D/g, "");
       const formatted = phone.startsWith("91") ? phone : "91" + phone;
-      const text = encodeURIComponent(`Hello ${activeInvoiceData.customer?.name}, your SRI RAM ENTERPRISES bill is ready: ${activeInvoiceData.publicUrl}`);
+      const text = encodeURIComponent(`नमस्ते ${activeInvoiceData.customer?.name || "Customer"}, आपका SRI RAM ENTERPRISES का बिल तैयार है। यहाँ ऑनलाइन देखें व डाउनलोड करें: ${activeInvoiceData.publicUrl}`);
       window.open(`https://wa.me/${formatted}?text=${text}`, "_blank");
     }
 
     function saveSettings() {
       gasUrl = document.getElementById("settings-gas-url").value.trim();
       localStorage.setItem("sre_gas_url", gasUrl);
-      showPopup("success", "Settings Saved", ["Google Apps Script URL has been successfully saved."], "Go to Dashboard", () => {
+      showPopup("success", "Settings Saved", ["Google Apps Script URL has been saved."], "Go to Dashboard", () => {
         closePopup();
         showView("dashboard");
       });
@@ -1348,9 +1410,9 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       showView("dashboard");
-      checkHashForBill();
+      checkUrlForBill();
     });
-    window.addEventListener("hashchange", checkHashForBill);
+    window.addEventListener("hashchange", checkUrlForBill);
   </script>
 </body>
 </html>
