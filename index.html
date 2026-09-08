@@ -136,7 +136,7 @@
         </div>
       </div>
 
-      <!-- REPAIR DETAILS (REPAIR ONLY) -->
+      <!-- REPAIR DETAILS -->
       <div id="repair-section" class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/80 space-y-2.5 hidden">
         <h3 class="font-bold text-xs text-amber-950 uppercase tracking-wider">🔧 Device & Repair Specs</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -179,7 +179,7 @@
         </div>
       </div>
 
-      <!-- PAYMENT MODULE (STREAMLINED & REARRANGED) -->
+      <!-- PAYMENT MODULE (PRIMARY & SECONDARY) -->
       <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <!-- PRIMARY MODE DROPDOWN -->
@@ -206,12 +206,12 @@
             <select id="pay-secondary-dropdown" onchange="onSecondaryModeChange()" class="w-full p-2.5 bg-rose-50/60 border border-rose-300 rounded-xl text-xs font-bold text-rose-950 shadow-sm focus:border-rose-600">
               <option value="">-- None (Keep Primary Mode) --</option>
               <option value="Finance">🏦 Finance / EMI</option>
-              <option value="Dues">📝 Dues / Udhar (Full)</option>
+              <option value="Dues">📝 Dues / Udhar</option>
             </select>
           </div>
         </div>
 
-        <!-- FINANCE MODULE (REPLACES TOTAL PAID WITH DOWN PAYMENT & LOAN AMOUNT) -->
+        <!-- FINANCE MODULE -->
         <div id="finance-inputs-container" class="pt-3 border-t border-slate-200 space-y-3 bg-blue-50/60 p-3.5 rounded-2xl border border-blue-200/80 hidden">
           <div class="flex justify-between items-center">
             <h4 class="text-xs font-black text-blue-950 uppercase tracking-wide">🏦 Finance Setup</h4>
@@ -240,19 +240,19 @@
           <div id="fin-split-container" class="pt-2 border-t border-blue-200 grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
             <div id="fin-split-box-cash" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP Cash (₹)</label>
-              <input type="number" id="fin-split-cash" placeholder="कैश राशि लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
+              <input type="number" id="fin-split-cash" placeholder="कैश डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
             </div>
             <div id="fin-split-box-qr" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP QR (₹)</label>
-              <input type="number" id="fin-split-qr" placeholder="QR राशि लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
+              <input type="number" id="fin-split-qr" placeholder="QR डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
             </div>
             <div id="fin-split-box-card" class="hidden">
               <label class="text-[10px] font-bold text-slate-500 uppercase">DP Card (₹)</label>
-              <input type="number" id="fin-split-card" placeholder="कार्ड राशि लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
+              <input type="number" id="fin-split-card" placeholder="कार्ड डाउनपेमेंट लिखें" oninput="calcFinSplit()" class="w-full mt-1 p-2 bg-white border rounded-xl text-xs font-bold" />
             </div>
           </div>
 
-          <!-- DOWN PAYMENT & LOAN AMOUNT DISPLAY INSTEAD OF TOTAL PAID -->
+          <!-- DOWN PAYMENT & LOAN AMOUNT DISPLAY -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div class="bg-white p-3 rounded-xl border border-emerald-300 shadow-sm">
               <label class="text-[10px] font-black text-emerald-800 uppercase block tracking-wider">Down Payment (जमा राशि ₹)</label>
@@ -265,18 +265,64 @@
           </div>
         </div>
 
-        <!-- DUES STATE NOTIFICATION (WHEN DUES CHOSEN) -->
-        <div id="dues-inputs-container" class="pt-2 border-t border-slate-200 hidden">
-          <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <span class="text-base">📝</span>
-              <p class="text-xs font-bold text-rose-900">Dues / Udhar Sale: Total amount will be booked as Pending Balance.</p>
+        <!-- DUES (UDHAR) MODULE WITH COMPREHENSIVE PAYMENT METHODS -->
+        <div id="dues-inputs-container" class="pt-3 border-t border-slate-200 space-y-3 bg-rose-50/60 p-3.5 rounded-2xl border border-rose-200/80 hidden">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-black text-rose-950 uppercase tracking-wide">📝 Dues / Udhar Setup</h4>
+            <span class="text-[10px] text-rose-800 font-bold bg-rose-100 px-2 py-0.5 rounded-md">Udhar Active</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Token / Advance Paid Method</label>
+              <select id="dues-pay-mode" onchange="onDuesModeChange()" class="w-full mt-1 p-2 bg-white border border-rose-300 rounded-xl text-xs font-bold">
+                <option value="Cash">💵 Cash</option>
+                <option value="QR">📲 QR</option>
+                <option value="Card">💳 Card</option>
+                <option value="Cash + QR">💵 + 📲 Cash + QR</option>
+                <option value="Cash + Card">💵 + 💳 Cash + Card</option>
+                <option value="QR + Card">📲 + 💳 QR + Card</option>
+                <option value="Cash + QR + Card">💵 + 📲 + 💳 Cash + QR + Card</option>
+              </select>
             </div>
-            <span class="text-[10px] font-black uppercase text-rose-700 bg-rose-200 px-2 py-0.5 rounded">Full Due</span>
+
+            <!-- DUES SPLIT ROW (Shows when split method is chosen) -->
+            <div id="dues-single-input-wrapper">
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Advance / Token Amount (₹)</label>
+              <input type="number" id="dues-partial-amt" placeholder="टोकन राशि लिखें (खाली छोड़ सकते हैं)" oninput="handleDuesInput()" class="w-full mt-1 p-2 bg-white border border-rose-300 rounded-xl text-xs font-bold text-emerald-700" />
+            </div>
+          </div>
+
+          <!-- SPLIT BOXES FOR DUES TOKEN (Cash Box + QR Box etc.) -->
+          <div id="dues-split-container" class="pt-2 border-t border-rose-200 grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
+            <div id="dues-split-box-cash" class="hidden">
+              <label class="text-[10px] font-bold text-slate-500 uppercase">Token Cash (₹)</label>
+              <input type="number" id="dues-split-cash" placeholder="कैश टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-2 bg-white border border-rose-300 rounded-xl text-xs font-bold" />
+            </div>
+            <div id="dues-split-box-qr" class="hidden">
+              <label class="text-[10px] font-bold text-slate-500 uppercase">Token QR (₹)</label>
+              <input type="number" id="dues-split-qr" placeholder="QR टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-2 bg-white border border-rose-300 rounded-xl text-xs font-bold" />
+            </div>
+            <div id="dues-split-box-card" class="hidden">
+              <label class="text-[10px] font-bold text-slate-500 uppercase">Token Card (₹)</label>
+              <input type="number" id="dues-split-card" placeholder="कार्ड टोकन राशि लिखें" oninput="calcDuesSplit()" class="w-full mt-1 p-2 bg-white border border-rose-300 rounded-xl text-xs font-bold" />
+            </div>
+          </div>
+
+          <!-- DUES SUMMARY DISPLAY CARDS -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="bg-white p-3 rounded-xl border border-emerald-300 shadow-sm">
+              <label class="text-[10px] font-black text-emerald-800 uppercase block tracking-wider">Advance / Token Paid (जमा राशि ₹)</label>
+              <p id="dues-disp-paid" class="mt-1 text-lg font-black text-emerald-700">₹0</p>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-rose-300 shadow-sm">
+              <label class="text-[10px] font-black text-rose-900 uppercase block tracking-wider">Remaining Balance Due (उधार बकाया ₹)</label>
+              <p id="dues-disp-due" class="mt-1 text-lg font-black text-rose-600">₹0</p>
+            </div>
           </div>
         </div>
 
-        <!-- PRIMARY SPLIT INPUTS -->
+        <!-- PRIMARY SPLIT INPUTS (Row: Cash Box + QR Box etc.) -->
         <div id="split-inputs-container" class="pt-2 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2.5 hidden">
           <div id="split-box-cash" class="hidden">
             <label class="text-[10px] font-bold text-slate-500 uppercase">Cash Amount (₹)</label>
@@ -525,6 +571,11 @@
 
       document.getElementById("pay-primary-dropdown").value = "Cash";
       document.getElementById("pay-secondary-dropdown").value = "";
+      document.getElementById("dues-partial-amt").value = "";
+      document.getElementById("dues-split-cash").value = "";
+      document.getElementById("dues-split-qr").value = "";
+      document.getElementById("dues-split-card").value = "";
+
       updatePaymentFields();
 
       const container = document.getElementById("items-container");
@@ -666,22 +717,22 @@
 
       if (mode === "Finance") {
         finBox.classList.remove("hidden");
-        regularPaidBox.classList.add("hidden"); // Total Paid replaced by Down Payment & Loan
+        regularPaidBox.classList.add("hidden"); // Replaced by DP and Loan Amount cards
         onFinDpModeChange();
         handleFinanceInput();
       } else if (mode === "Dues") {
         duesBox.classList.remove("hidden");
-        regularPaidBox.classList.add("hidden"); // Entire bill goes to Pending Dues
-        paidInput.value = "0";
+        regularPaidBox.classList.add("hidden"); // Replaced by Token Paid and Remaining Due cards
+        onDuesModeChange();
+        handleDuesInput();
       } else {
-        // Standard Primary Modes (Shows Regular Paid Box)
+        // Standard Primary Modes
         regularPaidBox.classList.remove("hidden");
 
         if (mode === "Cash" || mode === "QR" || mode === "Card Swipe") {
           paidInput.readOnly = false;
           paidInput.classList.remove("bg-slate-100");
         } else {
-          // Primary Split Modes (Cash + QR, etc.)
           splitBox.classList.remove("hidden");
           paidInput.readOnly = true;
           paidInput.classList.add("bg-slate-100");
@@ -739,7 +790,49 @@
       const { grand } = recalcTotals();
       const loan = Math.max(0, grand - dpVal);
       document.getElementById("fin-loan").value = loan;
-      document.getElementById("pay-paid").value = dpVal; // Down Payment is collected paid amount
+      document.getElementById("pay-paid").value = dpVal;
+      recalcTotals();
+    }
+
+    // DUES TOKEN LOGIC (SUPPORTS ALL 7 METHODS + SPLITS)
+    function onDuesModeChange() {
+      const mode = document.getElementById("dues-pay-mode").value;
+      const splitBox = document.getElementById("dues-split-container");
+      const singleWrapper = document.getElementById("dues-single-input-wrapper");
+      const boxCash = document.getElementById("dues-split-box-cash");
+      const boxQr = document.getElementById("dues-split-box-qr");
+      const boxCard = document.getElementById("dues-split-box-card");
+      const partialInput = document.getElementById("dues-partial-amt");
+
+      const isSplit = mode.includes("+");
+      splitBox.classList.toggle("hidden", !isSplit);
+
+      if (isSplit) {
+        singleWrapper.classList.add("hidden");
+        boxCash.classList.toggle("hidden", !mode.includes("Cash"));
+        boxQr.classList.toggle("hidden", !mode.includes("QR"));
+        boxCard.classList.toggle("hidden", !mode.includes("Card"));
+        calcDuesSplit();
+      } else {
+        singleWrapper.classList.remove("hidden");
+        handleDuesInput();
+      }
+    }
+
+    function calcDuesSplit() {
+      const mode = document.getElementById("dues-pay-mode").value;
+      let total = 0;
+      if (mode.includes("Cash")) total += Number(document.getElementById("dues-split-cash").value) || 0;
+      if (mode.includes("QR")) total += Number(document.getElementById("dues-split-qr").value) || 0;
+      if (mode.includes("Card")) total += Number(document.getElementById("dues-split-card").value) || 0;
+
+      document.getElementById("dues-partial-amt").value = total > 0 ? total : "";
+      handleDuesInput();
+    }
+
+    function handleDuesInput() {
+      const tokenVal = Number(document.getElementById("dues-partial-amt").value) || 0;
+      document.getElementById("pay-paid").value = tokenVal;
       recalcTotals();
     }
 
@@ -811,7 +904,9 @@
 
       let paid = 0;
       if (secVal === "Dues") {
-        paid = 0;
+        paid = Math.min(grand, Number(document.getElementById("dues-partial-amt").value) || 0);
+        document.getElementById("dues-disp-paid").innerText = "₹" + paid.toLocaleString("en-IN");
+        document.getElementById("dues-disp-due").innerText = "₹" + Math.max(0, grand - paid).toLocaleString("en-IN");
       } else if (secVal === "Finance") {
         paid = Math.min(grand, Number(document.getElementById("fin-dp").value) || 0);
       } else {
@@ -891,6 +986,7 @@
       const effectiveMode = secVal ? secVal : primVal;
 
       let financeDetails = null;
+      let duesDetails = null;
 
       if (effectiveMode === "Finance") {
         const finComp = document.getElementById("fin-company").value.trim();
@@ -902,6 +998,11 @@
           downPayment: Number(document.getElementById("fin-dp").value) || 0,
           loanAmount: Number(document.getElementById("fin-loan").value) || 0,
           dpMode: document.getElementById("fin-dp-mode").value
+        };
+      } else if (effectiveMode === "Dues") {
+        duesDetails = {
+          tokenPaid: paid,
+          tokenMode: document.getElementById("dues-pay-mode").value
         };
       }
 
@@ -931,6 +1032,7 @@
         repairDetails,
         payment: { mode: effectiveMode, amountPaid: paid, dueAmount: due },
         finance: financeDetails,
+        duesData: duesDetails,
         totals: { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst },
         secureToken,
         publicUrl
@@ -1003,7 +1105,7 @@
       const payMode = bill.payment?.mode || bill.paymentMode || "Cash";
       document.getElementById("inv-pay-mode").innerText = "Mode: " + payMode;
 
-      // Finance Details Display
+      // Finance Details
       const finBox = document.getElementById("inv-fin-box");
       if (bill.finance && payMode === "Finance") {
         finBox.classList.remove("hidden");
@@ -1013,6 +1115,17 @@
         `;
       } else {
         finBox.classList.add("hidden");
+      }
+
+      // Dues Details
+      const duesBox = document.getElementById("inv-dues-box");
+      if (bill.duesData && payMode === "Dues" && Number(bill.duesData.tokenPaid) > 0) {
+        duesBox.classList.remove("hidden");
+        duesBox.innerHTML = `
+          <p>Advance/Token Paid: ₹${Number(bill.duesData.tokenPaid).toLocaleString("en-IN")} (${bill.duesData.tokenMode || "Cash"})</p>
+        `;
+      } else {
+        duesBox.classList.add("hidden");
       }
 
       // Repair Section
