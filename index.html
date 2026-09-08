@@ -132,7 +132,7 @@
         </div>
       </div>
 
-      <!-- REPAIR DETAILS (ONLY FOR REPAIRING) -->
+      <!-- REPAIR DETAILS (FOR REPAIRING) -->
       <div id="repair-section" class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3 hidden">
         <h3 class="font-bold text-sm text-amber-900">🔧 Device & Repair Specs (रिपेयर विवरण)</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -148,7 +148,7 @@
           </div>
           <div>
             <label class="text-xs font-bold text-slate-600">Labour GST %</label>
-            <select id="rep-gst" onchange="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm">
+            <select id="rep-gst" onchange="recalcTotals()" class="w-full mt-1 p-2 bg-white border rounded-lg text-sm font-bold">
               <option value="18">18%</option><option value="12">12%</option><option value="5">5%</option><option value="28">28%</option><option value="0">0%</option>
             </select>
           </div>
@@ -162,69 +162,79 @@
         <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">+ अन्य आइटम जोड़ें</button>
       </div>
 
-      <!-- PAYMENT MODES (RADIO BUTTONS) -->
+      <!-- LIVE GST SUMMARY IN FORM (BEFORE SAVE) -->
+      <div id="form-gst-live-summary" class="p-3 bg-blue-50/80 border border-blue-200 rounded-xl space-y-1.5 text-xs text-blue-950 hidden">
+        <p class="font-bold text-[11px] uppercase tracking-wide text-blue-900">GST Breakdown (टैक्स का विवरण)</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-blue-200">
+          <div><span class="text-slate-500 font-medium">Taxable Amount:</span> <span id="live-taxable" class="font-bold">₹0</span></div>
+          <div><span class="text-slate-500 font-medium">CGST:</span> <span id="live-cgst" class="font-bold">₹0</span></div>
+          <div><span class="text-slate-500 font-medium">SGST:</span> <span id="live-sgst" class="font-bold">₹0</span></div>
+          <div><span class="text-slate-500 font-medium">Total GST:</span> <span id="live-total-gst" class="font-bold text-blue-900">₹0</span></div>
+        </div>
+      </div>
+
+      <!-- PAYMENT SECTION (DROPDOWN MENU) -->
       <div class="p-4 bg-slate-50 rounded-xl border space-y-3">
-        <label class="text-xs font-bold text-slate-700 block uppercase">Payment Mode (भुगतान का प्रकार चुनें)</label>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Cash" checked onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">💵 Cash</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">📲 QR</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Finance" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-blue-900">🏦 Finance / EMI</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Dues" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-rose-600">📝 Dues / Udhar</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Cash + QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">💵 Cash + 📲 QR</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Card Swipe + QR" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">💳 Card + 📲 QR</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Card Swipe + Cash" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">💳 Card + 💵 Cash</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-2 bg-white border rounded-lg cursor-pointer hover:border-blue-500 transition">
-            <input type="radio" name="pay-mode-radio" value="Card Swipe + QR + Cash" onchange="updatePaymentFields()" class="w-4 h-4 text-blue-900" />
-            <span class="text-xs font-bold text-slate-800">💳 + 📲 + 💵</span>
-          </label>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block uppercase mb-1">Payment Mode (भुगतान का प्रकार चुनें) *</label>
+          <select id="pay-mode-dropdown" onchange="updatePaymentFields()" class="w-full p-2.5 bg-white border rounded-lg text-sm font-bold text-slate-800">
+            <option value="Cash">💵 Cash</option>
+            <option value="QR">📲 QR</option>
+            <option value="Finance">🏦 Finance / EMI</option>
+            <option value="Dues">📝 Dues / Udhar (बकाया)</option>
+            <option value="Cash + QR">💵 Cash + 📲 QR</option>
+            <option value="Card Swipe + QR">💳 Card Swipe + 📲 QR</option>
+            <option value="Card Swipe + Cash">💳 Card Swipe + 💵 Cash</option>
+            <option value="Card Swipe + QR + Cash">💳 Card + 📲 QR + 💵 Cash</option>
+          </select>
         </div>
 
-        <!-- FINANCE DETAILS SECTION -->
-        <div id="finance-inputs-container" class="pt-3 border-t mt-2 space-y-2.5 bg-blue-50/70 p-3 rounded-xl border border-blue-200 hidden">
+        <!-- FINANCE SUB-SECTION -->
+        <div id="finance-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-blue-50/70 p-3.5 rounded-xl border border-blue-200 hidden">
           <h4 class="text-xs font-black text-blue-950 uppercase flex items-center space-x-1">
             <span>🏦 Finance Details (फाइनेंस की जानकारी)</span>
           </h4>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">Finance Company / Name *</label>
-              <input type="text" id="fin-company" placeholder="जैसे: Bajaj Finserv, TVS, HDB" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Finance Company Name *</label>
+              <input type="text" id="fin-company" placeholder="उदा: Bajaj, TVS, HDB, Home Credit" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold" />
             </div>
             <div>
-              <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment (जमा राशि ₹)</label>
-              <input type="number" id="fin-dp" placeholder="ग्राहक द्वारा DP" oninput="handleFinanceInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
+              <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment (DP ₹)</label>
+              <input type="number" id="fin-dp" placeholder="DP राशि भरें" oninput="handleFinanceInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
             </div>
             <div>
               <label class="text-[10px] font-bold text-slate-600 uppercase">Loan Amount (कंपनी से आएगा ₹)</label>
-              <input type="number" id="fin-loan" placeholder="कंपनी से आने वाली राशि" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-lg text-xs font-bold text-blue-900" />
+              <input type="number" id="fin-loan" placeholder="लोन राशि" readonly class="w-full mt-1 p-2 bg-slate-100 border rounded-lg text-xs font-bold text-blue-900" />
+            </div>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 uppercase">Down Payment कैसे मिला? (DP Payment Mode)</label>
+            <select id="fin-dp-mode" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
+              <option value="Cash">Cash</option>
+              <option value="QR">QR</option>
+              <option value="Cash + QR">Cash + QR</option>
+              <option value="Card Swipe">Card Swipe</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- DUES SUB-SECTION -->
+        <div id="dues-inputs-container" class="pt-3 border-t mt-2 space-y-3 bg-rose-50/60 p-3.5 rounded-xl border border-rose-200 hidden">
+          <h4 class="text-xs font-black text-rose-950 uppercase">📝 Dues / टोकन विवरण</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 uppercase">अभी जमा की गई राशि (यदि कोई टोकन मिला हो ₹)</label>
+              <input type="number" id="dues-partial-amt" placeholder="टोकन राशि भरें (अन्यथा खाली रखें)" oninput="handleDuesInput()" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold text-emerald-700" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 uppercase">जमा राशि का माध्यम (Payment Mode)</label>
+              <select id="dues-pay-mode" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-bold">
+                <option value="Cash">Cash</option>
+                <option value="QR">QR</option>
+                <option value="Cash + QR">Cash + QR</option>
+                <option value="Card Swipe">Card Swipe</option>
+              </select>
             </div>
           </div>
         </div>
@@ -304,6 +314,7 @@
           <div class="text-right">
             <p id="inv-pay-mode" class="text-slate-800 font-bold">Mode: Cash</p>
             <div id="inv-fin-box" class="mt-1 text-[10px] text-blue-900 font-semibold hidden"></div>
+            <div id="inv-dues-box" class="mt-1 text-[10px] text-rose-700 font-semibold hidden"></div>
           </div>
         </div>
 
@@ -323,7 +334,7 @@
           <tbody id="inv-items-tbody"></tbody>
         </table>
 
-        <!-- GST BREAKDOWN TABLE (Appears only if GST > 0) -->
+        <!-- GST BREAKDOWN ON INVOICE -->
         <div id="inv-gst-breakdown" class="my-2 p-2 bg-slate-50 border rounded text-[10px] hidden">
           <div class="flex justify-between font-bold border-b pb-1 text-slate-700">
             <span>Taxable Value: ₹<span id="inv-taxable-val">0</span></span>
@@ -471,8 +482,7 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("pay-paid").value = "";
 
-      const cashRadio = document.querySelector('input[name="pay-mode-radio"][value="Cash"]');
-      if (cashRadio) cashRadio.checked = true;
+      document.getElementById("pay-mode-dropdown").value = "Cash";
       updatePaymentFields();
 
       const container = document.getElementById("items-container");
@@ -585,31 +595,29 @@
       imeiBox.appendChild(grid);
     }
 
-    function getSelectedPayMode() {
-      const selected = document.querySelector('input[name="pay-mode-radio"]:checked');
-      return selected ? selected.value : "Cash";
-    }
-
     function updatePaymentFields() {
-      const mode = getSelectedPayMode();
+      const mode = document.getElementById("pay-mode-dropdown").value;
       const splitBox = document.getElementById("split-inputs-container");
       const boxCash = document.getElementById("split-box-cash");
       const boxQr = document.getElementById("split-box-qr");
       const boxCard = document.getElementById("split-box-card");
       const finBox = document.getElementById("finance-inputs-container");
+      const duesBox = document.getElementById("dues-inputs-container");
       const paidInput = document.getElementById("pay-paid");
 
       // Hide all dynamic sub-boxes first
       splitBox.classList.add("hidden");
       finBox.classList.add("hidden");
+      duesBox.classList.add("hidden");
 
       if (mode === "Cash" || mode === "QR") {
         paidInput.readOnly = false;
         paidInput.classList.remove("bg-slate-100");
       } else if (mode === "Dues") {
-        paidInput.value = "0";
-        paidInput.readOnly = false;
-        paidInput.classList.remove("bg-slate-100");
+        duesBox.classList.remove("hidden");
+        paidInput.readOnly = true;
+        paidInput.classList.add("bg-slate-100");
+        handleDuesInput();
       } else if (mode === "Finance") {
         finBox.classList.remove("hidden");
         paidInput.readOnly = true;
@@ -639,8 +647,14 @@
       recalcTotals();
     }
 
+    function handleDuesInput() {
+      const tokenVal = document.getElementById("dues-partial-amt").value;
+      document.getElementById("pay-paid").value = tokenVal !== "" ? Number(tokenVal) : 0;
+      recalcTotals();
+    }
+
     function handleSplitInput() {
-      const mode = getSelectedPayMode();
+      const mode = document.getElementById("pay-mode-dropdown").value;
       let total = 0;
       let hasValue = false;
 
@@ -665,6 +679,7 @@
       let grand = 0;
       let totalTaxable = 0;
       let totalGstAmt = 0;
+      let hasAnyGst = false;
 
       const rows = document.querySelectorAll(".item-row");
       rows.forEach(r => {
@@ -677,6 +692,7 @@
         grand += lineTotal;
 
         if (gstRate > 0) {
+          hasAnyGst = true;
           const taxable = lineTotal / (1 + (gstRate / 100));
           totalTaxable += taxable;
           totalGstAmt += (lineTotal - taxable);
@@ -690,6 +706,7 @@
         const labGst = Number(document.getElementById("rep-gst").value) || 0;
         grand += lab;
         if (labGst > 0) {
+          hasAnyGst = true;
           const lTax = lab / (1 + (labGst / 100));
           totalTaxable += lTax;
           totalGstAmt += (lab - lTax);
@@ -703,10 +720,22 @@
       const paid = paidVal === "" ? 0 : Math.min(grand, Number(paidVal) || 0);
       const due = Math.max(0, grand - paid);
 
+      // Update Form Live GST Box
+      const liveGstBox = document.getElementById("form-gst-live-summary");
+      if (hasAnyGst && totalGstAmt > 0) {
+        liveGstBox.classList.remove("hidden");
+        document.getElementById("live-taxable").innerText = "₹" + totalTaxable.toFixed(2);
+        document.getElementById("live-cgst").innerText = "₹" + (totalGstAmt / 2).toFixed(2);
+        document.getElementById("live-sgst").innerText = "₹" + (totalGstAmt / 2).toFixed(2);
+        document.getElementById("live-total-gst").innerText = "₹" + totalGstAmt.toFixed(2);
+      } else {
+        liveGstBox.classList.add("hidden");
+      }
+
       document.getElementById("total-grand").innerText = "₹" + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "₹" + due.toLocaleString("en-IN");
 
-      return { grand, paid, due, totalTaxable, totalGstAmt };
+      return { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst };
     }
 
     async function saveCurrentBill() {
@@ -718,7 +747,7 @@
       if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "गलत नंबर", ["कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
       if (!address) return showPopup("error", "पता अनिवार्य है", ["कृपया Customer Address अवश्य भरें।"]);
 
-      const { grand, paid, due, totalTaxable, totalGstAmt } = recalcTotals();
+      const { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst } = recalcTotals();
       if (grand <= 0) return showPopup("error", "गलत राशि", ["बिल की कुल राशि 0 से अधिक होनी चाहिए। कृपया सही Rate भरें।"]);
 
       let imeiValidationError = false;
@@ -757,18 +786,25 @@
 
       if (imeiValidationError) return;
 
-      const selectedMode = getSelectedPayMode();
+      const selectedMode = document.getElementById("pay-mode-dropdown").value;
       let financeDetails = null;
+      let duesDetails = null;
 
       if (selectedMode === "Finance") {
         const finComp = document.getElementById("fin-company").value.trim();
         if (!finComp) {
-          return showPopup("error", "फाइनेंस कंपनी भरें", ["कृपया Finance Company Name (उदा: Bajaj Finserv) दर्ज करें।"]);
+          return showPopup("error", "फाइनेंस कंपनी भरें", ["कृपया Finance Company Name दर्ज करें।"]);
         }
         financeDetails = {
           company: finComp,
           downPayment: Number(document.getElementById("fin-dp").value) || 0,
-          loanAmount: Number(document.getElementById("fin-loan").value) || 0
+          loanAmount: Number(document.getElementById("fin-loan").value) || 0,
+          dpMode: document.getElementById("fin-dp-mode").value
+        };
+      } else if (selectedMode === "Dues") {
+        duesDetails = {
+          partialPaid: paid,
+          duesMode: document.getElementById("dues-pay-mode").value
         };
       }
 
@@ -798,7 +834,8 @@
         repairDetails,
         payment: { mode: selectedMode, amountPaid: paid, dueAmount: due },
         finance: financeDetails,
-        totals: { grand, paid, due, totalTaxable, totalGstAmt },
+        duesData: duesDetails,
+        totals: { grand, paid, due, totalTaxable, totalGstAmt, hasAnyGst },
         secureToken,
         publicUrl
       };
@@ -867,20 +904,30 @@
       document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || bill.mobile;
       document.getElementById("inv-cust-address").innerText = (bill.customer?.address || bill.address) ? `Address: ${bill.customer?.address || bill.address}` : "";
       
-      // Payment mode display
       const payMode = bill.payment?.mode || bill.paymentMode || "Cash";
       document.getElementById("inv-pay-mode").innerText = "Mode: " + payMode;
 
-      // Finance Details Display
+      // Finance Info on Invoice
       const finBox = document.getElementById("inv-fin-box");
       if (bill.finance && payMode === "Finance") {
         finBox.classList.remove("hidden");
         finBox.innerHTML = `
-          <p>Financed By: <b>${bill.finance.company}</b></p>
-          <p>Down Payment: ₹${Number(bill.finance.downPayment).toLocaleString("en-IN")} | Loan: ₹${Number(bill.finance.loanAmount).toLocaleString("en-IN")}</p>
+          <p>Finance Co: <b>${bill.finance.company}</b></p>
+          <p>DP: ₹${Number(bill.finance.downPayment).toLocaleString("en-IN")} (${bill.finance.dpMode || "Cash"}) | Loan: ₹${Number(bill.finance.loanAmount).toLocaleString("en-IN")}</p>
         `;
       } else {
         finBox.classList.add("hidden");
+      }
+
+      // Dues Info on Invoice
+      const duesBox = document.getElementById("inv-dues-box");
+      if (bill.duesData && payMode === "Dues" && bill.duesData.partialPaid > 0) {
+        duesBox.classList.remove("hidden");
+        duesBox.innerHTML = `
+          <p>Token Received: ₹${Number(bill.duesData.partialPaid).toLocaleString("en-IN")} (${bill.duesData.duesMode || "Cash"})</p>
+        `;
+      } else {
+        duesBox.classList.add("hidden");
       }
 
       // Repair Section
@@ -896,7 +943,7 @@
         repBox.classList.add("hidden");
       }
 
-      // Items Table
+      // Items Table & GST Check
       let hasAnyGst = false;
       const tbody = document.getElementById("inv-items-tbody");
       tbody.innerHTML = (bill.items || []).map(it => {
@@ -926,12 +973,12 @@
         `;
       }
 
-      // GST Breakdown Box (Visible only if GST > 0)
+      // Invoice GST Breakdown Box
       const gstBox = document.getElementById("inv-gst-breakdown");
       const totGstAmt = Number(bill.totals?.totalGstAmt) || 0;
       const totTaxable = Number(bill.totals?.totalTaxable) || 0;
 
-      if (hasAnyGst && totGstAmt > 0) {
+      if ((hasAnyGst || bill.totals?.hasAnyGst) && totGstAmt > 0) {
         gstBox.classList.remove("hidden");
         document.getElementById("inv-taxable-val").innerText = totTaxable.toFixed(2);
         document.getElementById("inv-cgst-val").innerText = (totGstAmt / 2).toFixed(2);
