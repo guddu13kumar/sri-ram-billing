@@ -1,15 +1,15 @@
 {
-  "short_name": "Sri Ram Billing",
-  "name": "SRI RAM ENTERPRISES Billing",
+  "short_name": "SRE POS",
+  "name": "Sri Ram Enterprises Billing",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1055/1055644.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/1041/1041883.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": "./index.html",
-  "background_color": "#1e3a8a",
+  "background_color": "#0f172a",
   "theme_color": "#1e3a8a",
   "display": "standalone",
   "orientation": "portrait"
