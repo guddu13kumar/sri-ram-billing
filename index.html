@@ -1,1068 +1,1737 @@
 <!DOCTYPE html>
-<html lang="en" class="notranslate" translate="no">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SRI RAM ENTERPRISES - POS & Invoicing</title>
-  <meta name="theme-color" content="#0f172a" />
-
-  <!-- Tailwind CSS, Pure jsPDF Engine & Reliable QRCode.js -->
+  <title>Sri Ram Enterprises - Billing & POS</title>
+  
+  <!-- PWA Metadata -->
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  
+  <!-- Tailwind CSS Engine -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Core Libraries -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-area, #printable-area * { visibility: visible; }
+      #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+    
+    /* 80mm Thermal Receipt Geometry (Continuous Roll) */
+    .thermal-receipt {
+      width: 76mm;
+      margin: 0 auto;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    /* PWA Touch Optimizations */
+    input, button, select { touch-action: manipulation; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
+  <div id="root"></div>
 
-  <!-- TOP APP HEADER -->
-  <header id="main-header" class="bg-slate-900 text-white sticky top-0 z-30 px-4 py-3 shadow-md flex items-center justify-between border-b border-slate-800">
-    <div class="flex items-center space-x-3 cursor-pointer" onclick="showView('dashboard')">
-      <div class="bg-amber-400 text-slate-950 font-black px-2 py-1 rounded-lg text-xs tracking-wider shadow">SRE</div>
-      <div>
-        <h1 class="font-extrabold text-sm tracking-wide leading-none">SRI RAM ENTERPRISES</h1>
-        <p class="text-[10px] text-slate-400 font-medium mt-0.5">Sector-4, Bokaro • Point of Sale</p>
-      </div>
-    </div>
-    <button onclick="showView('settings')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold border border-slate-700 transition">
-      ⚙️ Settings
-    </button>
-  </header>
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
 
-  <!-- POPUP NOTIFICATION MODAL -->
-  <div id="popup-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
-    <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-      <div id="popup-header" class="p-3.5 flex items-center justify-between text-white bg-slate-900">
-        <h3 id="popup-title" class="font-bold text-xs tracking-wide">Notification</h3>
-        <button onclick="closePopup()" class="text-white hover:opacity-75 text-base font-bold">✕</button>
-      </div>
-      <div id="popup-body" class="p-4 space-y-1.5 text-xs text-slate-700 bg-slate-50 font-medium"></div>
-      <div class="p-2.5 bg-white border-t flex justify-end">
-        <button onclick="closePopup()" class="px-4 py-1.5 bg-slate-900 text-white font-bold rounded-lg text-xs shadow hover:bg-slate-800 transition">OK</button>
-      </div>
-    </div>
-  </div>
+    // Default Fallback Configuration
+    const DEFAULT_CONFIG = {
+      gasUrl: localStorage.getItem("SRE_GAS_URL") || "",
+      businessName: "SRI RAM ENTERPRISES",
+      tagline: "Mobile • Accessories • Repairing",
+      address: "GB-15, CITY CENTRE, SECTOR-4, B.S. CITY, NEAR INDIAN BANK, BOKARO, JHARKHAND",
+      phones: "9334765000, 9334237111, 9335136000",
+      gstin: "20APOPK6864K1ZH",
+      terms: "1. Goods once sold will not be returned.\n2. Brand warranty handled at service centers.\n3. Water/Physical damage voids all claim.\n4. Original tax invoice compulsory for claims."
+    };
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-5">
+    // -------------------------------------------------------------
+    // MAIN APP CONTROLLER
+    // -------------------------------------------------------------
+    function App() {
+      const [staff, setStaff] = useState(() => JSON.parse(sessionStorage.getItem("SRE_AUTH") || "null"));
+      const [view, setView] = useState("dashboard"); // dashboard, new_bill, bills, dues, reports, settings, public_bill
+      const [appConfig, setAppConfig] = useState(DEFAULT_CONFIG);
+      const [toast, setToast] = useState(null);
+      const [isOnline, setIsOnline] = useState(navigator.onLine);
+      const [draftCount, setDraftCount] = useState(0);
 
-    <!-- VIEW 1: DASHBOARD -->
-    <div id="view-dashboard" class="space-y-4">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Today's Bills</span>
-          <p id="dash-today-count" class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">0</p>
-        </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Today's Sales</span>
-          <p id="dash-today-sales" class="text-xl sm:text-2xl font-black text-blue-900 mt-0.5">Rs. 0</p>
-        </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Collection</span>
-          <p id="dash-today-paid" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p>
-        </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-slate-200">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Due</span>
-          <p id="dash-total-due" class="text-xl sm:text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p>
-        </div>
-      </div>
+      useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+        refreshDraftCount();
+        return () => {
+          window.removeEventListener("online", handleOnline);
+          window.removeEventListener("offline", handleOffline);
+        };
+      }, []);
 
-      <div class="grid grid-cols-3 gap-2.5">
-        <button onclick="startNewBill('MOBILE')" class="p-3.5 bg-slate-900 text-white rounded-xl shadow hover:bg-slate-800 active:scale-95 transition flex flex-col items-center">
-          <span class="text-xl mb-0.5">📱</span>
-          <span class="font-bold text-xs">Mobile Sale</span>
-        </button>
-        <button onclick="startNewBill('ACCESSORIES')" class="p-3.5 bg-blue-900 text-white rounded-xl shadow hover:bg-blue-800 active:scale-95 transition flex flex-col items-center">
-          <span class="text-xl mb-0.5">🎧</span>
-          <span class="font-bold text-xs">Accessories</span>
-        </button>
-        <button onclick="startNewBill('REPAIRING')" class="p-3.5 bg-indigo-900 text-white rounded-xl shadow hover:bg-indigo-800 active:scale-95 transition flex flex-col items-center">
-          <span class="text-xl mb-0.5">🔧</span>
-          <span class="font-bold text-xs">Repairing</span>
-        </button>
-      </div>
+      const showToast = (message, type = "info") => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4500);
+      };
 
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-4 py-2.5 border-b bg-slate-50 font-black text-xs text-slate-700 flex justify-between items-center">
-          <span>Recent Invoices</span>
-          <span class="text-[10px] text-slate-400 font-normal">Offline Cache & Cloud</span>
-        </div>
-        <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto"></div>
-      </div>
-    </div>
+      const refreshDraftCount = () => {
+        const drafts = JSON.parse(localStorage.getItem("SRE_DRAFTS") || "[]");
+        setDraftCount(drafts.length);
+      };
 
-    <!-- VIEW 2: BILLING FORM -->
-    <div id="view-new-bill" class="bg-white rounded-2xl shadow-md p-4 sm:p-6 space-y-4 border border-slate-200 hidden">
-      <div class="flex justify-between items-center border-b pb-3">
-        <div>
-          <span class="text-[9px] font-black text-blue-900 tracking-wider uppercase block">BILL GENERATOR</span>
-          <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-00001</h2>
-        </div>
-        <div class="flex bg-slate-100 p-0.5 rounded-xl border">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white">MOBILE</button>
-          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600">ACCESSORIES</button>
-          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600">REPAIRING</button>
-        </div>
-      </div>
+      // Check URL for Public Bill View Token (#/bill/:token)
+      useEffect(() => {
+        const hash = window.location.hash;
+        if (hash.startsWith("#/bill/")) {
+          const token = hash.replace("#/bill/", "");
+          if (token) {
+            setView("public_bill");
+          }
+        }
+      }, []);
 
-      <!-- CUSTOMER DETAILS (MOBILE & ACCESSORIES) -->
-      <div id="standard-cust-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
-        <div>
-          <label id="lbl-cust-name" class="text-[10px] font-bold text-slate-500 uppercase">Customer Name *</label>
-          <input type="text" id="cust-name" placeholder="ग्राहक का नाम" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold outline-none focus:border-slate-900" />
-        </div>
-        <div>
-          <label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-500 uppercase">Mobile Number *</label>
-          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंक मोबाइल" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold outline-none focus:border-slate-900" />
-        </div>
-        <div>
-          <label id="lbl-cust-address" class="text-[10px] font-bold text-slate-500 uppercase">Customer Address *</label>
-          <input type="text" id="cust-address" placeholder="पूरा पता लिखें" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold outline-none focus:border-slate-900" />
-        </div>
-      </div>
+      if (view === "public_bill") {
+        const token = window.location.hash.replace("#/bill/", "");
+        return <PublicBillView token={token} config={appConfig} />;
+      }
 
-      <!-- QUICK REPAIR BOX -->
-      <div id="repair-simple-box" class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <input type="tel" id="rep-cust-phone" maxlength="10" placeholder="कस्टमर मोबाइल नंबर *" class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-semibold" />
-          <input type="text" id="rep-product-name" placeholder="डिवाइस / पार्ट नाम *" class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-semibold" />
-        </div>
-        <textarea id="rep-issue-desc" rows="2" placeholder="समस्या / रिमार्क लिखें..." class="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs"></textarea>
-        <input type="number" id="rep-charge-amount" placeholder="रिपेयरिंग चार्ज (Rs.) *" oninput="recalcTotals()" class="w-48 p-2 bg-white border-2 border-amber-400 rounded-lg text-xs font-black" />
-      </div>
+      if (!staff) {
+        return <LoginScreen setStaff={setStaff} config={appConfig} showToast={showToast} setAppConfig={setAppConfig} />;
+      }
 
-      <!-- ITEMS SECTION -->
-      <div id="standard-items-section" class="space-y-2.5">
-        <div class="flex justify-between items-center">
-          <h3 id="items-title" class="font-bold text-xs text-slate-800 uppercase tracking-wider">Products / Handsets</h3>
-          <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-lg border border-blue-200 transition">+ Add Item</button>
-        </div>
-        <div id="items-container" class="space-y-2.5"></div>
-      </div>
-
-      <!-- PAYMENT MODULE (PRIMARY & SECONDARY) -->
-      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div>
-            <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Primary Mode *</label>
-            <select id="pay-primary-dropdown" onchange="onPrimaryModeChange()" class="w-full p-2 bg-white border rounded-lg text-xs font-bold outline-none focus:border-slate-900">
-              <option value="Cash">💵 Cash</option>
-              <option value="QR">📲 QR</option>
-              <option value="Card Swipe">💳 Card Swipe</option>
-              <option value="Cash + QR">💵 Cash + 📲 QR</option>
-              <option value="Card Swipe + QR">💳 Card Swipe + 📲 QR</option>
-              <option value="Card Swipe + Cash">💳 Card Swipe + 💵 Cash</option>
-              <option value="Card Swipe + QR + Cash">💳 Card + 📲 QR + 💵 Cash</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-rose-700 uppercase block mb-1">Secondary Mode</label>
-            <select id="pay-secondary-dropdown" onchange="onSecondaryModeChange()" class="w-full p-2 bg-rose-50 border border-rose-200 rounded-lg text-xs font-bold text-rose-900 outline-none">
-              <option value="">-- None (Keep Primary Mode) --</option>
-              <option value="Finance">🏦 Finance / EMI</option>
-              <option value="Dues">📝 Dues / Udhar</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- FINANCE MODULE -->
-        <div id="finance-inputs-container" class="pt-2.5 border-t space-y-2 bg-blue-50/60 p-3 rounded-xl border border-blue-200 hidden">
-          <div class="flex justify-between items-center">
-            <h4 class="text-xs font-black text-blue-950 uppercase tracking-wide">🏦 Finance Setup</h4>
-            <span class="text-[9px] text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded">Finance Active</span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <input type="text" id="fin-company" placeholder="Finance Company Name (Bajaj, TVS, HDB) *" class="p-1.5 bg-white border rounded-lg text-xs font-bold" />
-            <select id="fin-dp-mode" onchange="onFinDpModeChange()" class="p-1.5 bg-white border rounded-lg text-xs font-bold">
-              <option value="Cash">💵 Cash</option>
-              <option value="QR">📲 QR</option>
-              <option value="Card">💳 Card</option>
-              <option value="Cash + QR">💵 + 📲 Cash + QR</option>
-            </select>
-          </div>
-          <div id="fin-split-container" class="pt-1.5 border-t grid grid-cols-2 gap-2 hidden">
-            <input type="number" id="fin-split-cash" placeholder="DP Cash (Rs.)" oninput="calcFinSplit()" class="p-1.5 bg-white border rounded text-xs font-bold" />
-            <input type="number" id="fin-split-qr" placeholder="DP QR (Rs.)" oninput="calcFinSplit()" class="p-1.5 bg-white border rounded text-xs font-bold" />
-          </div>
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <div class="bg-white p-2 rounded-lg border border-emerald-300">
-              <span class="text-[9px] font-bold text-emerald-800 uppercase block">Down Payment (जमा राशि Rs.)</span>
-              <input type="number" id="fin-dp" placeholder="0" oninput="handleFinanceInput()" class="w-full text-base font-black text-emerald-700 bg-transparent outline-none" />
+      return (
+        <div class="flex flex-col md:flex-row min-h-screen">
+          {/* Top Bar on Mobile */}
+          <div class="md:hidden bg-blue-950 text-white flex items-center justify-between p-3 sticky top-0 z-40">
+            <div class="flex items-center space-x-2">
+              <span class="bg-amber-400 text-blue-950 font-black px-2 py-0.5 rounded text-xs">SRE</span>
+              <span class="font-bold text-sm truncate">{appConfig.businessName}</span>
             </div>
-            <div class="bg-white p-2 rounded-lg border border-blue-300">
-              <span class="text-[9px] font-bold text-blue-900 uppercase block">Company Loan Amount (Rs.)</span>
-              <input type="number" id="fin-loan" placeholder="0" readonly class="w-full text-base font-black text-blue-950 bg-transparent outline-none" />
-            </div>
-          </div>
-        </div>
-
-        <!-- DUES MODULE -->
-        <div id="dues-inputs-container" class="pt-2.5 border-t space-y-2 bg-rose-50/60 p-3 rounded-xl border border-rose-200 hidden">
-          <div class="flex justify-between items-center">
-            <h4 class="text-xs font-black text-rose-950 uppercase tracking-wide">📝 Dues / Udhar Setup</h4>
-            <span class="text-[9px] text-rose-800 font-bold bg-rose-100 px-1.5 py-0.5 rounded">Udhar Active</span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <select id="dues-pay-mode" class="p-1.5 bg-white border border-rose-300 rounded-lg text-xs font-bold">
-              <option value="Cash">💵 Cash</option>
-              <option value="QR">📲 QR</option>
-            </select>
-            <input type="number" id="dues-partial-amt" placeholder="Advance / Token Amount (Rs.)" oninput="handleDuesInput()" class="p-1.5 bg-white border border-rose-300 rounded-lg text-xs font-bold text-emerald-700" />
-          </div>
-        </div>
-
-        <!-- SPLIT PAYMENT INPUTS -->
-        <div id="split-inputs-container" class="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
-          <div id="split-box-cash" class="hidden">
-            <input type="number" id="split-cash" placeholder="Cash Amount (Rs.)" oninput="handleSplitInput()" class="w-full p-1.5 bg-white border rounded text-xs font-bold" />
-          </div>
-          <div id="split-box-qr" class="hidden">
-            <input type="number" id="split-qr" placeholder="QR Amount (Rs.)" oninput="handleSplitInput()" class="w-full p-1.5 bg-white border rounded text-xs font-bold" />
-          </div>
-          <div id="split-box-card" class="hidden">
-            <input type="number" id="split-card" placeholder="Card Amount (Rs.)" oninput="handleSplitInput()" class="w-full p-1.5 bg-white border rounded text-xs font-bold" />
-          </div>
-        </div>
-
-        <!-- TOTAL PAID BOX -->
-        <div id="regular-paid-container" class="pt-2 border-t">
-          <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Total Amount Paid (Rs.) *</label>
-          <input type="number" id="pay-paid" placeholder="कुल जमा राशि दर्ज करें" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 bg-white text-xs sm:text-sm outline-none" />
-        </div>
-      </div>
-
-      <!-- INVOICE SUMMARY BANNER -->
-      <div class="bg-slate-900 text-white p-3.5 rounded-xl flex justify-between items-center shadow">
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Bill Amount</span>
-          <p id="total-grand" class="text-xl sm:text-2xl font-black text-amber-400 leading-none mt-0.5">Rs. 0</p>
-        </div>
-        <div class="text-right">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Balance Due</span>
-          <p id="total-due" class="text-base sm:text-lg font-bold text-rose-400 leading-none mt-0.5">Rs. 0</p>
-        </div>
-      </div>
-
-      <div class="flex space-x-2 pt-1">
-        <button type="button" onclick="showView('dashboard')" class="flex-1 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-300 transition">Cancel</button>
-        <button type="button" onclick="saveCurrentBill()" class="flex-[2] py-2.5 bg-slate-900 text-white font-black rounded-xl text-xs shadow hover:bg-slate-800 transition">
-          SAVE & GENERATE INVOICE
-        </button>
-      </div>
-    </div>
-
-    <!-- VIEW 3: INVOICE VIEW (CLEAN CORPORATE DESIGN) -->
-    <div id="view-invoice" class="space-y-4 hidden">
-      <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-3 rounded-xl border shadow-sm">
-        <div class="flex space-x-2">
-          <button onclick="downloadCleanPDF()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
-            <span>📥</span>
-            <span>DOWNLOAD CLEAN PDF</span>
-          </button>
-          <button id="btn-whatsapp" onclick="shareOnWhatsApp()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow flex items-center space-x-1.5 transition">
-            <span>💬</span>
-            <span>WHATSAPP</span>
-          </button>
-        </div>
-        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 hover:text-slate-900">← Back</button>
-      </div>
-
-      <!-- INVOICE SHEET -->
-      <div class="w-full flex justify-center overflow-x-auto pb-6">
-        <div id="invoice-capture" class="bg-white p-7 border border-slate-300 shadow-xl text-xs text-slate-900 w-[680px] max-w-[680px] rounded-lg">
-          
-          <!-- STORE HEADER -->
-          <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
-            <div>
-              <h1 class="text-2xl font-black text-slate-900 tracking-tight leading-none">SRI RAM ENTERPRISES</h1>
-              <p class="text-xs font-semibold text-slate-600 mt-1">Mobile • Accessories • Repairing</p>
-              <p class="text-[10px] text-slate-500 mt-0.5">GB-15, City Centre, Sector-4, Bokaro Steel City (Near Indian Bank)</p>
-              <p class="text-[10px] text-slate-700 font-bold mt-0.5">GSTIN: 20APOPK6864K1ZH • Mob: 9334765000, 9334237111</p>
-            </div>
-            <div class="text-right">
-              <span class="bg-slate-900 text-white font-black px-2.5 py-0.5 text-[10px] tracking-widest uppercase rounded">TAX INVOICE</span>
-              <p id="inv-no-display" class="font-black text-sm text-slate-900 mt-2">SRE-2026-00001</p>
-              <p id="inv-date-display" class="text-slate-500 text-[10px] font-semibold mt-0.5"></p>
+            <div class="flex items-center space-x-2">
+              {!isOnline && <span class="bg-rose-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">OFFLINE</span>}
+              <button onClick={() => setView("new_bill")} class="bg-amber-400 text-blue-950 px-2.5 py-1 rounded text-xs font-bold">+ BILL</button>
             </div>
           </div>
 
-          <!-- CUSTOMER DETAILS & PAYMENT INFO -->
-          <div class="grid grid-cols-2 gap-3 py-3 border-b border-slate-200">
-            <div>
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Billed To:</span>
-              <p id="inv-cust-name" class="font-extrabold text-sm text-slate-900"></p>
-              <p id="inv-cust-phone" class="text-slate-600 font-mono-code text-[11px]"></p>
-              <p id="inv-cust-address" class="text-slate-600 text-[10px]"></p>
-            </div>
-            <div class="text-right flex flex-col justify-end">
-              <p id="inv-pay-mode" class="font-bold text-xs text-slate-800"></p>
-              <div id="inv-fin-box" class="text-[10px] text-blue-900 font-bold mt-0.5 hidden"></div>
-            </div>
-          </div>
-
-          <!-- ITEMS TABLE -->
-          <div class="my-3 overflow-hidden rounded-lg border border-slate-200">
-            <table class="w-full border-collapse text-left text-[11px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
-                  <th class="p-2 w-10 text-center">#</th>
-                  <th class="p-2">Product Description</th>
-                  <th class="p-2">IMEI / Remarks</th>
-                  <th class="p-2 text-center w-12">Qty</th>
-                  <th class="p-2 text-right w-20">Rate</th>
-                  <th class="p-2 text-right w-24">Amount</th>
-                </tr>
-              </thead>
-              <tbody id="inv-items-tbody" class="divide-y divide-slate-200 font-medium"></tbody>
-            </table>
-          </div>
-
-          <!-- GST SUMMARY (IF ANY) -->
-          <div id="inv-gst-breakdown" class="my-2 p-2 bg-slate-50 rounded border border-slate-200 text-[10px] flex justify-between font-bold text-slate-700 hidden">
-            <span>Taxable: Rs. <span id="inv-taxable-val">0</span></span>
-            <span>CGST (9%): Rs. <span id="inv-cgst-val">0</span></span>
-            <span>SGST (9%): Rs. <span id="inv-sgst-val">0</span></span>
-            <span>Total Tax: Rs. <span id="inv-tot-gst-val">0</span></span>
-          </div>
-
-          <!-- BOTTOM SECTION: VERIFIED QR & TOTAL -->
-          <div class="flex justify-between items-end pt-3 border-t-2 border-slate-900 mt-3">
-            <div class="flex items-center space-x-3">
-              <div id="inv-qrcode-container" class="w-16 h-16 bg-white border border-slate-300 p-1 flex items-center justify-center rounded"></div>
-              <div class="text-[9px] text-slate-500 leading-tight">
-                <span class="font-black text-slate-900 block text-[10px]">VERIFIED DIGITAL INVOICE</span>
-                Scan with any Camera or Lens<br />to verify authenticity online.
+          {/* Desktop Navigation Sidebar */}
+          <aside class="hidden md:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800">
+            <div class="p-4 border-b border-slate-800 flex items-center space-x-3">
+              <div class="bg-amber-400 text-blue-950 font-black p-2 rounded-lg text-sm">SRE</div>
+              <div>
+                <h1 class="font-bold text-white text-sm leading-none">{appConfig.businessName}</h1>
+                <p class="text-[10px] text-slate-400 mt-1">Bokaro Sector-4</p>
               </div>
             </div>
 
-            <div class="text-right">
-              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Grand Total</span>
-              <p id="inv-tot-grand" class="text-2xl font-black text-slate-900 leading-none mt-0.5">Rs. 0</p>
+            <nav class="flex-1 p-3 space-y-1 text-sm">
+              <NavItem active={view === "dashboard"} onClick={() => setView("dashboard")} label="Dashboard" icon="layout-dashboard" />
+              <NavItem active={view === "new_bill"} onClick={() => setView("new_bill")} label="New Invoice" icon="receipt" />
+              <NavItem active={view === "bills"} onClick={() => setView("bills")} label="All Bills & Register" icon="archive" />
+              <NavItem active={view === "dues"} onClick={() => setView("dues")} label="Due Collection" icon="credit-card" />
+              <NavItem active={view === "reports"} onClick={() => setView("reports")} label="Sales & GST Reports" icon="bar-chart-3" />
+              {staff.role === "ADMIN" && (
+                <NavItem active={view === "settings"} onClick={() => setView("settings")} label="Master Settings" icon="settings" />
+              )}
+            </nav>
+
+            <div class="p-3 border-t border-slate-800 text-xs">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-slate-400">Status:</span>
+                <span class={isOnline ? "text-emerald-400 flex items-center font-bold" : "text-rose-400 font-bold"}>
+                  <span class={`inline-block w-2 h-2 rounded-full mr-1 ${isOnline ? "bg-emerald-400" : "bg-rose-400"}`}></span>
+                  {isOnline ? "Live Cloud" : "Offline Drafts"}
+                </span>
+              </div>
+              <div class="bg-slate-800/80 p-2.5 rounded-lg mb-2">
+                <p class="font-bold text-white">{staff.fullName}</p>
+                <p class="text-[11px] text-amber-400">{staff.role} ({staff.staffId})</p>
+              </div>
+              <button 
+                onClick={() => { sessionStorage.removeItem("SRE_AUTH"); setStaff(null); }} 
+                class="w-full text-center py-1.5 bg-slate-800 hover:bg-rose-950 hover:text-rose-300 rounded transition font-medium"
+              >
+                Log Out
+              </button>
+            </div>
+          </aside>
+
+          {/* Core Content Area */}
+          <div class="flex-1 flex flex-col min-w-0">
+            <main class="flex-1 p-3 sm:p-6 overflow-y-auto">
+              {view === "dashboard" && <DashboardView setView={setView} config={appConfig} staff={staff} showToast={showToast} draftCount={draftCount} />}
+              {view === "new_bill" && <NewBillView setView={setView} config={appConfig} staff={staff} showToast={showToast} refreshDraftCount={refreshDraftCount} />}
+              {view === "bills" && <BillsRegisterView config={appConfig} staff={staff} showToast={showToast} />}
+              {view === "dues" && <DuesManagementView config={appConfig} staff={staff} showToast={showToast} />}
+              {view === "reports" && <ReportsView config={appConfig} staff={staff} showToast={showToast} />}
+              {view === "settings" && <SettingsView config={appConfig} setConfig={setAppConfig} staff={staff} showToast={showToast} />}
+            </main>
+
+            {/* Mobile Bottom Navigation Bar */}
+            <div class="md:hidden bg-white border-t border-slate-200 grid grid-cols-5 text-[10px] text-center p-1.5 sticky bottom-0 z-30 font-medium">
+              <button onClick={() => setView("dashboard")} class={`p-1 ${view === "dashboard" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
+                Dashboard
+              </button>
+              <button onClick={() => setView("new_bill")} class={`p-1 ${view === "new_bill" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
+                + Bill
+              </button>
+              <button onClick={() => setView("bills")} class={`p-1 ${view === "bills" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
+                Register
+              </button>
+              <button onClick={() => setView("dues")} class={`p-1 ${view === "dues" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
+                Dues
+              </button>
+              <button onClick={() => setView("reports")} class={`p-1 ${view === "reports" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
+                Reports
+              </button>
             </div>
           </div>
 
-          <!-- SIGNATURES & TERMS -->
-          <div class="mt-8 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
-            <div>
-              <p class="font-bold text-slate-700">Terms & Conditions:</p>
-              <p>• Goods once sold cannot be returned or replaced without warranty terms.</p>
-              <p>• Brand warranty handled directly by manufacturer authorized service centers.</p>
+          {/* Floating Toast Notification Engine */}
+          {toast && (
+            <div class={`fixed bottom-14 md:bottom-5 right-5 z-50 px-4 py-2.5 rounded-lg shadow-xl text-white text-xs font-semibold flex items-center space-x-2 ${
+              toast.type === "error" ? "bg-rose-600" : (toast.type === "success" ? "bg-emerald-600" : "bg-blue-900")
+            }`}>
+              <span>{toast.message}</span>
             </div>
-            <div class="text-center">
-              <div class="h-6"></div>
-              <span class="border-t border-slate-400 pt-0.5 inline-block w-36 font-bold text-slate-800">Authorized Signatory</span>
-            </div>
-          </div>
-
+          )}
         </div>
-      </div>
-    </div>
-
-    <!-- VIEW 4: SETTINGS -->
-    <div id="view-settings" class="space-y-3 bg-white p-4 rounded-xl border border-slate-200 max-w-md mx-auto hidden">
-      <h2 class="font-bold text-xs uppercase tracking-wider text-slate-700">Settings</h2>
-      <div>
-        <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Google Apps Script Web App URL</label>
-        <input type="text" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2 border rounded-lg text-xs font-mono-code outline-none" />
-      </div>
-      <div class="flex space-x-2 pt-1">
-        <button onclick="showView('dashboard')" class="flex-1 py-1.5 bg-slate-200 text-slate-700 font-bold rounded-lg text-xs">Back</button>
-        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-slate-900 text-white font-bold rounded-lg text-xs">SAVE</button>
-      </div>
-    </div>
-
-  </main>
-
-  <script>
-    let currentBillType = "MOBILE";
-    let activeInvoiceData = null;
-    let billsCache = JSON.parse(localStorage.getItem("sre_bills_cache") || "[]");
-    let gasUrl = localStorage.getItem("sre_gas_url") || "";
-
-    function showPopup(type, title, details) {
-      const modal = document.getElementById("popup-modal");
-      document.getElementById("popup-title").innerText = title;
-      document.getElementById("popup-body").innerHTML = (Array.isArray(details) ? details : [details]).map(d => `<p>• ${d}</p>`).join("");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
+      );
     }
 
-    function closePopup() {
-      const modal = document.getElementById("popup-modal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
+    function NavItem({ active, onClick, label, icon }) {
+      return (
+        <button
+          onClick={onClick}
+          class={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg font-medium transition ${
+            active ? "bg-blue-900 text-white shadow" : "hover:bg-slate-800 text-slate-400 hover:text-white"
+          }`}
+        >
+          <span>{label}</span>
+        </button>
+      );
     }
 
-    function showView(viewName) {
-      document.getElementById("view-dashboard").classList.add("hidden");
-      document.getElementById("view-new-bill").classList.add("hidden");
-      document.getElementById("view-invoice").classList.add("hidden");
-      document.getElementById("view-settings").classList.add("hidden");
+    // -------------------------------------------------------------
+    // LOGIN SCREEN COMPONENT
+    // -------------------------------------------------------------
+    function LoginScreen({ setStaff, config, showToast, setAppConfig }) {
+      const [username, setUsername] = useState("admin");
+      const [password, setPassword] = useState("admin123");
+      const [gasUrl, setGasUrl] = useState(config.gasUrl);
+      const [loading, setLoading] = useState(false);
+      const [showConfig, setShowConfig] = useState(!config.gasUrl);
 
-      if (viewName === "dashboard") {
-        renderDashboard();
-        document.getElementById("view-dashboard").classList.remove("hidden");
-      } else if (viewName === "new-bill") {
-        document.getElementById("view-new-bill").classList.remove("hidden");
-      } else if (viewName === "invoice") {
-        document.getElementById("view-invoice").classList.remove("hidden");
-      } else if (viewName === "settings") {
-        document.getElementById("settings-gas-url").value = gasUrl;
-        document.getElementById("view-settings").classList.remove("hidden");
-      }
-    }
-
-    function renderDashboard() {
-      const today = new Date().toISOString().split("T")[0];
-      const todayBills = billsCache.filter(b => b.billDate === today);
-      
-      const todaySales = todayBills.reduce((acc, b) => acc + (Number(b.totals?.grand || b.grandTotal) || 0), 0);
-      const todayPaid = todayBills.reduce((acc, b) => acc + (Number(b.totals?.paid || b.paid) || 0), 0);
-      const totalDue = billsCache.reduce((acc, b) => acc + (Number(b.totals?.due || b.due) || 0), 0);
-
-      document.getElementById("dash-today-count").innerText = todayBills.length;
-      document.getElementById("dash-today-sales").innerText = "Rs. " + todaySales.toLocaleString("en-IN");
-      document.getElementById("dash-today-paid").innerText = "Rs. " + todayPaid.toLocaleString("en-IN");
-      document.getElementById("dash-total-due").innerText = "Rs. " + totalDue.toLocaleString("en-IN");
-
-      const listElem = document.getElementById("recent-bills-list");
-      if (billsCache.length === 0) {
-        listElem.innerHTML = '<p class="p-4 text-xs text-slate-400">No bills generated yet.</p>';
-        return;
-      }
-
-      listElem.innerHTML = billsCache.slice(0, 15).map(b => `
-        <div onclick='openSavedInvoice("${b.secureToken}")' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center">
-          <div>
-            <p class="font-bold text-slate-900 text-xs">${b.invoiceNo}</p>
-            <p class="text-xs text-slate-600">${b.customer?.name || "Customer"}</p>
-            <span class="text-[9px] text-slate-400">${b.billDate}</span>
-          </div>
-          <div class="text-right font-black text-xs">
-            Rs. ${(b.totals?.grand || b.grandTotal).toLocaleString("en-IN")}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function startNewBill(type) {
-      currentBillType = type;
-      changeBillType(type);
-
-      document.getElementById("cust-name").value = "";
-      document.getElementById("cust-phone").value = "";
-      document.getElementById("cust-address").value = "";
-      document.getElementById("rep-cust-phone").value = "";
-      document.getElementById("rep-product-name").value = "";
-      document.getElementById("rep-issue-desc").value = "";
-      document.getElementById("rep-charge-amount").value = "";
-      document.getElementById("pay-paid").value = "";
-
-      document.getElementById("pay-primary-dropdown").value = "Cash";
-      document.getElementById("pay-secondary-dropdown").value = "";
-      updatePaymentFields();
-
-      const container = document.getElementById("items-container");
-      container.innerHTML = "";
-      addNewItemRow();
-
-      const year = new Date().getFullYear();
-      const num = (billsCache.length + 1).toString().padStart(5, "0");
-      document.getElementById("form-invoice-no").innerText = `SRE-${year}-${num}`;
-
-      recalcTotals();
-      showView("new-bill");
-    }
-
-    function changeBillType(type) {
-      currentBillType = type;
-      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
-        const btn = document.getElementById(`pill-${t}`);
-        btn.className = (t === type) ? "px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white shadow" : "px-3 py-1 rounded-lg text-xs font-bold text-slate-600";
-      });
-
-      const standardCust = document.getElementById("standard-cust-box");
-      const standardItems = document.getElementById("standard-items-section");
-      const repairBox = document.getElementById("repair-simple-box");
-
-      if (type === "REPAIRING") {
-        standardCust.classList.add("hidden");
-        standardItems.classList.add("hidden");
-        repairBox.classList.remove("hidden");
-      } else {
-        standardCust.classList.remove("hidden");
-        standardItems.classList.remove("hidden");
-        repairBox.classList.add("hidden");
-
-        const lblName = document.getElementById("lbl-cust-name");
-        const lblPhone = document.getElementById("lbl-cust-phone");
-        const lblAddr = document.getElementById("lbl-cust-address");
-
-        if (type === "ACCESSORIES") {
-          lblName.innerText = "Customer Name (Optional)";
-          lblPhone.innerText = "Mobile Number (Optional)";
-          lblAddr.innerText = "Customer Address (Optional)";
-        } else {
-          lblName.innerText = "Customer Name *";
-          lblPhone.innerText = "Mobile Number *";
-          lblAddr.innerText = "Customer Address *";
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        if (!gasUrl) {
+          showToast("Backend Google Apps Script URL is required.", "error");
+          setShowConfig(true);
+          return;
         }
-      }
-      recalcTotals();
-    }
 
-    function addNewItemRow() {
-      const container = document.getElementById("items-container");
-      const row = document.createElement("div");
-      row.className = "item-row p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2";
-      row.innerHTML = `
-        <input type="text" placeholder="Product Name / Description *" class="item-product-name w-full p-2 bg-white border rounded-lg text-xs font-semibold outline-none" />
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" min="1" value="1" placeholder="Qty" oninput="recalcTotals()" class="item-qty p-2 bg-white border rounded-lg text-xs font-bold" />
-          <input type="number" placeholder="Rate *" oninput="recalcTotals()" class="item-rate p-2 bg-white border rounded-lg text-xs font-bold" />
-          <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-2 bg-white border rounded-lg text-xs" />
-          <select class="item-gst p-2 bg-white border rounded-lg text-xs font-bold" onchange="recalcTotals()">
-            <option value="18" selected>18%</option>
-            <option value="12">12%</option>
-            <option value="0">0%</option>
-          </select>
-        </div>
-        <input type="text" maxlength="15" placeholder="IMEI Number (15 अंक) *" oninput="this.value=this.value.replace(/\\D/g,'')" class="item-imei-input w-full p-2 bg-white border rounded-lg text-xs font-mono-code" />
-      `;
-      container.appendChild(row);
-    }
-
-    function onPrimaryModeChange() {
-      document.getElementById("pay-secondary-dropdown").value = "";
-      updatePaymentFields();
-    }
-
-    function onSecondaryModeChange() {
-      updatePaymentFields();
-    }
-
-    function updatePaymentFields() {
-      const secVal = document.getElementById("pay-secondary-dropdown").value;
-      const primVal = document.getElementById("pay-primary-dropdown").value;
-      const mode = secVal ? secVal : primVal;
-
-      const splitBox = document.getElementById("split-inputs-container");
-      const boxCash = document.getElementById("split-box-cash");
-      const boxQr = document.getElementById("split-box-qr");
-      const boxCard = document.getElementById("split-box-card");
-      const finBox = document.getElementById("finance-inputs-container");
-      const duesBox = document.getElementById("dues-inputs-container");
-      const regularPaidBox = document.getElementById("regular-paid-container");
-      const paidInput = document.getElementById("pay-paid");
-
-      splitBox.classList.add("hidden");
-      finBox.classList.add("hidden");
-      duesBox.classList.add("hidden");
-
-      if (mode === "Finance") {
-        finBox.classList.remove("hidden");
-        regularPaidBox.classList.add("hidden");
-        handleFinanceInput();
-      } else if (mode === "Dues") {
-        duesBox.classList.remove("hidden");
-        regularPaidBox.classList.add("hidden");
-        handleDuesInput();
-      } else {
-        regularPaidBox.classList.remove("hidden");
-
-        if (mode === "Cash" || mode === "QR" || mode === "Card Swipe") {
-          paidInput.readOnly = false;
-          paidInput.classList.remove("bg-slate-100");
-        } else {
-          splitBox.classList.remove("hidden");
-          paidInput.readOnly = true;
-          paidInput.classList.add("bg-slate-100");
-
-          boxCash.classList.toggle("hidden", !mode.includes("Cash"));
-          boxQr.classList.toggle("hidden", !mode.includes("QR"));
-          boxCard.classList.toggle("hidden", !mode.includes("Card"));
-
-          handleSplitInput();
-        }
-      }
-      recalcTotals();
-    }
-
-    function onFinDpModeChange() {
-      const mode = document.getElementById("fin-dp-mode").value;
-      const splitBox = document.getElementById("fin-split-container");
-      splitBox.classList.toggle("hidden", !mode.includes("+"));
-      if (mode.includes("+")) {
-        calcFinSplit();
-      } else {
-        handleFinanceInput();
-      }
-    }
-
-    function calcFinSplit() {
-      const c = Number(document.getElementById("fin-split-cash").value) || 0;
-      const q = Number(document.getElementById("fin-split-qr").value) || 0;
-      document.getElementById("fin-dp").value = (c + q) > 0 ? (c + q) : "";
-      handleFinanceInput();
-    }
-
-    function handleFinanceInput() {
-      const dpVal = Number(document.getElementById("fin-dp").value) || 0;
-      const { grand } = recalcTotals();
-      document.getElementById("fin-loan").value = Math.max(0, grand - dpVal);
-      document.getElementById("pay-paid").value = dpVal;
-      recalcTotals();
-    }
-
-    function handleDuesInput() {
-      const tokenVal = Number(document.getElementById("dues-partial-amt").value) || 0;
-      document.getElementById("pay-paid").value = tokenVal;
-      recalcTotals();
-    }
-
-    function handleSplitInput() {
-      const mode = document.getElementById("pay-primary-dropdown").value;
-      let total = 0;
-      let has = false;
-
-      if (mode.includes("Cash")) {
-        const val = document.getElementById("split-cash").value;
-        if (val !== "") { total += Number(val); has = true; }
-      }
-      if (mode.includes("QR")) {
-        const val = document.getElementById("split-qr").value;
-        if (val !== "") { total += Number(val); has = true; }
-      }
-      if (mode.includes("Card")) {
-        const val = document.getElementById("split-card").value;
-        if (val !== "") { total += Number(val); has = true; }
-      }
-
-      document.getElementById("pay-paid").value = has ? total : "";
-      recalcTotals();
-    }
-
-    function recalcTotals() {
-      let grand = 0;
-      let totalTaxable = 0;
-      let totalGstAmt = 0;
-
-      if (currentBillType === "REPAIRING") {
-        const repCharge = Number(document.getElementById("rep-charge-amount").value) || 0;
-        grand = repCharge;
-        totalTaxable = repCharge;
-      } else {
-        document.querySelectorAll(".item-row").forEach(r => {
-          const q = Number(r.querySelector(".item-qty")?.value) || 1;
-          const rate = Number(r.querySelector(".item-rate")?.value) || 0;
-          const disc = Number(r.querySelector(".item-disc")?.value) || 0;
-          const gstRate = Number(r.querySelector(".item-gst")?.value) || 0;
-
-          const lineTotal = (q * rate) - disc;
-          grand += lineTotal;
-
-          if (gstRate > 0) {
-            const taxable = lineTotal / (1 + (gstRate / 100));
-            totalTaxable += taxable;
-            totalGstAmt += (lineTotal - taxable);
-          } else {
-            totalTaxable += lineTotal;
-          }
-        });
-      }
-
-      grand = Math.max(0, Math.round(grand));
-      const secVal = document.getElementById("pay-secondary-dropdown").value;
-
-      let paid = 0;
-      if (secVal === "Dues") {
-        paid = Math.min(grand, Number(document.getElementById("dues-partial-amt").value) || 0);
-      } else if (secVal === "Finance") {
-        paid = Math.min(grand, Number(document.getElementById("fin-dp").value) || 0);
-      } else {
-        const paidVal = document.getElementById("pay-paid").value;
-        paid = paidVal === "" ? 0 : Math.min(grand, Number(paidVal) || 0);
-      }
-
-      const due = Math.max(0, grand - paid);
-
-      document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
-      document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
-
-      return { grand, paid, due, totalTaxable, totalGstAmt };
-    }
-
-    async function saveCurrentBill() {
-      let name = "";
-      let phone = "";
-      let address = "";
-
-      if (currentBillType === "REPAIRING") {
-        phone = document.getElementById("rep-cust-phone").value.trim();
-        name = "Repair Customer";
-        address = "Bokaro";
-
-        const pName = document.getElementById("rep-product-name").value.trim();
-        const charge = Number(document.getElementById("rep-charge-amount").value) || 0;
-
-        if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["10 अंकों का वैध मोबाइल नंबर दर्ज करें।"]);
-        if (!pName || charge <= 0) return showPopup("error", "Incomplete", ["प्रोडक्ट और चार्ज अवश्य भरें।"]);
-      } 
-      else if (currentBillType === "ACCESSORIES") {
-        name = document.getElementById("cust-name").value.trim() || "Cash Customer";
-        phone = document.getElementById("cust-phone").value.trim();
-        address = document.getElementById("cust-address").value.trim() || "Local";
-      } 
-      else {
-        name = document.getElementById("cust-name").value.trim();
-        phone = document.getElementById("cust-phone").value.trim();
-        address = document.getElementById("cust-address").value.trim();
-
-        if (!name) return showPopup("error", "Name Required", ["कृपया Customer Name भरें।"]);
-        if (!/^[6-9]\d{9}$/.test(phone)) return showPopup("error", "Invalid Mobile", ["10 अंकों का मोबाइल नंबर भरें।"]);
-        if (!address) return showPopup("error", "Address Required", ["कृपया पता भरें।"]);
-      }
-
-      const { grand, paid, due, totalTaxable, totalGstAmt } = recalcTotals();
-      if (grand <= 0) return showPopup("error", "Invalid Amount", ["बिल राशि 0 से अधिक होनी चाहिए।"]);
-
-      let items = [];
-      if (currentBillType === "REPAIRING") {
-        items = [{
-          productName: document.getElementById("rep-product-name").value.trim(),
-          imei1: document.getElementById("rep-issue-desc").value.trim() || "Service",
-          quantity: 1,
-          rate: grand,
-          discount: 0
-        }];
-      } else {
-        let err = false;
-        document.querySelectorAll(".item-row").forEach((r, idx) => {
-          const pName = r.querySelector(".item-product-name").value.trim();
-          if (!pName) {
-            showPopup("error", "Product Name", [`लाइन #${idx+1} में Product Name खाली है।`]);
-            err = true;
-            return;
-          }
-          items.push({
-            productName: pName,
-            imei1: r.querySelector(".item-imei-input").value.trim() || "-",
-            quantity: Number(r.querySelector(".item-qty").value) || 1,
-            rate: Number(r.querySelector(".item-rate").value) || 0,
-            discount: Number(r.querySelector(".item-disc").value) || 0
+        setLoading(true);
+        try {
+          const res = await fetch(gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "login", username, password })
           });
-        });
-        if (err) return;
-      }
+          const data = await res.json();
+          if (data.success) {
+            sessionStorage.setItem("SRE_AUTH", JSON.stringify(data.staff));
+            setStaff(data.staff);
+            showToast(`Welcome back, ${data.staff.fullName}!`, "success");
+          } else {
+            showToast(data.error || "Authentication failed.", "error");
+          }
+        } catch (err) {
+          showToast("Network / CORS error: Verify Google Script deployment permissions.", "error");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-      const secVal = document.getElementById("pay-secondary-dropdown").value;
-      const primVal = document.getElementById("pay-primary-dropdown").value;
-      const effectiveMode = secVal ? secVal : primVal;
+      const handleSaveGasUrl = () => {
+        localStorage.setItem("SRE_GAS_URL", gasUrl);
+        setAppConfig(prev => ({ ...prev, gasUrl }));
+        showToast("Cloud Backend URL updated.", "success");
+        setShowConfig(false);
+      };
 
-      let finance = null;
-      if (effectiveMode === "Finance") {
-        finance = {
-          company: document.getElementById("fin-company").value.trim() || "Finance",
-          dp: Number(document.getElementById("fin-dp").value) || 0,
-          loan: Number(document.getElementById("fin-loan").value) || 0
+      return (
+        <div class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+          <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
+            <div class="text-center">
+              <span class="inline-block bg-amber-400 text-blue-950 font-black px-3 py-1 rounded-lg text-sm mb-2">SRE</span>
+              <h1 class="text-xl font-black text-slate-900 tracking-tight">{config.businessName}</h1>
+              <p class="text-xs text-slate-500 font-medium">Bokaro Sector-4 • Enterprise POS</p>
+            </div>
+
+            <form onSubmit={handleLogin} class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Staff Username</label>
+                <input 
+                  type="text" 
+                  value={username} 
+                  onChange={e => setUsername(e.target.value)} 
+                  required 
+                  class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-900 outline-none" 
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  required 
+                  class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-900 outline-none" 
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={loading}
+                class="w-full bg-blue-950 hover:bg-blue-900 text-white font-bold py-3 rounded-lg text-sm shadow transition flex items-center justify-center space-x-2"
+              >
+                {loading ? <span>Verifying Credentials...</span> : <span>Open Register / Sign In</span>}
+              </button>
+            </form>
+
+            <div class="pt-4 border-t border-slate-100 text-center">
+              <button 
+                onClick={() => setShowConfig(!showConfig)} 
+                class="text-xs text-slate-500 hover:text-blue-900 font-medium underline"
+              >
+                {showConfig ? "Hide Cloud Gateway" : "Configure Cloud Backend Gateway"}
+              </button>
+            </div>
+
+            {showConfig && (
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                <label class="block text-[11px] font-bold text-slate-700">Google Apps Script Web App URL</label>
+                <input 
+                  type="url" 
+                  value={gasUrl} 
+                  onChange={e => setGasUrl(e.target.value)} 
+                  placeholder="https://script.google.com/macros/s/.../exec"
+                  class="w-full p-2 border border-slate-300 rounded text-xs font-mono"
+                />
+                <button 
+                  type="button" 
+                  onClick={handleSaveGasUrl}
+                  class="w-full py-1.5 bg-slate-800 text-white text-xs font-bold rounded hover:bg-slate-700"
+                >
+                  Save Gateway Connection
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // DASHBOARD COMPONENT
+    // -------------------------------------------------------------
+    function DashboardView({ setView, config, staff, showToast, draftCount }) {
+      const [stats, setStats] = useState(null);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        loadDashboardReports();
+      }, []);
+
+      const loadDashboardReports = async () => {
+        if (!config.gasUrl) return;
+        const todayStr = new Date().toISOString().substring(0, 10);
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "getReports", startDate: todayStr, endDate: todayStr })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setStats(data.report);
+          }
+        } catch (err) {
+          showToast("Could not load real-time cloud metrics.", "error");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h1 class="text-xl font-black text-slate-900">Today's POS Overview</h1>
+              <p class="text-xs text-slate-500 font-medium">Bokaro Steel City Hub • Shift Operator: {staff.fullName}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button 
+                onClick={() => setView("new_bill")}
+                class="bg-blue-950 hover:bg-blue-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow transition"
+              >
+                + Create New Invoice
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Metrics */}
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard title="Today's Bills" value={loading ? "..." : (stats?.totalBills || 0)} subtext="Transactions Generated" color="blue" />
+            <StatCard title="Gross Sales" value={loading ? "..." : `₹${(stats?.grossSales || 0).toLocaleString('en-IN')}`} subtext="Total Booked Value" color="amber" />
+            <StatCard title="Collection" value={loading ? "..." : `₹${(stats?.totalCollection || 0).toLocaleString('en-IN')}`} subtext="Cash, QR & Bank" color="emerald" />
+            <StatCard title="Today's Due" value={loading ? "..." : `₹${(stats?.totalDue || 0).toLocaleString('en-IN')}`} subtext="Pending Recovery" color="rose" />
+          </div>
+
+          {/* Breakdown by Revenue Vertical */}
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <VerticalCard title="Mobile Phones" amount={stats?.mobileSales || 0} icon="📱" onClick={() => setView("new_bill")} />
+            <VerticalCard title="Accessories" amount={stats?.accessoriesSales || 0} icon="🎧" onClick={() => setView("new_bill")} />
+            <VerticalCard title="Repair Services" amount={stats?.repairSales || 0} icon="🔧" onClick={() => setView("new_bill")} />
+          </div>
+
+          {/* Offline Draft Alert Banner */}
+          {draftCount > 0 && (
+            <div class="p-4 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-amber-900">Offline Drafts Pending ({draftCount})</p>
+                <p class="text-[11px] text-amber-700">Invoices saved locally while offline require atomic cloud synchronization.</p>
+              </div>
+              <button onClick={() => setView("bills")} class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow">
+                Review & Sync
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function StatCard({ title, value, subtext, color }) {
+      const colors = {
+        blue: "border-blue-200 bg-blue-50/50 text-blue-950",
+        amber: "border-amber-200 bg-amber-50/50 text-amber-950",
+        emerald: "border-emerald-200 bg-emerald-50/50 text-emerald-950",
+        rose: "border-rose-200 bg-rose-50/50 text-rose-950"
+      };
+      return (
+        <div class={`p-4 rounded-xl border bg-white shadow-sm flex flex-col justify-between ${colors[color] || ""}`}>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{title}</span>
+          <p class="text-2xl font-black my-1">{value}</p>
+          <span class="text-[10px] text-slate-400 font-medium">{subtext}</span>
+        </div>
+      );
+    }
+
+    function VerticalCard({ title, amount, icon, onClick }) {
+      return (
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <span class="text-2xl mb-1 block">{icon}</span>
+            <p class="text-xs font-bold text-slate-600">{title}</p>
+            <p class="text-lg font-black text-slate-900">₹{amount.toLocaleString('en-IN')}</p>
+          </div>
+          <button onClick={onClick} class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100">
+            + Bill
+          </button>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // NEW BILL GENERATION ENGINE (MOBILE, ACCESSORIES, REPAIRS)
+    // -------------------------------------------------------------
+    function NewBillView({ setView, config, staff, showToast, refreshDraftCount }) {
+      const [billType, setBillType] = useState("MOBILE SALE"); // MOBILE SALE, ACCESSORIES SALE, REPAIRING
+      const [customer, setCustomer] = useState({ name: "", mobile: "", address: "", gstin: "" });
+      const [items, setItems] = useState([createEmptyItem("MOBILE SALE")]);
+      const [payments, setPayments] = useState({ cash: 0, qr: 0, card: 0, finance: 0, other: 0 });
+      const [finance, setFinance] = useState({ company: "", downPayment: 0, loanAmount: 0, reference: "" });
+      const [repair, setRepair] = useState({ deviceBrand: "", deviceModel: "", imei: "", complaint: "", repairingWork: "", partsUsed: "", labourCharge: 0 });
+      const [isSaving, setIsSaving] = useState(false);
+      const [savedSuccessData, setSavedSuccessData] = useState(null);
+
+      function createEmptyItem(type) {
+        return {
+          itemType: type,
+          brand: "",
+          productName: "",
+          model: "",
+          colour: "",
+          ram: "",
+          storage: "",
+          imei1: "",
+          imei2: "",
+          serialNumber: "",
+          quantity: 1,
+          rate: 0,
+          discount: 0,
+          gstPercent: 18
         };
       }
 
-      const invoiceNo = document.getElementById("form-invoice-no").innerText;
-      const billDate = new Date().toISOString().split("T")[0];
-      const secureToken = Math.random().toString(36).substring(2, 9);
-      const publicUrl = `${window.location.origin}${window.location.pathname}?b=${secureToken}`;
+      // Auto-load customer profile when 10 digits entered
+      const handleMobileChange = async (mobileVal) => {
+        const clean = mobileVal.replace(/\D/g, "");
+        setCustomer(prev => ({ ...prev, mobile: clean }));
 
-      const billPayload = {
-        invoiceNo,
-        billType: currentBillType,
-        billDate,
-        customer: { name, mobile: phone, address },
-        items,
-        payment: { mode: effectiveMode, amountPaid: paid, dueAmount: due },
-        finance,
-        totals: { grand, paid, due, totalTaxable, totalGstAmt },
-        secureToken,
-        publicUrl
+        if (clean.length === 10 && config.gasUrl) {
+          try {
+            const res = await fetch(config.gasUrl, {
+              method: "POST",
+              body: JSON.stringify({ action: "getCustomers", query: clean })
+            });
+            const data = await res.json();
+            if (data.success && data.customers && data.customers.length > 0) {
+              const matched = data.customers[0];
+              setCustomer({
+                name: matched.name,
+                mobile: matched.mobile,
+                address: matched.address,
+                gstin: matched.gstin || ""
+              });
+              showToast("Existing customer found & autofilled!", "info");
+            }
+          } catch (e) {
+            // Non-blocking query failure
+          }
+        }
       };
 
-      billsCache = [billPayload, ...billsCache];
-      localStorage.setItem("sre_bills_cache", JSON.stringify(billsCache));
+      // Math Engine
+      const totals = useMemo(() => {
+        let subtotal = 0;
+        let discount = 0;
+        let taxable = 0;
+        let totalGst = 0;
 
-      // Sync Cloud in background
-      if (gasUrl) {
-        fetch(gasUrl, {
-          method: "POST",
-          body: JSON.stringify({ action: "createBill", billData: billPayload })
-        }).catch(() => {});
+        const isInterstate = customer.gstin && !customer.gstin.startsWith("20");
+
+        items.forEach(it => {
+          const lineGross = (it.quantity || 1) * (it.rate || 0);
+          const lineTaxable = Math.max(0, lineGross - (it.discount || 0));
+          const gstRate = parseFloat(it.gstPercent) || 0;
+          const lineGst = lineTaxable * (gstRate / 100);
+
+          subtotal += lineGross;
+          discount += (it.discount || 0);
+          taxable += lineTaxable;
+          totalGst += lineGst;
+        });
+
+        if (billType === "REPAIRING") {
+          const labour = parseFloat(repair.labourCharge) || 0;
+          taxable += labour;
+          totalGst += (labour * 0.18); // Standard 18% on Labour Service
+          subtotal += labour;
+        }
+
+        const grandTotal = Math.round(taxable + totalGst);
+        const totalPaid = (parseFloat(payments.cash) || 0) + 
+                          (parseFloat(payments.qr) || 0) + 
+                          (parseFloat(payments.card) || 0) + 
+                          (parseFloat(payments.finance) || 0) + 
+                          (parseFloat(payments.other) || 0);
+        const dueAmount = Math.max(0, grandTotal - totalPaid);
+
+        return {
+          subtotal: Math.round(subtotal * 100) / 100,
+          discount: Math.round(discount * 100) / 100,
+          taxable: Math.round(taxable * 100) / 100,
+          totalGst: Math.round(totalGst * 100) / 100,
+          grandTotal: grandTotal,
+          totalPaid: Math.round(totalPaid * 100) / 100,
+          dueAmount: Math.round(dueAmount * 100) / 100
+        };
+      }, [items, payments, billType, repair, customer.gstin]);
+
+      const handleSaveBill = async () => {
+        // Validation Checks
+        if (!customer.name.trim()) return showToast("Customer Name is required.", "error");
+        if (customer.mobile.length !== 10) return showToast("Valid 10-Digit Mobile is required.", "error");
+
+        if (billType === "MOBILE SALE") {
+          for (let i = 0; i < items.length; i++) {
+            const it = items[i];
+            if (!it.productName) return showToast(`Line ${i + 1}: Model/Product Name is required.`, "error");
+            if (!it.imei1 || it.imei1.length !== 15) {
+              return showToast(`Line ${i + 1}: IMEI 1 must be strictly 15 digits.`, "error");
+            }
+          }
+        }
+
+        if (totals.totalPaid > totals.grandTotal) {
+          return showToast("Total Paid exceeds Grand Total. Adjust payments.", "error");
+        }
+
+        const billPayload = {
+          billType,
+          billDate: new Date().toISOString().substring(0, 10),
+          customer,
+          items,
+          payments,
+          finance: payments.finance > 0 ? finance : null,
+          repairDetails: billType === "REPAIRING" ? repair : null,
+          appDomain: window.location.origin + window.location.pathname
+        };
+
+        // Offline Guard
+        if (!navigator.onLine) {
+          const drafts = JSON.parse(localStorage.getItem("SRE_DRAFTS") || "[]");
+          drafts.push({ ...billPayload, localDraftId: "DRAFT-" + Date.now() });
+          localStorage.setItem("SRE_DRAFTS", JSON.stringify(drafts));
+          refreshDraftCount();
+          showToast("Internet unavailable: Saved as Local Draft!", "info");
+          setView("dashboard");
+          return;
+        }
+
+        setIsSaving(true);
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "createBill", billData: billPayload, staff })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setSavedSuccessData(data);
+            showToast("Invoice recorded and synchronized with Google Cloud!", "success");
+          } else {
+            showToast(data.error || "Server validation rejected invoice.", "error");
+          }
+        } catch (err) {
+          showToast("Cloud sync failed. Connection timeout.", "error");
+        } finally {
+          setIsSaving(false);
+        }
+      };
+
+      if (savedSuccessData) {
+        return (
+          <SuccessReceiptScreen 
+            data={savedSuccessData} 
+            config={config} 
+            onReset={() => {
+              setSavedSuccessData(null);
+              setCustomer({ name: "", mobile: "", address: "", gstin: "" });
+              setItems([createEmptyItem("MOBILE SALE")]);
+              setPayments({ cash: 0, qr: 0, card: 0, finance: 0, other: 0 });
+            }} 
+          />
+        );
       }
 
-      displayInvoice(billPayload);
+      return (
+        <div class="max-w-4xl mx-auto space-y-4 pb-20">
+          {/* Top Bar Switcher */}
+          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-3">
+            <div class="flex space-x-1 bg-slate-100 p-1 rounded-lg">
+              {["MOBILE SALE", "ACCESSORIES SALE", "REPAIRING"].map(type => (
+                <button
+                  key={type}
+                  onClick={() => { setBillType(type); setItems([createEmptyItem(type)]); }}
+                  class={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+                    billType === type ? "bg-blue-950 text-white shadow" : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 font-bold block">DATE</span>
+              <span class="text-xs font-bold text-slate-800">{new Date().toLocaleDateString('en-IN')}</span>
+            </div>
+          </div>
+
+          {/* Customer Metadata Card */}
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Customer Specifications</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Mobile Number *</label>
+                <input 
+                  type="tel" 
+                  maxLength="10" 
+                  value={customer.mobile} 
+                  onChange={e => handleMobileChange(e.target.value)} 
+                  placeholder="9876543210"
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono font-bold"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Customer Name *</label>
+                <input 
+                  type="text" 
+                  value={customer.name} 
+                  onChange={e => setCustomer({ ...customer, name: e.target.value })} 
+                  placeholder="Full Name"
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Address / City</label>
+                <input 
+                  type="text" 
+                  value={customer.address} 
+                  onChange={e => setCustomer({ ...customer, address: e.target.value })} 
+                  placeholder="Bokaro Steel City"
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Customer GSTIN (Optional)</label>
+                <input 
+                  type="text" 
+                  maxLength="15" 
+                  value={customer.gstin} 
+                  onChange={e => setCustomer({ ...customer, gstin: e.target.value.toUpperCase() })} 
+                  placeholder="20AAAAA0000A1Z5"
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Repair Vertical Meta */}
+          {billType === "REPAIRING" && (
+            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
+              <h2 class="text-xs font-black uppercase text-amber-900 tracking-wider">Device Intake & Diagnostics</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input 
+                  type="text" 
+                  placeholder="Device Brand (e.g. Vivo, Redmi)" 
+                  value={repair.deviceBrand} 
+                  onChange={e => setRepair({ ...repair, deviceBrand: e.target.value })}
+                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold" 
+                />
+                <input 
+                  type="text" 
+                  placeholder="Model Name / Number" 
+                  value={repair.deviceModel} 
+                  onChange={e => setRepair({ ...repair, deviceModel: e.target.value })}
+                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold" 
+                />
+                <input 
+                  type="text" 
+                  placeholder="IMEI / Serial Number" 
+                  value={repair.imei} 
+                  onChange={e => setRepair({ ...repair, imei: e.target.value })}
+                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-mono" 
+                />
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <textarea 
+                  rows="2" 
+                  placeholder="Customer Reported Fault / Complaint..." 
+                  value={repair.complaint} 
+                  onChange={e => setRepair({ ...repair, complaint: e.target.value })}
+                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs" 
+                />
+                <textarea 
+                  rows="2" 
+                  placeholder="Engineer Work Description / Parts Replaced..." 
+                  value={repair.repairingWork} 
+                  onChange={e => setRepair({ ...repair, repairingWork: e.target.value })}
+                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs" 
+                />
+              </div>
+              <div class="max-w-xs">
+                <label class="block text-[11px] font-bold text-amber-950">Labour Service Charge (₹)</label>
+                <input 
+                  type="number" 
+                  value={repair.labourCharge || ""} 
+                  onChange={e => setRepair({ ...repair, labourCharge: parseFloat(e.target.value) || 0 })}
+                  class="w-full p-2 bg-white border border-amber-300 rounded-lg text-sm font-bold text-amber-950" 
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Product Items Table */}
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center">
+              <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Line Items Ledger</h2>
+              <button 
+                type="button" 
+                onClick={() => setItems([...items, createEmptyItem(billType)])}
+                class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg"
+              >
+                + Add Another Product
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              {items.map((item, index) => (
+                <div key={index} class="p-3 bg-slate-50/70 border border-slate-200 rounded-xl space-y-2 relative">
+                  {items.length > 1 && (
+                    <button 
+                      onClick={() => setItems(items.filter((_, idx) => idx !== index))}
+                      class="absolute top-2 right-2 text-rose-600 hover:text-rose-800 font-bold text-xs"
+                    >
+                      Remove
+                    </button>
+                  )}
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Brand (e.g. Samsung)" 
+                      value={item.brand} 
+                      onChange={e => {
+                        const copy = [...items]; copy[index].brand = e.target.value; setItems(copy);
+                      }}
+                      class="p-2 border border-slate-300 bg-white rounded-lg text-xs font-bold" 
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Product / Model Description *" 
+                      value={item.productName} 
+                      onChange={e => {
+                        const copy = [...items]; copy[index].productName = e.target.value; setItems(copy);
+                      }}
+                      class="p-2 border border-slate-300 bg-white rounded-lg text-xs font-bold sm:col-span-2" 
+                    />
+                  </div>
+
+                  {billType === "MOBILE SALE" && (
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Colour" 
+                        value={item.colour} 
+                        onChange={e => { const copy = [...items]; copy[index].colour = e.target.value; setItems(copy); }}
+                        class="p-1.5 border border-slate-300 bg-white rounded text-xs" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="RAM / Storage" 
+                        value={item.ram} 
+                        onChange={e => { const copy = [...items]; copy[index].ram = e.target.value; setItems(copy); }}
+                        class="p-1.5 border border-slate-300 bg-white rounded text-xs" 
+                      />
+                      <input 
+                        type="text" 
+                        maxLength="15" 
+                        placeholder="IMEI 1 (15-digit) *" 
+                        value={item.imei1} 
+                        onChange={e => { const copy = [...items]; copy[index].imei1 = e.target.value.replace(/\D/g, ""); setItems(copy); }}
+                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono font-bold" 
+                      />
+                      <input 
+                        type="text" 
+                        maxLength="15" 
+                        placeholder="IMEI 2" 
+                        value={item.imei2} 
+                        onChange={e => { const copy = [...items]; copy[index].imei2 = e.target.value.replace(/\D/g, ""); setItems(copy); }}
+                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono font-bold" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Serial Number" 
+                        value={item.serialNumber} 
+                        onChange={e => { const copy = [...items]; copy[index].serialNumber = e.target.value; setItems(copy); }}
+                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono" 
+                      />
+                    </div>
+                  )}
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-bold">Qty</label>
+                      <input 
+                        type="number" 
+                        min="1" 
+                        value={item.quantity} 
+                        onChange={e => { const copy = [...items]; copy[index].quantity = parseInt(e.target.value, 10) || 1; setItems(copy); }}
+                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold" 
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-bold">Unit Rate (₹)</label>
+                      <input 
+                        type="number" 
+                        value={item.rate || ""} 
+                        onChange={e => { const copy = [...items]; copy[index].rate = parseFloat(e.target.value) || 0; setItems(copy); }}
+                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold" 
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-bold">Discount (₹)</label>
+                      <input 
+                        type="number" 
+                        value={item.discount || ""} 
+                        onChange={e => { const copy = [...items]; copy[index].discount = parseFloat(e.target.value) || 0; setItems(copy); }}
+                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs" 
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-bold">GST Slab</label>
+                      <select 
+                        value={item.gstPercent} 
+                        onChange={e => { const copy = [...items]; copy[index].gstPercent = parseFloat(e.target.value); setItems(copy); }}
+                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold"
+                      >
+                        <option value="0">0% (Nil)</option>
+                        <option value="5">5% (Tax)</option>
+                        <option value="12">12% (Tax)</option>
+                        <option value="18">18% (Standard)</option>
+                        <option value="28">28% (Luxury)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Multi-Split Payment Engine */}
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Multi-Method Payment Settlement</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Cash (₹)</label>
+                <input 
+                  type="number" 
+                  value={payments.cash || ""} 
+                  onChange={e => setPayments({ ...payments, cash: parseFloat(e.target.value) || 0 })}
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">QR / UPI (₹)</label>
+                <input 
+                  type="number" 
+                  value={payments.qr || ""} 
+                  onChange={e => setPayments({ ...payments, qr: parseFloat(e.target.value) || 0 })}
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">POS Card (₹)</label>
+                <input 
+                  type="number" 
+                  value={payments.card || ""} 
+                  onChange={e => setPayments({ ...payments, card: parseFloat(e.target.value) || 0 })}
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Finance Disbursal (₹)</label>
+                <input 
+                  type="number" 
+                  value={payments.finance || ""} 
+                  onChange={e => {
+                    const finAmt = parseFloat(e.target.value) || 0;
+                    setPayments({ ...payments, finance: finAmt });
+                    setFinance(prev => ({ ...prev, loanAmount: finAmt }));
+                  }}
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-indigo-900" 
+                />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700">Other / Portal (₹)</label>
+                <input 
+                  type="number" 
+                  value={payments.other || ""} 
+                  onChange={e => setPayments({ ...payments, other: parseFloat(e.target.value) || 0 })}
+                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
+                />
+              </div>
+            </div>
+
+            {/* If Finance Active, Show Meta */}
+            {payments.finance > 0 && (
+              <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl space-y-2">
+                <span class="text-[11px] font-bold text-indigo-950 uppercase block">Finance Partner Specification</span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <input 
+                    type="text" 
+                    placeholder="Company (Bajaj, TVS, HDB)" 
+                    value={finance.company} 
+                    onChange={e => setFinance({ ...finance, company: e.target.value })}
+                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-bold" 
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Down Payment (₹)" 
+                    value={finance.downPayment || ""} 
+                    onChange={e => setFinance({ ...finance, downPayment: parseFloat(e.target.value) || 0 })}
+                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-bold" 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Approval Code / Ref" 
+                    value={finance.reference} 
+                    onChange={e => setFinance({ ...finance, reference: e.target.value })}
+                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-mono" 
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Real-Time Total Sheet */}
+          <div class="bg-slate-900 text-white p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <span class="text-xs text-slate-400 font-bold">TOTAL PAYABLE BILL</span>
+              <p class="text-3xl font-black text-amber-400 leading-none mt-1">₹{totals.grandTotal.toLocaleString('en-IN')}</p>
+              <div class="flex space-x-3 text-[11px] text-slate-300 mt-2">
+                <span>Taxable: ₹{totals.taxable}</span>
+                <span>GST: ₹{totals.totalGst}</span>
+                <span>Paid: ₹{totals.totalPaid}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
+              <div class="text-right">
+                <span class="text-xs text-slate-400 font-bold block">OUTSTANDING DUE</span>
+                <span class={`text-lg font-black ${totals.dueAmount > 0 ? "text-rose-400" : "text-emerald-400"}`}>
+                  ₹{totals.dueAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <button
+                onClick={handleSaveBill}
+                disabled={isSaving}
+                class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-3 rounded-lg text-sm shadow-xl transition active:scale-95 flex items-center space-x-2"
+              >
+                {isSaving ? <span>Syncing Cloud...</span> : <span>Confirm & Save Bill</span>}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
     }
 
-    function displayInvoice(bill) {
-      activeInvoiceData = bill;
+    // -------------------------------------------------------------
+    // POST-SALE TRANSACTION SUCCESS & EXPORT ENGINE
+    // -------------------------------------------------------------
+    function SuccessReceiptScreen({ data, config, onReset }) {
+      const qrCanvasRef = useRef(null);
+      const [qrGenerated, setQrGenerated] = useState(false);
 
-      document.getElementById("inv-no-display").innerText = bill.invoiceNo;
-      document.getElementById("inv-date-display").innerText = bill.billDate;
-      document.getElementById("inv-cust-name").innerText = bill.customer?.name || "Cash Customer";
-      document.getElementById("inv-cust-phone").innerText = bill.customer?.mobile || "-";
-      document.getElementById("inv-cust-address").innerText = bill.customer?.address || "-";
+      useEffect(() => {
+        if (data.publicUrl && qrCanvasRef.current) {
+          qrCanvasRef.current.innerHTML = "";
+          new QRCode(qrCanvasRef.current, {
+            text: data.publicUrl,
+            width: 140,
+            height: 140,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          setQrGenerated(true);
+        }
+      }, [data.publicUrl]);
 
-      const payMode = bill.payment?.mode || "Cash";
-      document.getElementById("inv-pay-mode").innerText = "Payment: " + payMode;
+      const handleWhatsAppShare = () => {
+        const phone = "91" + data.customer.mobile;
+        const msg = `Hello ${data.customer.name} 👋\n\nThank you for shopping with *Sri Ram Enterprises*.\n\n*Invoice No:* ${data.invoiceNo}\n*Total Amount:* ₹${data.totals.grandTotal}\n*Paid:* ₹${data.totals.totalPaid}\n*Due:* ₹${data.totals.dueAmount}\n\nView / Download Official Invoice:\n${data.publicUrl}\n\nThank you for your business! 🙏`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+      };
 
-      const finBox = document.getElementById("inv-fin-box");
-      if (bill.finance && payMode === "Finance") {
-        finBox.classList.remove("hidden");
-        finBox.innerText = `Finance: ${bill.finance.company} | DP: Rs. ${bill.finance.dp} | Loan: Rs. ${bill.finance.loan}`;
-      } else {
-        finBox.classList.add("hidden");
-      }
-
-      const tbody = document.getElementById("inv-items-tbody");
-      tbody.innerHTML = "";
-
-      const items = bill.items || [];
-      items.forEach((it, i) => {
-        const lineTotal = ((it.quantity || 1) * (it.rate || 0) - (it.discount || 0));
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-2 text-center text-slate-400 font-bold">${i + 1}</td>
-            <td class="p-2 font-bold text-slate-900">${it.productName}</td>
-            <td class="p-2 font-mono-code text-[10px] text-slate-600">${it.imei1}</td>
-            <td class="p-2 text-center font-bold">${it.quantity || 1}</td>
-            <td class="p-2 text-right">Rs. ${(it.rate || 0).toLocaleString("en-IN")}</td>
-            <td class="p-2 text-right font-black text-slate-900">Rs. ${lineTotal.toLocaleString("en-IN")}</td>
-          </tr>
-        `;
-      });
-
-      const grand = Number(bill.totals?.grand || bill.grandTotal) || 0;
-      const gstAmt = Number(bill.totals?.totalGstAmt) || 0;
-      const taxable = Number(bill.totals?.totalTaxable) || 0;
-
-      const gstBox = document.getElementById("inv-gst-breakdown");
-      if (gstAmt > 0 && bill.billType !== "REPAIRING") {
-        gstBox.classList.remove("hidden");
-        document.getElementById("inv-taxable-val").innerText = taxable.toFixed(2);
-        document.getElementById("inv-cgst-val").innerText = (gstAmt / 2).toFixed(2);
-        document.getElementById("inv-sgst-val").innerText = (gstAmt / 2).toFixed(2);
-        document.getElementById("inv-tot-gst-val").innerText = gstAmt.toFixed(2);
-      } else {
-        gstBox.classList.add("hidden");
-      }
-
-      document.getElementById("inv-tot-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
-
-      // CLEAN HIGH SPEED QR (Instantly recognized by Google Lens & Cameras)
-      const qrContainer = document.getElementById("inv-qrcode-container");
-      qrContainer.innerHTML = "";
-      new QRCode(qrContainer, {
-        text: bill.publicUrl,
-        width: 64,
-        height: 64,
-        colorDark: "#0f172a",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.L
-      });
-
-      showView("invoice");
-    }
-
-    function openSavedInvoice(token) {
-      const b = billsCache.find(x => x.secureToken === token);
-      if (b) displayInvoice(b);
-    }
-
-    // DIRECT VECTOR-SHARP PDF EXPORT (NO BLUR, NO BROKEN FONTS)
-    function downloadCleanPDF() {
-      if (!activeInvoiceData) return;
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF("p", "mm", "a4");
-
-      const b = activeInvoiceData;
-
-      // Outer Clean Border
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(15, 12, 180, 255, 3, 3);
-
-      // Header
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
-      doc.setTextColor(15, 23, 42);
-      doc.text("SRI RAM ENTERPRISES", 20, 24);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(100, 100, 100);
-      doc.text("Mobile • Accessories • Repairing", 20, 29);
-      doc.text("GB-15, City Centre, Sector-4, Bokaro Steel City (Near Indian Bank)", 20, 33);
-      doc.text("GSTIN: 20APOPK6864K1ZH  |  Contact: 9334765000, 9334237111", 20, 37);
-
-      // Invoice Badge
-      doc.setFillColor(15, 23, 42);
-      doc.roundedRect(150, 18, 40, 7, 1, 1, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.text("TAX INVOICE", 170, 22.8, { align: "center" });
-
-      doc.setTextColor(15, 23, 42);
-      doc.setFontSize(9);
-      doc.text(b.invoiceNo, 190, 30, { align: "right" });
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.text(`Date: ${b.billDate}`, 190, 35, { align: "right" });
-
-      // Divider
-      doc.setDrawColor(220, 220, 220);
-      doc.line(20, 42, 190, 42);
-
-      // Customer Info
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(7.5);
-      doc.text("BILLED TO:", 20, 47);
-
-      doc.setTextColor(15, 23, 42);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9.5);
-      doc.text(b.customer?.name || "Cash Customer", 20, 52);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.5);
-      doc.setTextColor(70, 70, 70);
-      doc.text(b.customer?.mobile ? `Phone: ${b.customer.mobile}` : "", 20, 56.5);
-      doc.text(b.customer?.address ? `Address: ${b.customer.address}` : "", 20, 61);
-
-      // Payment Info
-      doc.setFontSize(8.5);
-      doc.setTextColor(15, 23, 42);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Payment Mode: ${b.payment?.mode || "Cash"}`, 190, 52, { align: "right" });
-      if (b.finance) {
-        doc.setFontSize(7.5);
-        doc.setTextColor(100, 100, 100);
-        doc.text(`Finance: ${b.finance.company} (DP: Rs. ${b.finance.dp})`, 190, 56.5, { align: "right" });
-      }
-
-      // Items Table Header
-      let y = 68;
-      doc.setFillColor(245, 247, 250);
-      doc.rect(20, y, 170, 7, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(70, 70, 70);
-      doc.text("#", 23, y + 4.8);
-      doc.text("Product Description", 32, y + 4.8);
-      doc.text("IMEI / Remarks", 95, y + 4.8);
-      doc.text("Qty", 140, y + 4.8, { align: "center" });
-      doc.text("Rate", 160, y + 4.8, { align: "right" });
-      doc.text("Amount", 188, y + 4.8, { align: "right" });
-
-      y += 7;
-
-      // Table Rows
-      const items = b.items || [];
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(15, 23, 42);
-
-      items.forEach((it, i) => {
-        const lineTotal = ((it.quantity || 1) * (it.rate || 0) - (it.discount || 0));
-        doc.setDrawColor(240, 240, 240);
-        doc.line(20, y + 7, 190, y + 7);
-
-        doc.setFontSize(8);
-        doc.text(String(i + 1), 23, y + 5);
+      const handleA4PdfDownload = () => {
+        const doc = new jspdf.jsPDF();
         doc.setFont("helvetica", "bold");
-        doc.text(String(it.productName || "").substring(0, 32), 32, y + 5);
+        doc.setFontSize(16);
+        doc.text(config.businessName, 105, 15, { align: "center" });
+        doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(7.5);
-        doc.text(String(it.imei1 || "-").substring(0, 25), 95, y + 5);
-        doc.setFontSize(8);
-        doc.text(String(it.quantity || 1), 140, y + 5, { align: "center" });
-        doc.text(`Rs. ${(it.rate || 0).toLocaleString("en-IN")}`, 160, y + 5, { align: "right" });
+        doc.text(config.tagline, 105, 21, { align: "center" });
+        doc.text(config.address, 105, 26, { align: "center" });
+        doc.text(`GSTIN: ${config.gstin} | Contact: ${config.phones}`, 105, 31, { align: "center" });
+        doc.line(10, 35, 200, 35);
+
         doc.setFont("helvetica", "bold");
-        doc.text(`Rs. ${lineTotal.toLocaleString("en-IN")}`, 188, y + 5, { align: "right" });
-
-        y += 7.5;
-      });
-
-      // Bottom Total & QR Code Area
-      y = Math.max(y + 10, 130);
-      doc.setDrawColor(220, 220, 220);
-      doc.line(20, y, 190, y);
-      y += 8;
-
-      // QR Code
-      const qrCanvas = document.querySelector("#inv-qrcode-container canvas");
-      if (qrCanvas) {
-        doc.addImage(qrCanvas.toDataURL("image/png"), "PNG", 20, y, 18, 18);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(7.5);
-        doc.setTextColor(15, 23, 42);
-        doc.text("VERIFIED DIGITAL INVOICE", 41, y + 6);
+        doc.text(`TAX INVOICE: ${data.invoiceNo}`, 10, 42);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(6.5);
-        doc.setTextColor(120, 120, 120);
-        doc.text("Scan with Camera or Lens\nto verify authenticity online.", 41, y + 10);
+        doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 150, 42);
+        doc.text(`Customer: ${data.customer.name} (${data.customer.mobile})`, 10, 48);
+        doc.text(`Address: ${data.customer.address || "Bokaro"}`, 10, 54);
+
+        doc.line(10, 58, 200, 58);
+        doc.text("Grand Total:", 130, 70);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Rs. ${data.totals.grandTotal.toLocaleString('en-IN')}`, 170, 70);
+        doc.text("Paid Amount:", 130, 76);
+        doc.text(`Rs. ${data.totals.totalPaid.toLocaleString('en-IN')}`, 170, 76);
+        doc.text("Balance Due:", 130, 82);
+        doc.text(`Rs. ${data.totals.dueAmount.toLocaleString('en-IN')}`, 170, 82);
+
+        doc.save(`${data.invoiceNo}.pdf`);
+      };
+
+      const handleThermalPrint = () => {
+        window.print();
+      };
+
+      return (
+        <div class="max-w-md mx-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-xl space-y-5 text-center">
+          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-black">
+            ✓
+          </div>
+
+          <div>
+            <h1 class="text-xl font-black text-slate-900">BILL CREATED & STORED</h1>
+            <p class="text-xs font-mono font-bold text-blue-900 mt-1">{data.invoiceNo}</p>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 rounded-xl space-y-1 text-xs text-left font-medium">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Customer:</span>
+              <span class="font-bold text-slate-800">{data.customer.name}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Grand Total:</span>
+              <span class="font-bold text-slate-900">₹{data.totals.grandTotal.toLocaleString('en-IN')}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Amount Paid:</span>
+              <span class="font-bold text-emerald-600">₹{data.totals.totalPaid.toLocaleString('en-IN')}</span>
+            </div>
+            <div class="flex justify-between border-t pt-1">
+              <span class="text-slate-500">Outstanding Due:</span>
+              <span class="font-bold text-rose-600">₹{data.totals.dueAmount.toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+
+          {/* QR Container */}
+          <div class="flex flex-col items-center justify-center space-y-1">
+            <div ref={qrCanvasRef} class="p-2 border rounded-lg bg-white shadow-sm"></div>
+            <span class="text-[10px] text-slate-400 font-bold">Public Verification QR</span>
+          </div>
+
+          {/* Action Row */}
+          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <button onClick={handleWhatsAppShare} class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow">
+              Send WhatsApp
+            </button>
+            <button onClick={handleThermalPrint} class="p-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow">
+              Print 80mm
+            </button>
+            <button onClick={handleA4PdfDownload} class="p-2.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg shadow">
+              Download PDF
+            </button>
+            <button onClick={() => { navigator.clipboard.writeText(data.publicUrl); alert("Copied!"); }} class="p-2.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
+              Copy Bill Link
+            </button>
+          </div>
+
+          <button onClick={onReset} class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg transition">
+            + Start Next Invoice
+          </button>
+
+          {/* Hidden Thermal Structure for System Print Dialog */}
+          <div id="printable-area" class="hidden">
+            <div class="thermal-receipt p-2 text-center">
+              <p class="font-bold text-sm">{config.businessName}</p>
+              <p class="text-[10px]">{config.tagline}</p>
+              <p class="text-[9px]">{config.address}</p>
+              <p class="text-[9px]">Ph: {config.phones}</p>
+              <p class="text-[9px]">GSTIN: {config.gstin}</p>
+              <p class="border-b border-dashed my-1"></p>
+              <div class="text-left text-[10px]">
+                <p>INV: {data.invoiceNo}</p>
+                <p>Date: {new Date().toLocaleDateString('en-IN')}</p>
+                <p>Cust: {data.customer.name}</p>
+                <p>Mob: {data.customer.mobile}</p>
+              </div>
+              <p class="border-b border-dashed my-1"></p>
+              <div class="text-left text-[10px]">
+                <p class="flex justify-between font-bold"><span>Total:</span><span>Rs. {data.totals.grandTotal}</span></p>
+                <p class="flex justify-between"><span>Paid:</span><span>Rs. {data.totals.totalPaid}</span></p>
+                <p class="flex justify-between"><span>Due:</span><span>Rs. {data.totals.dueAmount}</span></p>
+              </div>
+              <p class="border-b border-dashed my-1"></p>
+              <p class="text-[9px]">Scan to view official bill online:</p>
+              <p class="text-[8px] break-all">{data.publicUrl}</p>
+              <p class="text-[9px] mt-2">Thank you! Visit Again.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // REGISTER & BILL AUDIT COMPONENT
+    // -------------------------------------------------------------
+    function BillsRegisterView({ config, staff, showToast }) {
+      const [bills, setBills] = useState([]);
+      const [search, setSearch] = useState("");
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        fetchBills();
+      }, []);
+
+      const fetchBills = async () => {
+        if (!config.gasUrl) return;
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "getBills", staff })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setBills(data.bills);
+          }
+        } catch (e) {
+          showToast("Failed to fetch cloud register records.", "error");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const filtered = bills.filter(b => 
+        b.invoiceNo.toLowerCase().includes(search.toLowerCase()) ||
+        b.customerName.toLowerCase().includes(search.toLowerCase()) ||
+        b.customerMobile.includes(search)
+      );
+
+      return (
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h1 class="text-xl font-black text-slate-900">Invoices & Sales Register</h1>
+              <p class="text-xs text-slate-500 font-medium">Relational Records Stored in Google Sheets</p>
+            </div>
+            <input 
+              type="text" 
+              placeholder="Search Invoice, Name, Mobile..." 
+              value={search} 
+              onChange={e => setSearch(e.target.value)} 
+              class="p-2 border rounded-lg text-xs w-full sm:w-64 outline-none font-medium"
+            />
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 border-b text-slate-500 font-bold uppercase">
+                  <tr>
+                    <th class="p-3">Invoice No</th>
+                    <th class="p-3">Date</th>
+                    <th class="p-3">Customer</th>
+                    <th class="p-3">Total</th>
+                    <th class="p-3">Paid</th>
+                    <th class="p-3">Due</th>
+                    <th class="p-3">Staff</th>
+                    <th class="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                  {filtered.map(b => (
+                    <tr key={b.invoiceNo} class="hover:bg-slate-50">
+                      <td class="p-3 font-mono font-bold text-blue-900">{b.invoiceNo}</td>
+                      <td class="p-3 text-slate-500">{b.billDate}</td>
+                      <td class="p-3 font-bold text-slate-900">
+                        {b.customerName}
+                        <span class="block text-[10px] text-slate-400 font-normal">{b.customerMobile}</span>
+                      </td>
+                      <td class="p-3 font-bold">₹{b.grandTotal}</td>
+                      <td class="p-3 text-emerald-600 font-bold">₹{b.paid}</td>
+                      <td class="p-3 text-rose-600 font-bold">₹{b.due}</td>
+                      <td class="p-3 text-slate-500 text-[11px]">{b.createdBy}</td>
+                      <td class="p-3 text-right space-x-1 whitespace-nowrap">
+                        <a href={b.publicUrl} target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded font-bold text-[10px]">
+                          View
+                        </a>
+                        <a href={b.pdfUrl} target="_blank" class="px-2 py-1 bg-blue-900 text-white rounded font-bold text-[10px]">
+                          PDF
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colspan="8" class="p-6 text-center text-slate-400">No records found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // DUES RECOVERY ENGINE
+    // -------------------------------------------------------------
+    function DuesManagementView({ config, staff, showToast }) {
+      const [dueBills, setDueBills] = useState([]);
+      const [selectedBill, setSelectedBill] = useState(null);
+      const [paymentAmount, setPaymentAmount] = useState("");
+      const [paymentType, setPaymentType] = useState("Cash");
+
+      useEffect(() => {
+        fetchDues();
+      }, []);
+
+      const fetchDues = async () => {
+        if (!config.gasUrl) return;
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "getBills", staff })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setDueBills(data.bills.filter(b => parseFloat(b.due) > 0));
+          }
+        } catch (e) {
+          showToast("Failed to load outstanding ledger.", "error");
+        }
+      };
+
+      const handleAddPayment = async () => {
+        if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
+          return showToast("Enter a valid installment amount.", "error");
+        }
+        if (parseFloat(paymentAmount) > parseFloat(selectedBill.due)) {
+          return showToast("Payment exceeds current outstanding due balance.", "error");
+        }
+
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({
+              action: "addDuePayment",
+              paymentData: {
+                invoiceNo: selectedBill.invoiceNo,
+                amount: parseFloat(paymentAmount),
+                paymentType: paymentType
+              },
+              staff
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showToast("Installment payment credited successfully!", "success");
+            setSelectedBill(null);
+            setPaymentAmount("");
+            fetchDues();
+          } else {
+            showToast(data.error || "Update transaction failed.", "error");
+          }
+        } catch (e) {
+          showToast("Network error submitting installment.", "error");
+        }
+      };
+
+      return (
+        <div class="space-y-4">
+          <div>
+            <h1 class="text-xl font-black text-slate-900">Outstanding Due Recovery</h1>
+            <p class="text-xs text-slate-500 font-medium">Customer Credit Management & Payment Allocation</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <div class="p-3 bg-slate-50 border-b font-bold text-xs text-slate-700">Pending Accounts Receivable</div>
+              <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                {dueBills.map(b => (
+                  <div key={b.invoiceNo} onClick={() => setSelectedBill(b)} class={`p-3 cursor-pointer transition ${selectedBill?.invoiceNo === b.invoiceNo ? "bg-blue-50/70" : "hover:bg-slate-50"}`}>
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="font-bold text-xs text-slate-900">{b.customerName}</p>
+                        <p class="text-[10px] text-slate-500 font-mono">{b.customerMobile}</p>
+                        <p class="text-[10px] text-blue-900 font-bold mt-1">{b.invoiceNo}</p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-xs font-black text-rose-600 block">Due: ₹{b.due}</span>
+                        <span class="text-[10px] text-slate-400">Total: ₹{b.grandTotal}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {dueBills.length === 0 && <p class="p-4 text-center text-xs text-slate-400">All customer dues cleared!</p>}
+              </div>
+            </div>
+
+            {/* Payment Input Card */}
+            <div>
+              {selectedBill ? (
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                  <h3 class="text-xs font-black uppercase text-slate-500 tracking-wider">Record Installment: {selectedBill.invoiceNo}</h3>
+                  <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+                    <p><span class="text-slate-500">Customer:</span> <strong>{selectedBill.customerName}</strong> ({selectedBill.customerMobile})</p>
+                    <p><span class="text-slate-500">Remaining Balance:</span> <strong class="text-rose-600">₹{selectedBill.due}</strong></p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Installment Amount (₹)</label>
+                    <input 
+                      type="number" 
+                      value={paymentAmount} 
+                      onChange={e => setPaymentAmount(e.target.value)} 
+                      placeholder="0.00"
+                      class="w-full p-2.5 border rounded-lg text-sm font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
+                    <select value={paymentType} onChange={e => setPaymentType(e.target.value)} class="w-full p-2.5 border rounded-lg text-xs font-bold">
+                      <option value="Cash">Cash</option>
+                      <option value="QR">QR / UPI</option>
+                      <option value="Card">Card</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <button 
+                    onClick={handleAddPayment}
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition"
+                  >
+                    Credit Installment Payment
+                  </button>
+                </div>
+              ) : (
+                <div class="bg-white p-8 rounded-xl border border-dashed text-center text-xs text-slate-400">
+                  Select a bill from the left list to settle pending dues.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // FINANCIAL & GST AUDIT REPORTS COMPONENT
+    // -------------------------------------------------------------
+    function ReportsView({ config, staff, showToast }) {
+      const [startDate, setStartDate] = useState(() => new Date().toISOString().substring(0, 10));
+      const [endDate, setEndDate] = useState(() => new Date().toISOString().substring(0, 10));
+      const [rep, setRep] = useState(null);
+      const [loading, setLoading] = useState(false);
+
+      const fetchReport = async () => {
+        if (!config.gasUrl) return;
+        setLoading(true);
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "getReports", startDate, endDate })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setRep(data.report);
+          }
+        } catch (e) {
+          showToast("Failed to aggregate reports.", "error");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchReport();
+      }, []);
+
+      return (
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h1 class="text-xl font-black text-slate-900">Taxation & Sales Reports</h1>
+              <p class="text-xs text-slate-500 font-medium">GST Breakdown (CGST, SGST, IGST) and Revenue Analytics</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} class="p-1.5 border rounded text-xs font-bold" />
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} class="p-1.5 border rounded text-xs font-bold" />
+              <button onClick={fetchReport} class="px-3 py-1.5 bg-blue-950 text-white rounded text-xs font-bold">Filter</button>
+            </div>
+          </div>
+
+          {rep && (
+            <div class="space-y-4">
+              {/* Top Sales Figures */}
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white p-3 rounded-xl border">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase">Total Gross Sales</span>
+                  <p class="text-lg font-black text-slate-900">₹{rep.grossSales.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase">Taxable Turnover</span>
+                  <p class="text-lg font-black text-blue-900">₹{rep.taxableSales.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase">GST Collected</span>
+                  <p class="text-lg font-black text-emerald-600">₹{rep.totalGst.toLocaleString('en-IN')}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border">
+                  <span class="text-[10px] text-slate-400 font-bold uppercase">Net Recovered</span>
+                  <p class="text-lg font-black text-slate-900">₹{rep.totalCollection.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+
+              {/* GST Breakdown Table */}
+              <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h3 class="text-xs font-black uppercase text-slate-500 mb-3 tracking-wider">GST Output Liability Register</h3>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                  <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-xs text-slate-500 font-bold">CGST (Intrastate)</span>
+                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalCgst.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-xs text-slate-500 font-bold">SGST (Jharkhand)</span>
+                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalSgst.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div class="p-3 bg-slate-50 rounded-lg">
+                    <span class="text-xs text-slate-500 font-bold">IGST (Interstate)</span>
+                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalIgst.toLocaleString('en-IN')}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Collection by Tender Method */}
+              <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h3 class="text-xs font-black uppercase text-slate-500 mb-3 tracking-wider">Payment Method Reconciliations</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
+                  <div class="p-2 border rounded">Cash: <strong class="block text-sm">₹{rep.cashCollection}</strong></div>
+                  <div class="p-2 border rounded">QR/UPI: <strong class="block text-sm">₹{rep.qrCollection}</strong></div>
+                  <div class="p-2 border rounded">Cards: <strong class="block text-sm">₹{rep.cardCollection}</strong></div>
+                  <div class="p-2 border rounded">Finance: <strong class="block text-sm">₹{rep.financeCollection}</strong></div>
+                  <div class="p-2 border rounded">Other: <strong class="block text-sm">₹{rep.otherCollection}</strong></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // ENTERPRISE PARAMETER CONFIGURATION (ADMIN ONLY)
+    // -------------------------------------------------------------
+    function SettingsView({ config, setConfig, staff, showToast }) {
+      const [form, setForm] = useState(config);
+
+      const handleSave = async (e) => {
+        e.preventDefault();
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({
+              action: "saveSettings",
+              settings: {
+                BUSINESS_NAME: form.businessName,
+                TAGLINE: form.tagline,
+                ADDRESS: form.address,
+                PHONE: form.phones,
+                GSTIN: form.gstin,
+                TERMS: form.terms
+              },
+              staff
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setConfig(form);
+            showToast("Master business settings updated on cloud.", "success");
+          }
+        } catch (err) {
+          showToast("Failed to save remote settings.", "error");
+        }
+      };
+
+      return (
+        <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl border shadow-sm space-y-4">
+          <div>
+            <h1 class="text-lg font-black text-slate-900">Master Enterprise Settings</h1>
+            <p class="text-xs text-slate-500">Configure parameters printed on physical invoices and documents.</p>
+          </div>
+
+          <form onSubmit={handleSave} class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 uppercase mb-1">Business Name</label>
+              <input type="text" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} class="w-full p-2 border rounded font-bold" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 uppercase mb-1">Tagline</label>
+              <input type="text" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} class="w-full p-2 border rounded" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 uppercase mb-1">Shop Address</label>
+              <textarea rows="2" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} class="w-full p-2 border rounded" />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase mb-1">Phone Numbers</label>
+                <input type="text" value={form.phones} onChange={e => setForm({ ...form, phones: e.target.value })} class="w-full p-2 border rounded font-mono" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase mb-1">GSTIN</label>
+                <input type="text" value={form.gstin} onChange={e => setForm({ ...form, gstin: e.target.value })} class="w-full p-2 border rounded font-mono font-bold" />
+              </div>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 uppercase mb-1">Invoice Terms & Conditions</label>
+              <textarea rows="4" value={form.terms} onChange={e => setForm({ ...form, terms: e.target.value })} class="w-full p-2 border rounded" />
+            </div>
+
+            <button type="submit" class="w-full py-2.5 bg-blue-950 text-white font-bold rounded shadow hover:bg-blue-900">
+              Save All Business Configuration
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // PUBLIC CUSTOMER PORTAL (TOKEN VERIFIED, NO LOGIN REQUIRED)
+    // -------------------------------------------------------------
+    function PublicBillView({ token, config }) {
+      const [bill, setBill] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        fetchBill();
+      }, [token]);
+
+      const fetchBill = async () => {
+        try {
+          const res = await fetch(config.gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ action: "getBillByToken", token })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setBill(data.bill);
+          } else {
+            setError(data.error || "Invoice not found or link expired.");
+          }
+        } catch (e) {
+          setError("Network connection error. Please refresh.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (loading) {
+        return (
+          <div class="min-h-screen flex items-center justify-center p-4">
+            <p class="text-sm font-bold text-slate-500">Retrieving official digital invoice...</p>
+          </div>
+        );
       }
 
-      // Grand Total
-      const grand = Number(b.totals?.grand || b.grandTotal) || 0;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
-      doc.text("GRAND TOTAL", 190, y + 4, { align: "right" });
-      doc.setFontSize(14);
-      doc.setTextColor(15, 23, 42);
-      doc.text(`Rs. ${grand.toLocaleString("en-IN")}`, 190, y + 12, { align: "right" });
-
-      // Footer
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(6.5);
-      doc.setTextColor(130, 130, 130);
-      doc.text("Goods once sold cannot be returned without warranty terms. Service handled directly by Brand Authorized Centers.", 20, 245);
-
-      doc.setDrawColor(180, 180, 180);
-      doc.line(145, 248, 190, 248);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(7.5);
-      doc.setTextColor(15, 23, 42);
-      doc.text("Authorized Signatory", 167.5, 252, { align: "center" });
-
-      doc.save(`Invoice_${b.invoiceNo}.pdf`);
-    }
-
-    function shareOnWhatsApp() {
-      if (!activeInvoiceData) return;
-      const phone = (activeInvoiceData.customer?.mobile || "").replace(/\D/g, "");
-      const formatted = phone.startsWith("91") ? phone : "91" + phone;
-      const text = encodeURIComponent(`नमस्ते ${activeInvoiceData.customer?.name}, आपका SRI RAM ENTERPRISES का बिल: ${activeInvoiceData.publicUrl}`);
-      window.open(`https://wa.me/${formatted}?text=${text}`, "_blank");
-    }
-
-    function saveSettings() {
-      gasUrl = document.getElementById("settings-gas-url").value.trim();
-      localStorage.setItem("sre_gas_url", gasUrl);
-      showView("dashboard");
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      showView("dashboard");
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get("b");
-      if (token) {
-        const local = billsCache.find(x => x.secureToken === token);
-        if (local) displayInvoice(local);
+      if (error) {
+        return (
+          <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white p-6 rounded-xl border border-rose-200 text-center space-y-2 max-w-sm">
+              <p class="text-rose-600 font-bold text-sm">Invoice Unavailable</p>
+              <p class="text-xs text-slate-500">{error}</p>
+            </div>
+          </div>
+        );
       }
-    });
+
+      return (
+        <div class="min-h-screen bg-slate-100 p-2 sm:p-6">
+          <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border">
+            <div class="bg-blue-950 text-white p-4 text-center">
+              <h1 class="text-base font-black">{config.businessName}</h1>
+              <p class="text-[10px] text-blue-200">{config.address}</p>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs">
+              <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                  <p class="text-slate-400 font-bold text-[10px]">INVOICE NO</p>
+                  <p class="font-mono font-bold text-slate-900">{bill.invoiceNo}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-slate-400 font-bold text-[10px]">DATE</p>
+                  <p class="font-bold text-slate-900">{bill.billDate}</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-slate-400 font-bold text-[10px]">CUSTOMER</p>
+                <p class="font-bold text-slate-900">{bill.customer.name}</p>
+                <p class="text-slate-500">{bill.customer.mobile}</p>
+              </div>
+
+              {/* Items */}
+              <div class="border rounded-lg overflow-hidden">
+                <table class="w-full text-left">
+                  <thead class="bg-slate-50 text-slate-500 font-bold border-b">
+                    <tr>
+                      <th class="p-2">Item</th>
+                      <th class="p-2 text-center">Qty</th>
+                      <th class="p-2 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y">
+                    {bill.items.map((it, idx) => (
+                      <tr key={idx}>
+                        <td class="p-2">
+                          <p class="font-bold text-slate-900">{it.brand} {it.productName}</p>
+                          {it.imei1 && <p class="text-[10px] font-mono text-slate-400">IMEI: {it.imei1}</p>}
+                        </td>
+                        <td class="p-2 text-center">{it.quantity}</td>
+                        <td class="p-2 text-right font-bold">₹{it.lineTotal}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Payment Summary */}
+              <div class="p-3 bg-slate-50 rounded-lg space-y-1">
+                <div class="flex justify-between">
+                  <span>Grand Total:</span>
+                  <span class="font-bold">₹{bill.totals.grandTotal}</span>
+                </div>
+                <div class="flex justify-between text-emerald-600 font-bold">
+                  <span>Paid Amount:</span>
+                  <span>₹{bill.totals.paid}</span>
+                </div>
+                <div class="flex justify-between text-rose-600 font-bold border-t pt-1">
+                  <span>Balance Due:</span>
+                  <span>₹{bill.totals.due}</span>
+                </div>
+              </div>
+
+              {bill.pdfUrl && (
+                <a
+                  href={bill.pdfUrl}
+                  target="_blank"
+                  class="block w-full text-center py-2.5 bg-blue-950 text-white font-bold rounded-lg shadow"
+                >
+                  Download Original PDF Document
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Mount Virtual DOM
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
 </html>
