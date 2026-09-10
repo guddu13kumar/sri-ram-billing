@@ -301,11 +301,9 @@
   <script>
     let currentBillType = "MOBILE";
     let activeInvoiceData = null;
-    // FIX (vi): Browser local storage se load/save hataya gaya hai. Session caching in variable only.
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
 
-    // QR Data Compression
     function compressBill(b) {
         const min = {
             i: b.invoiceNo, d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress,
@@ -592,8 +590,37 @@
         if(imeiErr) return alert("IMEI नंबर पूरे 15 अंकों का होना चाहिए!");
       }
 
+      let cashAmt = 0, qrAmt = 0, cardAmt = 0;
       const s = document.getElementById("pay-secondary").value;
       const p = document.getElementById("pay-primary").value;
+      let activeMode = p;
+      if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
+      if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
+
+      const isSplit = activeMode.includes("+");
+
+      if (!isSplit) {
+        if (activeMode.includes("Cash")) cashAmt = totals.paid;
+        if (activeMode.includes("QR")) qrAmt = totals.paid;
+        if (activeMode.includes("Card")) cardAmt = totals.paid;
+      } else {
+        if (s === "Finance") {
+          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || 0;
+          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || 0;
+          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || 0;
+        } else if (s === "Dues") {
+          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || 0;
+          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || 0;
+          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || 0;
+        } else {
+          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("split-cash").value) || 0;
+          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("split-qr").value) || 0;
+          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("split-card").value) || 0;
+        }
+      }
+
+      const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
+
       const token = Math.random().toString(36).substring(2, 8);
       let finData = null;
       if(s === "Finance"){
@@ -609,11 +636,10 @@
         finance: finData, token
       };
 
-      // FIX (iv): Compress data for QR Code logic directly
       const scanPayload = compressBill(billData);
       billData.publicUrl = `${window.location.origin}${window.location.pathname}?scan=${scanPayload}`;
 
-      billsCache.unshift(billData); // Save to in-memory only (Fix vi)
+      billsCache.unshift(billData); 
       
       if (gasUrl) fetch(gasUrl, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "createBill", billData }) }).catch(()=>{});
       displayInvoice(billData);
@@ -642,7 +668,6 @@
       const gst = Number(bill.totalGst) || 0;
       const subtotal = grand + Number(bill.totalDiscount) - gst;
 
-      // FIX (i): Render GST in main total box perfectly
       const bd = document.getElementById("inv-total-breakdown");
       let bdHtml = `<div class="flex justify-between p-1.5"><span>Subtotal</span><span class="font-black">Rs. ${subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       if(Number(bill.totalDiscount) > 0) {
@@ -670,7 +695,6 @@
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
       
-      // FIX (ii): PDF Header Layout Left/Right Balance
       doc.setLineWidth(0.5); doc.circle(28, 24, 9);
       doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(...blue); doc.text("ENTERPRISES", 28, 20, { align: "center" });
       doc.setFontSize(11); doc.text("SRE", 28, 25, { align: "center" }); doc.setFontSize(6); doc.text("SINCE 2004", 28, 29, { align: "center" });
@@ -687,7 +711,6 @@
       doc.setFillColor(...blue); doc.rect(15, 41, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("TAX INVOICE", 105, 45.5, { align: "center" });
 
-      // FIX (iii): Exact Alignment equivalent for PDF
       doc.setTextColor(...dark); doc.setFontSize(8.5);
       doc.text("Invoice No. :", 20, 52); doc.setFont("helvetica", "bold"); doc.text(b.invoiceNo, 40, 52);
       doc.setFont("helvetica", "normal"); doc.text("Date :", 140, 52); doc.setFont("helvetica", "bold"); doc.text(b.billDate, 155, 52);
@@ -730,7 +753,6 @@
       doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       
-      // FIX (i) GST Logic PDF
       let rY = y;
       let breakdown = [ {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
       if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: Number(b.totalDiscount).toLocaleString("en-IN")});
@@ -746,7 +768,6 @@
       });
       doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN"), 192, rY+6, {align:"right"});
 
-      // FIX (v) E-bill format NO SIGNATURES
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
 
@@ -759,7 +780,6 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      // FIX (iv): Auto Decode from QR URL
       const scanParam = new URLSearchParams(window.location.search).get("scan");
       if (scanParam) {
           try {
