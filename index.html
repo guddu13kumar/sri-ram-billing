@@ -86,9 +86,9 @@
       </div>
 
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
-        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Customer Name *</label><input type="text" id="cust-name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
+        <div><label id="lbl-cust-name" class="text-[10px] font-bold text-slate-600 block mb-1">Customer Name *</label><input type="text" id="cust-name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
+        <div><label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
+        <div><label id="lbl-cust-address" class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
         <div><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
@@ -185,10 +185,10 @@
           <div>
             <label class="text-[10px] font-bold text-slate-600 block mb-1">Bill GST Slab</label>
             <select id="global-gst" onchange="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none">
-              <option value="0">0% GST</option>
+              <option value="0" selected>0% GST</option>
               <option value="5">5% GST</option>
               <option value="12">12% GST</option>
-              <option value="18" selected>18% GST</option>
+              <option value="18">18% GST</option>
               <option value="28">28% GST</option>
             </select>
           </div>
@@ -286,7 +286,6 @@
               </div>
             </div>
 
-            <!-- PERFECT VERTICAL ALIGNMENT BOX -->
             <div class="totals-box border-l-2 border-[#004aad] text-[11px] font-bold bg-slate-50 flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]" id="inv-total-breakdown"></div>
               <div class="bg-[#004aad] text-white flex justify-between px-2 py-2.5 font-black text-xs mt-auto">
@@ -348,7 +347,6 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // QR DATA COMPRESSION
     function compressBill(b) {
         const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
         const min = [
@@ -374,13 +372,11 @@
         return encodeURIComponent(base64);
     }
 
-    // 100% FIXED: SCANNER READS BOTH OLD AND NEW QR CODES WITHOUT ERROR
     function expandBill(str) {
         const base64 = decodeURIComponent(str);
         const jsonStr = decodeURIComponent(escape(atob(base64)));
         const min = JSON.parse(jsonStr);
         
-        // SUPPORT FOR NEW ARRAY FORMAT (Super Compressed)
         if (Array.isArray(min)) {
             const yr = String(min[1] || "").slice(-2) || "26";
             const invNo = `SRE-20${yr}-${String(min[0] || "0").padStart(3, '0')}`;
@@ -389,20 +385,19 @@
             return {
                 invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
                 items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4] })),
-                grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] || 18,
-                paymentMode: min[10] || "Cash", paid: min[11] || gt, due: min[12] || 0,
+                grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] !== undefined ? Number(min[9]) : 0,
+                paymentMode: min[10] || "Cash", paid: min[11] !== undefined ? min[11] : gt, due: min[12] || 0,
                 paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
                 finance: min[14] ? { company: min[14], dp: min[11], loan: min[12] } : null,
                 paymentRate: min[15] || ""
             };
         } 
-        // SUPPORT FOR OLD OBJECT FORMAT (Old QR Codes)
         else {
             const yr = String(min.d || "").slice(-2) || "26";
             const invNo = `SRE-20${yr}-${String(min.i || "0").padStart(3, '0')}`;
             
             let gt = 0;
-            if (min.tx && min.tg) {
+            if (min.tx !== undefined && min.tg !== undefined) {
                 gt = Math.round(min.tx + min.tg);
             } else if (min.it) {
                 min.it.forEach(item => { gt += item.length === 4 ? item[3] : item[4]; });
@@ -415,7 +410,7 @@
                     rate: x.length === 4 ? (x[2] > 0 ? Number((x[3]/x[2]).toFixed(2)) : 0) : x[3], 
                     amount: x.length === 4 ? x[3] : x[4]
                 })),
-                grandTotal: gt, totalTaxable: min.tx || 0, totalGst: min.tg || 0, totalDiscount: min.td || 0, paymentRate: min.pr || "", gstSlab: min.gs || 18
+                grandTotal: gt, totalTaxable: min.tx || 0, totalGst: min.tg || 0, totalDiscount: min.td || 0, paymentRate: min.pr || "", gstSlab: min.gs !== undefined ? Number(min.gs) : 0
             };
         }
     }
@@ -461,6 +456,17 @@
       document.getElementById("repair-box").classList.toggle("hidden", type !== "REPAIRING");
       document.getElementById("items-container").innerHTML = "";
       
+      // Dynamic Labels Logic (Removing mandatory '*' for Accessories)
+      if (type === "ACCESSORIES") {
+        document.getElementById("lbl-cust-name").innerText = "Customer Name";
+        document.getElementById("lbl-cust-phone").innerText = "Mobile";
+        document.getElementById("lbl-cust-address").innerText = "Address";
+      } else {
+        document.getElementById("lbl-cust-name").innerText = "Customer Name *";
+        document.getElementById("lbl-cust-phone").innerText = "Mobile *";
+        document.getElementById("lbl-cust-address").innerText = "Address *";
+      }
+
       document.getElementById("cust-name").value = "";
       document.getElementById("cust-phone").value = "";
       document.getElementById("cust-address").value = "";
@@ -472,7 +478,7 @@
       });
       document.getElementById("pay-primary").value = "Cash";
       document.getElementById("pay-secondary").value = "";
-      document.getElementById("global-gst").value = "18";
+      document.getElementById("global-gst").value = "0"; // Default GST 0%
       onPaymentModeChange();
 
       if(type !== "REPAIRING") addNewItemRow(true);
@@ -952,7 +958,6 @@
           doc.text("to verify and open online.", 46, y+29);
       }
 
-      // PERFECT ALIGNMENT FIX (Subtotal left border exactly aligns with Qty left line at x=134)
       doc.rect(134, y, 61, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       
