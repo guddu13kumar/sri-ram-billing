@@ -95,7 +95,13 @@
         <textarea id="rep-issue" rows="2" placeholder="समस्या विवरण..." class="w-full p-2 border rounded text-xs outline-none"></textarea>
         <div class="flex space-x-2">
           <input type="number" id="rep-charge" placeholder="Repair Charge (Rs.) *" oninput="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-black outline-none" />
-          <select id="rep-gst" onchange="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-bold outline-none"><option value="18">18% GST</option><option value="0">0% GST</option></select>
+          <select id="rep-gst" onchange="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-bold outline-none">
+            <option value="18">18% GST</option>
+            <option value="28">28% GST</option>
+            <option value="12">12% GST</option>
+            <option value="5">5% GST</option>
+            <option value="0">0% GST</option>
+          </select>
         </div>
       </div>
 
@@ -146,7 +152,7 @@
               <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
             </select>
           </div>
-          <div id="fin-split-container" class="grid grid-cols-3 gap-2">
+          <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden">
             <input type="number" id="fin-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
             <input type="number" id="fin-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
             <input type="number" id="fin-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
@@ -162,7 +168,7 @@
               <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
           </div>
-          <div id="dues-split-container" class="grid grid-cols-3 gap-2">
+          <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
             <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
             <input type="number" id="dues-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
             <input type="number" id="dues-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
@@ -193,7 +199,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - CLEAN HEADER (NO LOGO) -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -206,19 +212,12 @@
       <div class="w-full flex justify-center overflow-x-auto pb-6">
         <div id="invoice-capture" class="bg-white p-6 border-2 border-[#004aad] text-xs text-slate-900 w-[700px] min-w-[700px]">
           
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-            <div class="w-14 h-14 border-2 border-[#004aad] rounded-full flex flex-col items-center justify-center text-center shrink-0">
-              <span class="text-[6px] font-bold text-[#004aad] leading-none">ENTERPRISES</span>
-              <span class="text-sm font-black text-[#004aad] leading-none my-0.5">SRE</span>
-              <span class="text-[6px] font-bold text-[#004aad] leading-none">SINCE 2004</span>
-            </div>
-            <div class="text-center flex-1 px-2">
-              <h1 class="text-2xl font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
-              <p class="text-xs font-bold text-[#004aad] my-0.5">Mobile • Accessories • Repairing</p>
-              <p class="text-[9.5px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
-              <p class="text-[10px] font-bold text-slate-800">GSTIN: 20APOPK6864K1ZH • Ph: 9334765000, 9334237111</p>
-            </div>
-            <div class="w-10 shrink-0"></div>
+          <!-- NEW HEADER - NO LOGO -->
+          <div class="text-center w-full pb-3 border-b border-slate-200">
+            <h1 class="text-[28px] font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
+            <p class="text-[13px] font-bold text-[#004aad] my-1">Mobile • Accessories • Repairing</p>
+            <p class="text-[10px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
+            <p class="text-[11px] font-bold text-slate-800 mt-0.5">GSTIN: 20APOPK6864K1ZH • Ph: 9334765000, 9334237111</p>
           </div>
 
           <div class="bg-[#004aad] text-white font-black text-center py-1 text-xs tracking-widest uppercase my-2">TAX INVOICE</div>
@@ -350,7 +349,6 @@
       document.getElementById("repair-box").classList.toggle("hidden", type !== "REPAIRING");
       document.getElementById("items-container").innerHTML = "";
       
-      // Reset payment inputs
       ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
@@ -359,7 +357,6 @@
       document.getElementById("pay-secondary").value = "";
       onPaymentModeChange();
 
-      // Ensure first item row is added without remove button
       if(type !== "REPAIRING") addNewItemRow(true);
       
       const year = new Date().getFullYear();
@@ -397,6 +394,7 @@
         removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-3 text-rose-600 font-bold text-xs">X Remove</button>`;
       }
 
+      // ADDED ALL INDIAN GST SLABS
       div.innerHTML = `
         ${removeBtn}
         <input type="text" placeholder="Product Name *" class="item-name w-3/4 p-1.5 border rounded text-xs font-bold outline-none" />
@@ -404,7 +402,13 @@
           <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty p-1.5 border rounded text-xs font-bold outline-none" />
           <input type="number" placeholder="Rate *" oninput="recalcTotals()" class="item-rate p-1.5 border rounded text-xs font-bold outline-none" />
           <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-1.5 border rounded text-xs outline-none" />
-          <select class="item-gst p-1.5 border rounded text-xs font-bold outline-none" onchange="recalcTotals()"><option value="18">18% GST</option><option value="12">12% GST</option><option value="0">0% GST</option></select>
+          <select class="item-gst p-1.5 border rounded text-xs font-bold outline-none" onchange="recalcTotals()">
+            <option value="18">18% GST</option>
+            <option value="28">28% GST</option>
+            <option value="12">12% GST</option>
+            <option value="5">5% GST</option>
+            <option value="0">0% GST</option>
+          </select>
         </div>
         <div class="item-imeis-box"></div>
       `;
@@ -675,14 +679,17 @@
       const blue = [0, 74, 173]; const dark = [15, 23, 42];
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
-      doc.setLineWidth(0.5); doc.circle(28, 26, 9);
-      doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(...blue); doc.text("ENTERPRISES", 28, 22, { align: "center" });
-      doc.setFontSize(11); doc.text("SRE", 28, 27, { align: "center" }); doc.setFontSize(6); doc.text("SINCE 2004", 28, 31, { align: "center" });
-      doc.setFontSize(16); doc.text("SRI RAM ENTERPRISES", 105, 21, { align: "center" });
-      doc.setFontSize(9); doc.text("Mobile • Accessories • Repairing", 105, 26, { align: "center" });
-      doc.setFontSize(7.5); doc.setTextColor(70, 70, 70); doc.text("GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)", 105, 30, { align: "center" });
-      doc.setTextColor(...dark); doc.text("Contact : 9334765000, 9334237111, 9335136000", 105, 34, { align: "center" });
-      doc.setFont("helvetica", "bold"); doc.text("GSTIN : 20APOPK6864K1ZH", 105, 38, { align: "center" });
+      
+      // NEW HEADER - NO LOGO
+      doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...blue); 
+      doc.text("SRI RAM ENTERPRISES", 105, 22, { align: "center" });
+      doc.setFontSize(10); 
+      doc.text("Mobile • Accessories • Repairing", 105, 28, { align: "center" });
+      doc.setFontSize(8); doc.setTextColor(70, 70, 70); 
+      doc.text("GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)", 105, 33, { align: "center" });
+      doc.setTextColor(...dark); 
+      doc.text("GSTIN: 20APOPK6864K1ZH • Ph: 9334765000, 9334237111", 105, 38, { align: "center" });
+      
       doc.setFillColor(...blue); doc.rect(15, 41, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("TAX INVOICE", 105, 45.5, { align: "center" });
 
