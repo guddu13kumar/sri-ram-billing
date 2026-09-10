@@ -14,6 +14,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;600;700;800;900&display=swap');
     body { font-family: 'Inter', system-ui, sans-serif; }
+    .thank-you-text { font-family: 'Caveat', cursive; }
 
     @media print {
       body * { visibility: hidden; }
@@ -86,10 +87,11 @@
       </div>
 
       <!-- CUSTOMER -->
-      <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3 rounded-xl border">
+      <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
         <div><label class="text-[10px] font-bold text-slate-600">Customer Name *</label><input type="text" id="cust-name" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">Address *</label><input type="text" id="cust-address" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
+        <div><label class="text-[10px] font-bold text-slate-600">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
       <!-- REPAIR BOX -->
@@ -213,7 +215,7 @@
       <div class="w-full flex justify-center overflow-x-auto pb-6">
         <div id="invoice-capture" class="bg-white p-6 border-2 border-[#004aad] text-xs text-slate-900 w-[700px] min-w-[700px]">
           
-          <!-- BEAUTIFUL HEADER FULL WIDTH -->
+          <!-- BEAUTIFUL HEADER FULL WIDTH BALANCED -->
           <div class="w-full pb-3 border-b-2 border-[#004aad]">
             <div class="text-center mb-3">
               <h1 class="text-3xl font-black text-[#004aad] tracking-widest uppercase">SRI RAM ENTERPRISES</h1>
@@ -226,7 +228,7 @@
               </div>
               <div class="text-right">
                 <p>GSTIN: 20APOPK6864K1ZH</p>
-                <p>Ph: 9334765000, 9334237111</p>
+                <p>Ph: 9334765000, 9334237111, 9335136000</p>
               </div>
             </div>
           </div>
@@ -242,8 +244,9 @@
               <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">Date</span><span class="mx-1">:</span><span id="inv-date" class="border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-black border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">Mobile</span><span class="mx-1">:</span><span id="inv-cust-phone" class="font-mono border-b border-dotted border-slate-400 flex-1"></span></div>
+              <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="border-b border-dotted border-slate-400 flex-1 font-medium"></span></div>
+              <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">GSTIN</span><span class="mx-1">:</span><span id="inv-cust-gstin" class="font-mono uppercase border-b border-dotted border-slate-400 flex-1 font-bold"></span></div>
             </div>
-            <div class="flex items-center mt-2"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="border-b border-dotted border-slate-400 flex-1 font-medium"></span></div>
           </div>
 
           <!-- EXACT 8 ROWS TABLE -->
@@ -309,6 +312,7 @@
     let billsCache = []; // Strictly in-memory, no localStorage leak.
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
 
+    // CUSTOM POPUP FUNCTION (Fix: i & iv)
     function showPopup(title, msg, isError = false) {
       document.getElementById("popup-title").innerText = title;
       document.getElementById("popup-message").innerText = msg;
@@ -317,20 +321,22 @@
       document.getElementById("center-popup").classList.remove("hidden");
     }
 
+    // SAFE COMPRESSION FOR QR URL
     function compressBill(b) {
         const min = {
-            i: b.invoiceNo, d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress,
+            i: b.invoiceNo, d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress, cg: b.customerGstin,
             it: b.items.filter(x=>x).map(x => [x.name, x.imei, x.qty, x.rate, x.amount]),
             gt: b.grandTotal, tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount
         };
         return btoa(encodeURIComponent(JSON.stringify(min)));
     }
 
+    // SAFE EXPANSION FOR QR URL (Handles space/+ bug)
     function expandBill(str) {
         const b64 = str.replace(/ /g, '+');
         const min = JSON.parse(decodeURIComponent(atob(b64)));
         return {
-            invoiceNo: min.i, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a,
+            invoiceNo: min.i, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg,
             items: min.it.map(x => ({name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4]})),
             grandTotal: min.gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td
         };
@@ -370,6 +376,11 @@
       document.getElementById("repair-box").classList.toggle("hidden", type !== "REPAIRING");
       document.getElementById("items-container").innerHTML = "";
       
+      document.getElementById("cust-name").value = "";
+      document.getElementById("cust-phone").value = "";
+      document.getElementById("cust-address").value = "";
+      document.getElementById("cust-gstin").value = "";
+
       ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
@@ -556,7 +567,7 @@
     }
 
     function saveBill() {
-      let name = "", phone = "", address = "";
+      let name = "", phone = "", address = "", gstin = "";
       if (currentBillType === "REPAIRING") {
         phone = document.getElementById("rep-phone").value.trim(); name = "Repair Customer";
         if(phone.length !== 10) return showPopup("Error", "10 अंकों का मोबाइल नंबर डालें!", true);
@@ -564,6 +575,7 @@
         name = document.getElementById("cust-name").value.trim() || "Customer";
         phone = document.getElementById("cust-phone").value.trim();
         address = document.getElementById("cust-address").value.trim() || "-";
+        gstin = document.getElementById("cust-gstin").value.trim().toUpperCase() || "-";
         if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       }
 
@@ -637,7 +649,7 @@
       const billData = {
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
-        billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, items,
+        billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
         paymentMode: s || p, paymentBreakdown: paymentBreakdown,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
@@ -661,6 +673,7 @@
       document.getElementById("inv-cust-name").innerText = bill.customerName;
       document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
       document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
+      document.getElementById("inv-cust-gstin").innerText = bill.customerGstin || "-";
 
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
@@ -691,7 +704,7 @@
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
 
       document.getElementById("inv-qr-container").innerHTML = "";
-      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 70, height: 70, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
       showView("invoice");
     }
 
@@ -704,35 +717,32 @@
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
       
-      // FIX (ii): PDF Header Layout Left/Right Balance
       doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(...blue); 
       doc.text("SRI RAM ENTERPRISES", 105, 22, { align: "center" });
       
-      doc.setFillColor(...blue); doc.roundedRect(65, 25, 80, 4.5, 1, 1, "F");
+      doc.setFillColor(...blue); doc.roundedRect(65, 24, 80, 4.5, 1, 1, "F");
       doc.setFontSize(8); doc.setTextColor(255, 255, 255);
-      doc.text("MOBILE • ACCESSORIES • REPAIRING", 105, 28.5, { align: "center" });
+      doc.text("MOBILE • ACCESSORIES • REPAIRING", 105, 27.5, { align: "center" });
 
-      // Left Address
-      doc.setFontSize(9); doc.setTextColor(...dark); 
-      doc.text("GB-15, CITY CENTRE, SECTOR-4", 20, 35);
-      doc.text("B.S. CITY (NEAR INDIAN BANK)", 20, 39);
+      doc.setFontSize(8); doc.setTextColor(70, 70, 70); 
+      doc.text("GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)", 105, 32.5, { align: "center" });
+      doc.setTextColor(...dark); doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);
       
-      // Right GSTIN & Phone
       doc.text("GSTIN: 20APOPK6864K1ZH", 190, 35, { align: "right" });
-      doc.text("Ph: 9334765000, 9334237111", 190, 39, { align: "right" });
+      doc.text("Ph: 9334765000, 9334237111, 9335136000", 190, 39, { align: "right" });
       
       doc.setFillColor(...blue); doc.rect(15, 41, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("TAX INVOICE", 105, 45.5, { align: "center" });
 
-      // FIX (iii): Exact Alignment equivalent for PDF
       doc.setTextColor(...dark); doc.setFontSize(8.5);
-      doc.text("Invoice No. :", 20, 52); doc.setFont("helvetica", "bold"); doc.text(b.invoiceNo, 40, 52);
-      doc.setFont("helvetica", "normal"); doc.text("Date :", 140, 52); doc.setFont("helvetica", "bold"); doc.text(b.billDate, 155, 52);
+      doc.text("Invoice No.", 20, 52); doc.text(":", 40, 52); doc.setFont("helvetica", "bold"); doc.text(b.invoiceNo, 43, 52);
+      doc.setFont("helvetica", "normal"); doc.text("Date", 140, 52); doc.text(":", 152, 52); doc.setFont("helvetica", "bold"); doc.text(b.billDate, 155, 52);
       
-      doc.setFont("helvetica", "normal"); doc.text("Name :", 20, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerName, 40, 58);
-      doc.setFont("helvetica", "normal"); doc.text("Mobile :", 140, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerMobile || "-", 155, 58);
+      doc.setFont("helvetica", "normal"); doc.text("Name", 20, 58); doc.text(":", 40, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerName, 43, 58);
+      doc.setFont("helvetica", "normal"); doc.text("Mobile", 140, 58); doc.text(":", 152, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerMobile || "-", 155, 58);
       
-      doc.setFont("helvetica", "normal"); doc.text("Address :", 20, 64); doc.setFont("helvetica", "bold"); doc.text(b.customerAddress || "-", 40, 64);
+      doc.setFont("helvetica", "normal"); doc.text("Address", 20, 64); doc.text(":", 40, 64); doc.setFont("helvetica", "bold"); doc.text(b.customerAddress || "-", 43, 64);
+      doc.setFont("helvetica", "normal"); doc.text("GSTIN", 140, 64); doc.text(":", 152, 64); doc.setFont("helvetica", "bold"); doc.text(b.customerGstin || "-", 155, 64);
 
       let y = 70;
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
@@ -773,7 +783,6 @@
       doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       
-      // FIX (i) GST Logic PDF
       let rY = y;
       let breakdown = [ {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
       if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: Number(b.totalDiscount).toLocaleString("en-IN")});
@@ -789,7 +798,6 @@
       });
       doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN"), 192, rY+6, {align:"right"});
 
-      // FIX (v) E-bill format NO SIGNATURES
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
 
@@ -802,7 +810,6 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      // FIX (iv): Auto Decode from QR URL
       const scanParam = new URLSearchParams(window.location.search).get("scan");
       if (scanParam) {
           try {
