@@ -101,7 +101,10 @@
 
       <!-- ITEMS -->
       <div id="items-box" class="space-y-2.5">
-        <div class="flex justify-between"><h3 class="font-bold text-xs uppercase">Products</h3><button onclick="addNewItemRow()" class="text-xs font-bold text-[#004aad] bg-blue-50 px-3 py-1 rounded border border-blue-200">+ Add</button></div>
+        <div class="flex justify-between items-end">
+          <h3 class="font-bold text-xs uppercase text-slate-800">Products</h3>
+          <button onclick="addNewItemRow()" class="text-xs font-bold text-[#004aad] bg-blue-50 px-3 py-1 rounded border border-blue-200">+ Add Item</button>
+        </div>
         <div id="items-container" class="space-y-2.5"></div>
       </div>
 
@@ -109,7 +112,6 @@
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-2 gap-2.5">
           <div><label class="text-[10px] font-bold text-slate-600">Primary Mode</label>
-            <!-- onPrimaryModeChange() लगाया गया है ताकि प्राइमरी बदलते ही सेकेंडरी रीसेट हो जाए -->
             <select id="pay-primary" onchange="onPrimaryModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR (Paytm/PhonePe)</option>
@@ -132,9 +134,9 @@
           <div class="grid grid-cols-2 gap-2 mb-2">
             <input type="text" id="fin-company" placeholder="Fin Company" class="p-1.5 border rounded text-xs font-bold outline-none" />
             <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border rounded text-xs font-bold outline-none">
-              <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
-              <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
+              <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
+              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
+              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
           </div>
           <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden mb-2">
@@ -152,9 +154,9 @@
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
           <div class="mb-2">
             <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
-              <option value="Cash">Token Cash</option><option value="QR">Token QR</option><option value="Card">Token Card</option>
-              <option value="Cash + QR">Token Cash + QR</option><option value="Cash + Card">Token Cash + Card</option>
-              <option value="QR + Card">Token QR + Card</option><option value="Cash + QR + Card">Token Cash + QR + Card</option>
+              <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
+              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
+              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
@@ -172,7 +174,7 @@
         </div>
 
         <div>
-          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
+          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid / Advance (Rs.) *</label>
           <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none" />
         </div>
       </div>
@@ -188,7 +190,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN (NO PAID/DUE/MODE) -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - NO PAID/DUE/MODE IN PDF -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -263,7 +265,6 @@
               </div>
             </div>
 
-            <!-- CLEAN TOTAL BOX (NO PAID, NO DUE) -->
             <div class="w-60 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]">
                 <div class="flex justify-between p-1.5"><span>Subtotal</span><span id="inv-calc-subtotal" class="font-black">Rs. 0</span></div>
@@ -358,9 +359,16 @@
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
       if (currentBillType !== "MOBILE") { imeiBox.innerHTML = ""; return; }
-      const qty = Math.max(1, Number(row.querySelector(".item-qty").value) || 1);
+      
+      const existingImeis = Array.from(imeiBox.querySelectorAll(".item-imei")).map(inp => inp.value);
+      let qty = Math.max(1, Number(row.querySelector(".item-qty").value) || 1);
+      if (qty > 10) qty = 10; 
+      
       let html = '<div class="grid grid-cols-2 gap-2 mt-2">';
-      for(let i=1; i<=qty; i++){ html += `<input type="text" maxlength="15" placeholder="IMEI ${i} *" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none" />`; }
+      for(let i=0; i < qty; i++){ 
+        const val = existingImeis[i] || "";
+        html += `<input type="text" maxlength="15" value="${val}" placeholder="IMEI ${i+1} (15 अंक) *" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none" />`; 
+      }
       html += '</div>';
       imeiBox.innerHTML = html;
     }
@@ -368,11 +376,12 @@
     function addNewItemRow() {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
-      div.className = "item-row p-2.5 bg-slate-50 rounded-xl border";
+      div.className = "item-row relative p-2.5 bg-slate-50 rounded-xl border";
       div.innerHTML = `
-        <input type="text" placeholder="Product Name *" class="item-name w-full p-1.5 border rounded text-xs font-bold outline-none" />
+        <button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-3 text-rose-600 font-bold text-xs">X Remove</button>
+        <input type="text" placeholder="Product Name *" class="item-name w-3/4 p-1.5 border rounded text-xs font-bold outline-none" />
         <div class="grid grid-cols-4 gap-2 mt-2">
-          <input type="number" min="1" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty p-1.5 border rounded text-xs font-bold outline-none" />
           <input type="number" placeholder="Rate *" oninput="recalcTotals()" class="item-rate p-1.5 border rounded text-xs font-bold outline-none" />
           <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-1.5 border rounded text-xs outline-none" />
           <select class="item-gst p-1.5 border rounded text-xs font-bold outline-none" onchange="recalcTotals()"><option value="18">18% GST</option><option value="12">12% GST</option><option value="0">0% GST</option></select>
@@ -385,7 +394,6 @@
 
     function handleQtyChange(input) { renderItemImeis(input.closest(".item-row")); recalcTotals(); }
 
-    // Naya Function: Primary Mode Badalte hi Secondary Reset ho jayega
     function onPrimaryModeChange() {
       document.getElementById("pay-secondary").value = "";
       onPaymentModeChange();
@@ -438,8 +446,6 @@
       recalcTotals();
     }
 
-    function handleDuesChange() { document.getElementById("pay-paid").value = Number(document.getElementById("dues-token").value) || 0; recalcTotals(); }
-    
     function calcDuesSplit() {
       const dMode = document.getElementById("dues-mode").value;
       let t = 0;
@@ -457,10 +463,6 @@
       if(p.includes("QR")) paid += Number(document.getElementById("split-qr").value) || 0;
       if(p.includes("Card")) paid += Number(document.getElementById("split-card").value) || 0;
       document.getElementById("pay-paid").value = paid;
-      recalcTotals();
-    }
-
-    function handleFinanceChange() {
       recalcTotals();
     }
 
@@ -515,13 +517,30 @@
         items = [{ name: document.getElementById("rep-device").value.trim(), imei: document.getElementById("rep-issue").value.trim(), qty: 1, rate: totals.grand, amount: totals.grand }];
       } else {
         let err = false;
+        let imeiErr = false;
         document.querySelectorAll(".item-row").forEach(r => {
           const pName = r.querySelector(".item-name").value.trim();
           if(!pName) err = true;
-          const imeis = Array.from(r.querySelectorAll(".item-imei")).map(i => i.value).filter(v=>v).join(", ");
-          items.push({ name: pName, imei: imeis, qty: Number(r.querySelector(".item-qty").value)||1, rate: Number(r.querySelector(".item-rate").value)||0, amount: Math.max(0, (Number(r.querySelector(".item-qty").value)||1)*(Number(r.querySelector(".item-rate").value)||0)-Number(r.querySelector(".item-disc").value)||0) });
+          
+          let validImeis = [];
+          if(currentBillType === "MOBILE"){
+            Array.from(r.querySelectorAll(".item-imei")).forEach(inp => {
+               const val = inp.value.trim();
+               if(val.length !== 15) imeiErr = true;
+               validImeis.push(val);
+            });
+          }
+          
+          items.push({ 
+            name: pName, 
+            imei: validImeis.join(", "), 
+            qty: Number(r.querySelector(".item-qty").value)||1, 
+            rate: Number(r.querySelector(".item-rate").value)||0, 
+            amount: Math.max(0, (Number(r.querySelector(".item-qty").value)||1)*(Number(r.querySelector(".item-rate").value)||0)-Number(r.querySelector(".item-disc").value)||0) 
+          });
         });
-        if(err) return alert("प्रोडक्ट नाम भरें!");
+        if(err) return alert("प्रोडक्ट नाम भरना अनिवार्य है!");
+        if(imeiErr) return alert("IMEI नंबर पूरे 15 अंकों का होना चाहिए!");
       }
 
       let cashAmt = 0, qrAmt = 0, cardAmt = 0;
@@ -610,7 +629,6 @@
 
     function openSavedBill(token) { displayInvoice(billsCache.find(x => x.token === token)); }
 
-    // CLEAN VECTOR PDF (NO PAID, NO DUE, NO PAYMENT MODE)
     function downloadVectorPDF() {
       if (!activeInvoiceData) return;
       const { jsPDF } = window.jspdf;
@@ -649,11 +667,9 @@
         if (item) {
           doc.setFont("helvetica", "bold"); doc.text(String(item.name).substring(0,24), 28, y+5);
           doc.setFont("helvetica", "normal"); 
-          
           const imeiStr = String(item.imei || "-");
           doc.setFontSize(imeiStr.length > 18 ? 6 : 7.5);
           doc.text(imeiStr.substring(0, 42), 87, y+4.5);
-          
           doc.setFontSize(8); doc.text(String(item.qty), 141, y+5, { align:"center" });
           doc.text(String(item.rate), 165, y+5, { align:"right" });
           doc.setFont("helvetica", "bold"); doc.text(String(item.amount), 192, y+5, { align:"right" });
