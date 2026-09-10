@@ -64,12 +64,45 @@
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">COLLECTION</span><p id="dash-paid" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p></div>
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TOTAL DUE</span><p id="dash-due" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
       </div>
-      <div class="grid grid-cols-3 gap-2.5">
-        <button onclick="startNewBill('MOBILE')" class="p-3 bg-[#004aad] text-white rounded-xl shadow font-bold text-xs">📱 Mobile Sale</button>
-        <button onclick="startNewBill('ACCESSORIES')" class="p-3 bg-indigo-900 text-white rounded-xl shadow font-bold text-xs">🎧 Accessories</button>
-        <button onclick="startNewBill('REPAIRING')" class="p-3 bg-slate-800 text-white rounded-xl shadow font-bold text-xs">🔧 Repairing</button>
+      
+      <!-- FIXED: NEW DASHBOARD BUTTONS (SALE, PURCHASE, PAYMENT, RECEIPT) -->
+      <div class="space-y-2.5">
+        
+        <!-- SALE ENTRY -->
+        <div>
+          <button onclick="toggleMenu('menu-sale')" class="w-full p-3 bg-[#004aad] text-white rounded-xl shadow font-black text-sm flex justify-between items-center border border-blue-800">
+            <span class="flex items-center space-x-2.5"><span class="text-lg">🛒</span><span>SALE ENTRY</span></span>
+            <span id="arrow-menu-sale">▼</span>
+          </button>
+          <div id="menu-sale" class="hidden grid grid-cols-3 gap-2 mt-2">
+            <button onclick="startNewBill('MOBILE', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">📱 Mobile</button>
+            <button onclick="startNewBill('ACCESSORIES', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">🎧 Accessories</button>
+            <button onclick="startNewBill('REPAIRING', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">🔧 Repairing</button>
+          </div>
+        </div>
+
+        <!-- PURCHASE ENTRY -->
+        <div>
+          <button onclick="toggleMenu('menu-purchase')" class="w-full p-3 bg-indigo-800 text-white rounded-xl shadow font-black text-sm flex justify-between items-center border border-indigo-900">
+            <span class="flex items-center space-x-2.5"><span class="text-lg">📦</span><span>PURCHASE ENTRY</span></span>
+            <span id="arrow-menu-purchase">▼</span>
+          </button>
+          <div id="menu-purchase" class="hidden grid grid-cols-3 gap-2 mt-2">
+            <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">📱 Mobile</button>
+            <button onclick="startNewBill('ACCESSORIES', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">🎧 Accessories</button>
+            <button onclick="startNewBill('REPAIRING', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">🔧 Repairing</button>
+          </div>
+        </div>
+
+        <!-- PAYMENT & RECEIPT -->
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="p-3 bg-rose-600 text-white rounded-xl shadow font-black text-sm border border-rose-800 flex items-center justify-center space-x-1.5"><span class="text-lg">💸</span><span>PAYMENT</span></button>
+          <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="p-3 bg-emerald-600 text-white rounded-xl shadow font-black text-sm border border-emerald-800 flex items-center justify-center space-x-1.5"><span class="text-lg">🧾</span><span>RECEIPT</span></button>
+        </div>
+
       </div>
-      <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+
+      <div class="bg-white rounded-xl shadow-sm border overflow-hidden mt-3">
         <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs">Current Session Invoices</div>
         <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto"></div>
       </div>
@@ -92,7 +125,6 @@
         <div><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
-      <!-- FIXED: REPAIR CHARGE REMOVED -->
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="grid grid-cols-2 gap-2.5">
           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Customer Mobile *</label><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Mobile No" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
@@ -245,7 +277,7 @@
             </div>
           </div>
 
-          <div class="bg-blue-50 text-[#004aad] font-black text-center py-1.5 text-[13px] tracking-[0.3em] uppercase my-3 border border-blue-200 rounded">
+          <div id="inv-header-title" class="bg-blue-50 text-[#004aad] font-black text-center py-1.5 text-[13px] tracking-[0.3em] uppercase my-3 border border-blue-200 rounded">
             TAX INVOICE
           </div>
 
@@ -313,11 +345,26 @@
   </main>
 
   <script>
+    let currentEntryType = "SALE";
     let currentBillType = "MOBILE";
     let activeInvoiceData = null;
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
+
+    function toggleMenu(id) {
+       ['menu-sale', 'menu-purchase'].forEach(m => {
+          const el = document.getElementById(m);
+          const arrow = document.getElementById('arrow-' + m);
+          if (m === id) {
+             el.classList.toggle('hidden');
+             arrow.innerText = el.classList.contains('hidden') ? '▼' : '▲';
+          } else {
+             el.classList.add('hidden');
+             document.getElementById('arrow-' + m).innerText = '▼';
+          }
+       });
+    }
 
     function showPopup(title, msg, isError = false, billToDisplay = null) {
       document.getElementById("popup-title").innerText = title;
@@ -363,7 +410,8 @@
             b.due, 
             [b.paymentBreakdown.cash, b.paymentBreakdown.qr, b.paymentBreakdown.card], 
             b.finance ? b.finance.company : "", 
-            b.paymentRate 
+            b.paymentRate,
+            b.billType // FIXED: Store full bill type to remember if it was SALE or PURCHASE
         ];
         const jsonStr = JSON.stringify(min);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
@@ -377,7 +425,9 @@
         
         if (Array.isArray(min)) {
             const yr = String(min[1] || "").slice(-2) || "26";
-            const invNo = `SRE-20${yr}-${String(min[0] || "0").padStart(3, '0')}`;
+            const isPurchase = min[16] ? min[16].includes("PURCHASE") : false;
+            const prefix = isPurchase ? "PUR" : "SRE";
+            const invNo = `${prefix}-20${yr}-${String(min[0] || "0").padStart(3, '0')}`;
             let gt = Math.round(Number(min[6]) + Number(min[7]));
             
             return {
@@ -387,7 +437,7 @@
                 paymentMode: min[10] || "Cash", paid: min[11] !== undefined ? min[11] : gt, due: min[12] || 0,
                 paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
                 finance: min[14] ? { company: min[14], dp: min[11], loan: min[12] } : null,
-                paymentRate: min[15] || ""
+                paymentRate: min[15] || "", billType: min[16] || "SALE - MOBILE"
             };
         } 
         else {
@@ -408,7 +458,7 @@
                     rate: x.length === 4 ? (x[2] > 0 ? Number((x[3]/x[2]).toFixed(2)) : 0) : x[3], 
                     amount: x.length === 4 ? x[3] : x[4]
                 })),
-                grandTotal: gt, totalTaxable: min.tx || 0, totalGst: min.tg || 0, totalDiscount: min.td || 0, paymentRate: min.pr || "", gstSlab: min.gs !== undefined ? Number(min.gs) : 0
+                grandTotal: gt, totalTaxable: min.tx || 0, totalGst: min.tg || 0, totalDiscount: min.td || 0, paymentRate: min.pr || "", gstSlab: min.gs !== undefined ? Number(min.gs) : 0, billType: "SALE - MOBILE"
             };
         }
     }
@@ -446,8 +496,10 @@
         billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-xs">${b.customerName}</p></div><div class="font-black text-xs">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}</div></div>`).join("");
     }
 
-    function startNewBill(type) {
+    function startNewBill(type, entryType = currentEntryType) {
       currentBillType = type;
+      currentEntryType = entryType;
+      
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
       document.getElementById("cust-box").classList.toggle("hidden", type === "REPAIRING");
       document.getElementById("items-box").classList.toggle("hidden", type === "REPAIRING");
@@ -480,15 +532,16 @@
 
       if(type !== "REPAIRING") addNewItemRow(true);
       
+      // FIXED: GENERATE PROPER INVOICE PREFIX BASED ON SALE OR PURCHASE
+      const prefix = entryType === "PURCHASE" ? "PUR" : "SRE";
       const year = new Date().getFullYear();
-      document.getElementById("form-invoice-no").innerText = `SRE-${year}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
+      document.getElementById("form-invoice-no").innerText = `${prefix}-${year}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
       recalcTotals();
       showView("new-bill");
     }
 
-    function changeBillType(type) { startNewBill(type); }
+    function changeBillType(type) { startNewBill(type, currentEntryType); }
 
-    // FIXED: RENDER IMEI OR SERIAL NO BASED ON BILL TYPE
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
       if (currentBillType === "REPAIRING") { imeiBox.innerHTML = ""; return; }
@@ -609,7 +662,6 @@
       recalcTotals();
     }
 
-    // FIXED: UNIFIED GRAND TOTAL CALCULATION (Repairing uses main payment UI too)
     function recalcTotals() {
       let rawPaid = 0;
       const s = document.getElementById("pay-secondary").value;
@@ -797,7 +849,8 @@
       const billData = {
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: formattedDate,
-        billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
+        billType: `${currentEntryType} - ${currentBillType}`, // FIXED: SALE or PURCHASE
+        customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
         paymentMode: s_val || p_val, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
@@ -835,6 +888,10 @@
       document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
       document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
       document.getElementById("inv-cust-gstin").innerText = bill.customerGstin || "-";
+
+      // FIXED: HEADER TEXT CHANGES IF IT IS A PURCHASE VOUCHER
+      const isPur = bill.billType && bill.billType.includes("PURCHASE");
+      document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : "TAX INVOICE";
 
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
@@ -904,7 +961,11 @@
       doc.text("Ph: 9334765000, 9334237111, 9335136000", 190, 40.5, { align: "right" });
       
       doc.setFillColor(...blue); doc.rect(15, 45, 180, 6.5, "F");
-      doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("TAX INVOICE", 105, 49.5, { align: "center" });
+      doc.setTextColor(255, 255, 255); doc.setFontSize(9); 
+      
+      // FIXED: PDF TITLE CHANGES IF IT IS A PURCHASE VOUCHER
+      const isPur = b.billType && b.billType.includes("PURCHASE");
+      doc.text(isPur ? "PURCHASE VOUCHER" : "TAX INVOICE", 105, 49.5, { align: "center" });
 
       let y = 57;
       doc.setTextColor(...dark); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
