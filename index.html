@@ -82,7 +82,6 @@
 
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
         <div><label class="text-[10px] font-bold text-slate-600">Customer Name *</label><input type="text" id="cust-name" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
-        <!-- FIXED: STRICTLY NUMBERS ONLY -->
         <div><label class="text-[10px] font-bold text-slate-600">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">Address *</label><input type="text" id="cust-address" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
@@ -90,16 +89,12 @@
 
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="grid grid-cols-2 gap-2.5">
-          <!-- FIXED: STRICTLY NUMBERS ONLY -->
           <input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="कस्टमर मोबाइल *" class="p-2 border rounded text-xs font-bold outline-none" />
           <input type="text" id="rep-device" placeholder="डिवाइस / मॉडल *" class="p-2 border rounded text-xs font-bold outline-none" />
         </div>
         <textarea id="rep-issue" rows="2" placeholder="समस्या विवरण..." class="w-full p-2 border rounded text-xs outline-none"></textarea>
         <div class="flex space-x-2">
-          <input type="number" id="rep-charge" placeholder="Repair Charge (Rs.) *" oninput="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-black outline-none" />
-          <select id="rep-gst" onchange="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-bold outline-none">
-            <option value="0">0% GST</option><option value="5">5% GST</option><option value="12">12% GST</option><option value="18" selected>18% GST</option><option value="28">28% GST</option>
-          </select>
+          <input type="number" id="rep-charge" placeholder="Repair Charge (Rs.) *" oninput="recalcTotals()" class="w-full p-2 border border-amber-400 rounded text-xs font-black outline-none" />
         </div>
       </div>
 
@@ -124,7 +119,7 @@
               <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
             </select>
           </div>
-          <div><label class="text-[10px] font-bold text-rose-700">Secondary Mode</label>
+          <div><label class="text-[10px] font-bold text-slate-600">Secondary Mode</label>
             <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2 border border-rose-200 rounded text-xs font-bold outline-none">
               <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Udhar</option>
             </select>
@@ -137,7 +132,6 @@
           <input type="number" id="split-card" placeholder="Card Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
         </div>
 
-        <!-- FIXED: FINANCE WITH DROPDOWN AND RATE -->
         <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-3 gap-2 mb-2">
             <select id="fin-company" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
@@ -162,7 +156,6 @@
           </div>
         </div>
 
-        <!-- FIXED: DUES WITH RATE -->
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-2 gap-2 mb-2">
             <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
@@ -179,9 +172,27 @@
           </div>
         </div>
 
-        <div>
+        <!-- GLOBAL DISCOUNT & GST -->
+        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 block mb-1">Global Discount (Rs.)</label>
+            <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none" placeholder="Discount Amount" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 block mb-1">Bill GST Slab</label>
+            <select id="global-gst" onchange="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none">
+              <option value="0">0% GST</option>
+              <option value="5">5% GST</option>
+              <option value="12">12% GST</option>
+              <option value="18" selected>18% GST</option>
+              <option value="28">28% GST</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-2">
           <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
-          <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none bg-white" placeholder="Enter Amount..." />
+          <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border border-emerald-400 rounded-lg font-black text-emerald-700 text-sm outline-none bg-emerald-50" placeholder="Enter Amount..." />
         </div>
 
         <div id="finance-loan-row" class="hidden mt-2 flex justify-between items-center text-[11px] font-bold text-[#004aad] bg-blue-100 px-3 py-2 rounded-lg border border-blue-300">
@@ -200,7 +211,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE -->
+    <!-- VIEW 3: INVOICE (BEAUTIFUL PROFESSIONAL E-BILL) -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -247,6 +258,7 @@
             </div>
           </div>
 
+          <!-- FIXED: RATE RESTORED IN INVOICE TABLE -->
           <div class="mt-3">
             <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
               <thead>
@@ -321,6 +333,7 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
+    // FIXED: COMPRESS RATE
     function compressBill(b) {
         const min = {
             i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-5), 
@@ -333,6 +346,7 @@
         return encodeURIComponent(base64);
     }
 
+    // FIXED: EXPAND RATE
     function expandBill(str) {
         const base64 = decodeURIComponent(str);
         const jsonStr = decodeURIComponent(escape(atob(base64)));
@@ -390,12 +404,13 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("cust-gstin").value = "";
 
-      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate"].forEach(id => {
+      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
       });
       document.getElementById("pay-primary").value = "Cash";
       document.getElementById("pay-secondary").value = "";
+      document.getElementById("global-gst").value = "18";
       onPaymentModeChange();
 
       if(type !== "REPAIRING") addNewItemRow(true);
@@ -438,17 +453,9 @@
       div.innerHTML = `
         ${removeBtn}
         <input type="text" placeholder="Product Name *" class="item-name w-3/4 p-1.5 border rounded text-xs font-bold outline-none" />
-        <div class="grid grid-cols-4 gap-2 mt-2">
+        <div class="grid grid-cols-2 gap-2 mt-2">
           <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" placeholder="Rate *" oninput="recalcTotals()" class="item-rate p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-1.5 border rounded text-xs outline-none" />
-          <select class="item-gst p-1.5 border rounded text-xs font-bold outline-none" onchange="recalcTotals()">
-            <option value="0">0% GST</option>
-            <option value="5">5% GST</option>
-            <option value="12">12% GST</option>
-            <option value="18" selected>18% GST</option>
-            <option value="28">28% GST</option>
-          </select>
+          <input type="number" placeholder="Amount (Rs.) *" oninput="recalcTotals()" class="item-amount p-1.5 border rounded text-xs font-bold outline-none" />
         </div>
         <div class="item-imeis-box"></div>
       `;
@@ -517,23 +524,23 @@
     function recalcTotals() {
       let grand = 0, totalTaxable = 0, totalGst = 0, totalDiscount = 0;
 
+      const globalDisc = Number(document.getElementById("global-discount").value) || 0;
+      const globalGstRate = Number(document.getElementById("global-gst").value) || 0;
+
       if (currentBillType === "REPAIRING") {
         grand = Number(document.getElementById("rep-charge").value) || 0;
-        const gstRate = Number(document.getElementById("rep-gst").value) || 0;
-        totalTaxable = grand / (1 + (gstRate/100));
-        totalGst = grand - totalTaxable;
       } else {
         document.querySelectorAll(".item-row").forEach(r => {
-          const q = Number(r.querySelector(".item-qty").value) || 1;
-          const rate = Number(r.querySelector(".item-rate").value) || 0;
-          const disc = Number(r.querySelector(".item-disc").value) || 0;
-          const gstRate = Number(r.querySelector(".item-gst").value) || 0;
-          const lineTotal = Math.max(0, (q * rate) - disc);
-          grand += lineTotal; totalDiscount += disc;
-          const taxable = lineTotal / (1 + (gstRate/100));
-          totalTaxable += taxable; totalGst += (lineTotal - taxable);
+          grand += Number(r.querySelector(".item-amount").value) || 0;
         });
       }
+
+      totalDiscount = globalDisc;
+      grand = Math.max(0, grand - totalDiscount);
+      
+      totalTaxable = grand / (1 + (globalGstRate/100));
+      totalGst = grand - totalTaxable;
+
       grand = Math.round(grand);
 
       const s = document.getElementById("pay-secondary").value;
@@ -608,10 +615,15 @@
                validImeis.push(val);
             });
           }
+          
+          // FIXED: CALCULATE RATE AUTOMATICALLY
+          const q = Number(r.querySelector(".item-qty").value)||1;
+          const amt = Math.max(0, Number(r.querySelector(".item-amount").value)||0);
+          const computedRate = q > 0 ? Number((amt / q).toFixed(2)) : 0;
+
           items.push({ 
             name: pName, imei: validImeis.join(", "), 
-            qty: Number(r.querySelector(".item-qty").value)||1, rate: Number(r.querySelector(".item-rate").value)||0, 
-            amount: Math.max(0, (Number(r.querySelector(".item-qty").value)||1)*(Number(r.querySelector(".item-rate").value)||0)-Number(r.querySelector(".item-disc").value)||0) 
+            qty: q, rate: computedRate, amount: amt 
           });
         });
         if(err) return showPopup("Validation Error", "प्रोडक्ट नाम भरना अनिवार्य है!", true);
@@ -705,6 +717,7 @@
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
+          // FIXED: RATE RESTORED IN HTML TABLE
           tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1.5 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1.5 border border-[#004aad] font-mono text-[9px] text-slate-700 break-all">${it.imei}</td><td class="p-1.5 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1.5 border border-[#004aad] text-right font-semibold">${Number(it.rate).toLocaleString("en-IN")}</td><td class="p-1.5 border border-[#004aad] text-right font-black text-slate-950">${Number(it.amount).toLocaleString("en-IN")}</td></tr>`;
         } else {
           tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center text-slate-300">${i+1}</td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td></tr>`;
@@ -718,7 +731,7 @@
       const bd = document.getElementById("inv-total-breakdown");
       let bdHtml = `<div class="flex justify-between p-1.5"><span>Subtotal</span><span class="font-black">Rs. ${subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       if(Number(bill.totalDiscount) > 0) {
-        bdHtml += `<div class="flex justify-between p-1.5"><span>Discount</span><span>${Number(bill.totalDiscount).toLocaleString("en-IN")}</span></div>`;
+        bdHtml += `<div class="flex justify-between p-1.5"><span>Discount</span><span>-${Number(bill.totalDiscount).toLocaleString("en-IN")}</span></div>`;
       }
       if(gst > 0) {
         bdHtml += `<div class="flex justify-between p-1.5 text-slate-700"><span>Taxable Value</span><span>Rs. ${Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
@@ -775,14 +788,25 @@
       y += 8;
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(8);
-      doc.text("S.No", 19, y+4.5); doc.text("Brand / Product", 35, y+4.5); doc.text("Model / IMEI", 95, y+4.5);
-      doc.text("Qty.", 138, y+4.5); doc.text("Rate", 154, y+4.5); doc.text("Amount", 177, y+4.5);
+      
+      // FIXED: RATE RESTORED IN PDF
+      doc.text("S.No", 19, y+4.5); 
+      doc.text("Brand / Product", 35, y+4.5); 
+      doc.text("Model / IMEI", 95, y+4.5); 
+      doc.text("Qty.", 138, y+4.5); 
+      doc.text("Rate", 154, y+4.5);
+      doc.text("Amount", 177, y+4.5);
 
       y += 6.5; doc.setDrawColor(...blue); doc.setLineWidth(0.3);
       for (let i = 0; i < 8; i++) {
         const item = b.items[i];
         doc.rect(15, y, 180, 7.5);
-        doc.line(26, y, 26, y + 7.5); doc.line(85, y, 85, y + 7.5); doc.line(134, y, 134, y + 7.5); doc.line(148, y, 148, y + 7.5); doc.line(168, y, 168, y + 7.5);
+        doc.line(26, y, 26, y + 7.5); 
+        doc.line(85, y, 85, y + 7.5); 
+        doc.line(134, y, 134, y + 7.5); 
+        doc.line(148, y, 148, y + 7.5); 
+        doc.line(168, y, 168, y + 7.5); 
+        
         doc.setTextColor(...dark); doc.setFontSize(8); doc.text(String(i+1), 20.5, y+5, { align:"center" });
         if (item) {
           doc.setFont("helvetica", "bold"); doc.text(String(item.name).substring(0,24), 28, y+5);
@@ -813,7 +837,7 @@
       
       let rY = y;
       let breakdown = [ {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
-      if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: Number(b.totalDiscount).toLocaleString("en-IN")});
+      if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: "-"+Number(b.totalDiscount).toLocaleString("en-IN")});
       if(Number(b.totalGst) > 0) {
           breakdown.push({l:"Taxable Value", v: Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})});
           breakdown.push({l:"CGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
