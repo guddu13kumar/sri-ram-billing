@@ -82,14 +82,16 @@
 
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
         <div><label class="text-[10px] font-bold text-slate-600">Customer Name *</label><input type="text" id="cust-name" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
+        <!-- FIXED: STRICTLY NUMBERS ONLY -->
+        <div><label class="text-[10px] font-bold text-slate-600">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">Address *</label><input type="text" id="cust-address" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label class="text-[10px] font-bold text-slate-600">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="grid grid-cols-2 gap-2.5">
-          <input type="tel" id="rep-phone" maxlength="10" placeholder="कस्टमर मोबाइल *" class="p-2 border rounded text-xs font-bold outline-none" />
+          <!-- FIXED: STRICTLY NUMBERS ONLY -->
+          <input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="कस्टमर मोबाइल *" class="p-2 border rounded text-xs font-bold outline-none" />
           <input type="text" id="rep-device" placeholder="डिवाइस / मॉडल *" class="p-2 border rounded text-xs font-bold outline-none" />
         </div>
         <textarea id="rep-issue" rows="2" placeholder="समस्या विवरण..." class="w-full p-2 border rounded text-xs outline-none"></textarea>
@@ -135,9 +137,18 @@
           <input type="number" id="split-card" placeholder="Card Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
         </div>
 
+        <!-- FIXED: FINANCE WITH DROPDOWN AND RATE -->
         <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input type="text" id="fin-company" placeholder="Fin Company Name" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <select id="fin-company" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
+              <option value="">-- Fin. Company --</option>
+              <option value="Kisto Pe">Kisto Pe</option>
+              <option value="Bajaj Finserv">Bajaj Finserv</option>
+              <option value="HDB Finance">HDB Finance</option>
+              <option value="TVS Credit">TVS Credit</option>
+              <option value="IDFC First Bank">IDFC First Bank</option>
+            </select>
+            <input type="number" id="fin-rate" placeholder="Rate (%)" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
             <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
               <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
               <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
@@ -151,13 +162,15 @@
           </div>
         </div>
 
+        <!-- FIXED: DUES WITH RATE -->
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
-          <div class="mb-2">
+          <div class="grid grid-cols-2 gap-2 mb-2">
             <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
               <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
               <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
               <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
+            <input type="number" id="dues-rate" placeholder="Rate (%)" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
             <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
@@ -187,7 +200,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BEAUTIFUL PROFESSIONAL E-BILL) -->
+    <!-- VIEW 3: INVOICE -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -313,7 +326,7 @@
             i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-5), 
             d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress, cg: b.customerGstin,
             it: b.items.filter(x=>x).map(x => [x.name.substring(0,25), x.imei.substring(0,40), x.qty, x.rate, x.amount]),
-            tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount
+            tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount, pr: b.paymentRate
         };
         const jsonStr = JSON.stringify(min);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
@@ -334,7 +347,7 @@
         return {
             invoiceNo: invNo, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg,
             items: min.it.map(x => ({name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4]})),
-            grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td
+            grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td, paymentRate: min.pr || ""
         };
     }
 
@@ -377,7 +390,7 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("cust-gstin").value = "";
 
-      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid"].forEach(id => {
+      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
       });
@@ -635,6 +648,8 @@
       }
 
       const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
+      const pRate = (s === "Finance") ? document.getElementById("fin-rate").value : (s === "Dues" ? document.getElementById("dues-rate").value : "");
+      
       const token = Math.random().toString(36).substring(2, 8).toUpperCase();
       let finData = null;
       if(s === "Finance"){
@@ -645,7 +660,7 @@
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
         billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
-        paymentMode: s || p, paymentBreakdown: paymentBreakdown,
+        paymentMode: s || p, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
         finance: finData, token: token
@@ -664,10 +679,11 @@
           fetch(gasUrl, { 
               method: "POST", 
               mode: "no-cors",
+              headers: { "Content-Type": "text/plain" },
               body: JSON.stringify({ action: "createBill", billData: billData }) 
           })
-          .then(() => { showPopup("Bill Generated", "Invoice generated and sent to Cloud Successfully!"); })
-          .catch(err => { showPopup("Sync Error", "Internet problem. Failed to sync to Cloud.", true); });
+          .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!"); })
+          .catch(err => { showPopup("Sync Error", "Bill generated locally, but failed to sync to Cloud.", true); });
       } else {
           showPopup("Bill Generated", "Invoice generated locally. Add Backend URL in settings to sync.");
       }
