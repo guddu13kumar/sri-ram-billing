@@ -24,11 +24,11 @@
       }
     }
     
-    /* Strict Table Alignment Rules - 100% ALIGNED NOW */
+    /* Strict Table Alignment Rules */
     .table-col-qty { width: 55px; text-align: center; }
     .table-col-rate { width: 75px; text-align: right; }
     .table-col-amt { width: 95px; text-align: right; }
-    .totals-box { width: 225px; min-width: 225px; } /* 55 + 75 + 95 = 225px */
+    .totals-box { width: 225px; min-width: 225px; } 
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -348,7 +348,7 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // 100% FIXED & COMPRESSED QR CODE DATA
+    // QR DATA COMPRESSION
     function compressBill(b) {
         const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
         const min = [
@@ -374,25 +374,50 @@
         return encodeURIComponent(base64);
     }
 
-    // EXPANDING COMPRESSED DATA
+    // 100% FIXED: SCANNER READS BOTH OLD AND NEW QR CODES WITHOUT ERROR
     function expandBill(str) {
         const base64 = decodeURIComponent(str);
         const jsonStr = decodeURIComponent(escape(atob(base64)));
         const min = JSON.parse(jsonStr);
         
-        const yr = min[1].slice(-2);
-        const invNo = `SRE-20${yr}-${String(min[0]).padStart(3, '0')}`;
-        let gt = Math.round(min[6] + min[7]);
-        
-        return {
-            invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
-            items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4] })),
-            grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] || 18,
-            paymentMode: min[10] || "Cash", paid: min[11] || gt, due: min[12] || 0,
-            paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
-            finance: min[14] ? { company: min[14], dp: min[11], loan: min[12] } : null,
-            paymentRate: min[15] || ""
-        };
+        // SUPPORT FOR NEW ARRAY FORMAT (Super Compressed)
+        if (Array.isArray(min)) {
+            const yr = String(min[1] || "").slice(-2) || "26";
+            const invNo = `SRE-20${yr}-${String(min[0] || "0").padStart(3, '0')}`;
+            let gt = Math.round(Number(min[6]) + Number(min[7]));
+            
+            return {
+                invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
+                items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4] })),
+                grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] || 18,
+                paymentMode: min[10] || "Cash", paid: min[11] || gt, due: min[12] || 0,
+                paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
+                finance: min[14] ? { company: min[14], dp: min[11], loan: min[12] } : null,
+                paymentRate: min[15] || ""
+            };
+        } 
+        // SUPPORT FOR OLD OBJECT FORMAT (Old QR Codes)
+        else {
+            const yr = String(min.d || "").slice(-2) || "26";
+            const invNo = `SRE-20${yr}-${String(min.i || "0").padStart(3, '0')}`;
+            
+            let gt = 0;
+            if (min.tx && min.tg) {
+                gt = Math.round(min.tx + min.tg);
+            } else if (min.it) {
+                min.it.forEach(item => { gt += item.length === 4 ? item[3] : item[4]; });
+            }
+            
+            return {
+                invoiceNo: invNo, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg || "-",
+                items: (min.it || []).map(x => ({
+                    name: x[0], imei: x[1], qty: x[2], 
+                    rate: x.length === 4 ? (x[2] > 0 ? Number((x[3]/x[2]).toFixed(2)) : 0) : x[3], 
+                    amount: x.length === 4 ? x[3] : x[4]
+                })),
+                grandTotal: gt, totalTaxable: min.tx || 0, totalGst: min.tg || 0, totalDiscount: min.td || 0, paymentRate: min.pr || "", gstSlab: min.gs || 18
+            };
+        }
     }
 
     function showView(view) {
