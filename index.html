@@ -109,7 +109,8 @@
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-2 gap-2.5">
           <div><label class="text-[10px] font-bold text-slate-600">Primary Mode</label>
-            <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
+            <!-- onPrimaryModeChange() लगाया गया है ताकि प्राइमरी बदलते ही सेकेंडरी रीसेट हो जाए -->
+            <select id="pay-primary" onchange="onPrimaryModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR (Paytm/PhonePe)</option>
               <option value="Card Swipe">💳 Card Swipe</option>
@@ -171,7 +172,7 @@
         </div>
 
         <div>
-          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid / Down Payment (Rs.) *</label>
+          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
           <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none" />
         </div>
       </div>
@@ -187,7 +188,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN (NO PAID/DUE/MODE) -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -384,6 +385,12 @@
 
     function handleQtyChange(input) { renderItemImeis(input.closest(".item-row")); recalcTotals(); }
 
+    // Naya Function: Primary Mode Badalte hi Secondary Reset ho jayega
+    function onPrimaryModeChange() {
+      document.getElementById("pay-secondary").value = "";
+      onPaymentModeChange();
+    }
+
     function onPaymentModeChange() {
       const p = document.getElementById("pay-primary").value;
       const s = document.getElementById("pay-secondary").value;
@@ -431,6 +438,8 @@
       recalcTotals();
     }
 
+    function handleDuesChange() { document.getElementById("pay-paid").value = Number(document.getElementById("dues-token").value) || 0; recalcTotals(); }
+    
     function calcDuesSplit() {
       const dMode = document.getElementById("dues-mode").value;
       let t = 0;
@@ -448,6 +457,10 @@
       if(p.includes("QR")) paid += Number(document.getElementById("split-qr").value) || 0;
       if(p.includes("Card")) paid += Number(document.getElementById("split-card").value) || 0;
       document.getElementById("pay-paid").value = paid;
+      recalcTotals();
+    }
+
+    function handleFinanceChange() {
       recalcTotals();
     }
 
@@ -480,7 +493,6 @@
       
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
-      
       return { grand, paid, due, totalTaxable, totalGst, totalDiscount };
     }
 
@@ -629,7 +641,6 @@
       doc.text("Qty.", 138, y+4.5); doc.text("Rate", 154, y+4.5); doc.text("Amount", 177, y+4.5);
 
       y += 6.5; doc.setDrawColor(...blue); doc.setLineWidth(0.3);
-      // FULL 8 ROWS
       for (let i = 0; i < 8; i++) {
         const item = b.items[i];
         doc.rect(15, y, 180, 7.5);
