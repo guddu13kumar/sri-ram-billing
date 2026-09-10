@@ -28,7 +28,7 @@
     .table-col-qty { width: 55px; text-align: center; }
     .table-col-rate { width: 75px; text-align: right; }
     .table-col-amt { width: 95px; text-align: right; }
-    .totals-box { width: 225px; min-width: 225px; } /* 55 + 75 + 95 = 225px Exactly matches Qty+Rate+Amount */
+    .totals-box { width: 225px; min-width: 225px; } 
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -86,20 +86,20 @@
       </div>
 
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
-        <div><label class="text-[10px] font-bold text-slate-600">Customer Name *</label><input type="text" id="cust-name" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600">Address *</label><input type="text" id="cust-address" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full mt-1 p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
+        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Customer Name *</label><input type="text" id="cust-name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
+        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
+        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
+        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="grid grid-cols-2 gap-2.5">
-          <input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="कस्टमर मोबाइल *" class="p-2 border rounded text-xs font-bold outline-none" />
-          <input type="text" id="rep-device" placeholder="डिवाइस / मॉडल *" class="p-2 border rounded text-xs font-bold outline-none uppercase" />
+          <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Customer Mobile *</label><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Mobile No" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
+          <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Device / Model *</label><input type="text" id="rep-device" placeholder="Model Name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
         </div>
-        <textarea id="rep-issue" rows="2" placeholder="समस्या विवरण..." class="w-full p-2 border rounded text-xs outline-none uppercase"></textarea>
+        <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Issue Description *</label><textarea id="rep-issue" rows="2" placeholder="Issue Details..." class="w-full p-2 border rounded text-xs outline-none uppercase"></textarea></div>
         <div class="flex space-x-2">
-          <input type="number" id="rep-charge" placeholder="Repair Charge (Rs.) *" oninput="recalcTotals()" class="w-full p-2 border border-amber-400 rounded text-xs font-black outline-none" />
+          <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Repair Charge (Rs.) *</label><input type="number" id="rep-charge" placeholder="Amount" oninput="recalcTotals()" class="w-full p-2 border border-amber-400 rounded text-xs font-black outline-none" /></div>
         </div>
       </div>
 
@@ -113,7 +113,7 @@
 
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-2 gap-2.5">
-          <div><label class="text-[10px] font-bold text-slate-600">Primary Mode</label>
+          <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Primary Mode</label>
             <select id="pay-primary" onchange="onPrimaryModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
               <option value="Cash">💵 Cash</option>
               <option value="QR">📲 QR (Paytm/PhonePe)</option>
@@ -124,7 +124,7 @@
               <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
             </select>
           </div>
-          <div><label class="text-[10px] font-bold text-slate-600">Secondary Mode</label>
+          <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Secondary Mode</label>
             <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2 border border-rose-200 rounded text-xs font-bold outline-none">
               <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Udhar</option>
             </select>
@@ -132,48 +132,48 @@
         </div>
 
         <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
-          <input type="number" id="split-cash" placeholder="Cash Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
-          <input type="number" id="split-qr" placeholder="QR Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
-          <input type="number" id="split-card" placeholder="Card Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
+          <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
+          <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
+          <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
         </div>
 
         <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-3 gap-2 mb-2">
-            <select id="fin-company" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
+            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Company *</label><select id="fin-company" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
               <option value="">-- Fin. Company --</option>
               <option value="Kisto Pe">Kisto Pe</option>
               <option value="Bajaj Finserv">Bajaj Finserv</option>
               <option value="HDB Finance">HDB Finance</option>
               <option value="TVS Credit">TVS Credit</option>
               <option value="IDFC First Bank">IDFC First Bank</option>
-            </select>
-            <input type="number" id="fin-rate" placeholder="Rate" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" oninput="recalcTotals()" />
-            <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
+            </select></div>
+            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
+            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
               <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
               <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
               <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
-            </select>
+            </select></div>
           </div>
           <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <input type="number" id="fin-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="fin-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="fin-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
+            <div id="wrap-fin-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-fin-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-fin-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
           </div>
         </div>
 
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-2 gap-2 mb-2">
-            <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
+            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
               <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
               <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
               <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-            </select>
-            <input type="number" id="dues-rate" placeholder="Rate" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" oninput="recalcTotals()" />
+            </select></div>
+            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="dues-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="dues-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <div id="wrap-dues-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-dues-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-dues-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
           </div>
         </div>
 
@@ -286,7 +286,6 @@
               </div>
             </div>
 
-            <!-- PERFECT VERTICAL ALIGNMENT FIXED HERE -->
             <div class="totals-box border-l-2 border-[#004aad] text-[11px] font-bold bg-slate-50 flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]" id="inv-total-breakdown"></div>
               <div class="bg-[#004aad] text-white flex justify-between px-2 py-2.5 font-black text-xs mt-auto">
@@ -348,7 +347,6 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // QR DATA COMPRESSED SAFELY
     function compressBill(b) {
         const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
         const min = {
@@ -457,7 +455,10 @@
       let html = '<div class="grid grid-cols-2 gap-2 mt-2">';
       for(let i=0; i < qty; i++){ 
         const val = existingImeis[i] || "";
-        html += `<input type="text" maxlength="15" value="${val}" placeholder="IMEI ${i+1} (15 अंक) *" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none uppercase" />`; 
+        html += `<div>
+                   <label class="text-[10px] font-bold text-slate-600 block mb-1">IMEI ${i+1} *</label>
+                   <input type="text" maxlength="15" value="${val}" placeholder="15 Digit IMEI" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none uppercase" />
+                 </div>`; 
       }
       html += '</div>';
       imeiBox.innerHTML = html;
@@ -476,8 +477,14 @@
       div.innerHTML = `
         ${removeBtn}
         <div class="grid grid-cols-4 gap-2">
-           <div class="col-span-3"><input type="text" placeholder="Product Name *" class="item-name w-full p-1.5 border rounded text-xs font-bold outline-none uppercase" /></div>
-           <div class="col-span-1"><input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border rounded text-xs font-bold outline-none" /></div>
+           <div class="col-span-3">
+             <label class="text-[10px] font-bold text-slate-600 block mb-1">Product Name *</label>
+             <input type="text" placeholder="Enter Product Name" class="item-name w-full p-1.5 border rounded text-xs font-bold outline-none uppercase" />
+           </div>
+           <div class="col-span-1">
+             <label class="text-[10px] font-bold text-slate-600 block mb-1">Qty *</label>
+             <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border rounded text-xs font-bold outline-none" />
+           </div>
         </div>
         <div class="item-imeis-box"></div>
       `;
@@ -514,23 +521,23 @@
 
       document.getElementById("split-box").classList.toggle("hidden", s !== "" || !isSplit);
       if (s === "" && isSplit) {
-        document.getElementById("split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
-        document.getElementById("split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
-        document.getElementById("split-card").classList.toggle("hidden", !activeMode.includes("Card"));
+        document.getElementById("wrap-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
       }
 
       document.getElementById("fin-split-container").classList.toggle("hidden", s !== "Finance" || !isSplit);
       if (s === "Finance" && isSplit) {
-        document.getElementById("fin-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
-        document.getElementById("fin-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
-        document.getElementById("fin-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
+        document.getElementById("wrap-fin-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-fin-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-fin-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
       }
 
       document.getElementById("dues-split-container").classList.toggle("hidden", s !== "Dues" || !isSplit);
       if (s === "Dues" && isSplit) {
-        document.getElementById("dues-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
-        document.getElementById("dues-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
-        document.getElementById("dues-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
+        document.getElementById("wrap-dues-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-dues-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-dues-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
       }
 
       const payPaidInput = document.getElementById("pay-paid");
@@ -752,11 +759,11 @@
 
       billsCache.unshift(billData); 
 
-      // 100% FIXED GOOGLE SHEETS FETCH (Uses mode: 'no-cors' to bypass CORS completely)
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
               mode: "no-cors",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify({ action: "createBill", billData: billData }) 
           })
           .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!", false, billData); })
@@ -904,7 +911,6 @@
           doc.text("to verify and open online.", 46, y+29);
       }
 
-      // PERFECT VERTICAL ALIGNMENT (x=134 perfectly matches Qty left line)
       doc.rect(134, y, 61, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       
