@@ -6,7 +6,6 @@
   <title>SRI RAM ENTERPRISES - POS</title>
   <meta name="theme-color" content="#004aad" />
 
-  <!-- Tailwind CSS & Pure jsPDF / QR -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -98,6 +97,7 @@
         </div>
       </div>
 
+      <!-- PRODUCTS BOX (CLEANED) -->
       <div id="items-box" class="space-y-2.5">
         <div class="flex justify-between items-end">
           <h3 class="font-bold text-xs uppercase text-slate-800">Products</h3>
@@ -142,7 +142,8 @@
               <option value="TVS Credit">TVS Credit</option>
               <option value="IDFC First Bank">IDFC First Bank</option>
             </select>
-            <input type="number" id="fin-rate" placeholder="Rate (%)" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
+            <!-- RATE TRIGGERS RECALC -->
+            <input type="number" id="fin-rate" placeholder="Total Rate" oninput="recalcTotals()" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
             <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
               <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
               <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
@@ -163,7 +164,8 @@
               <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
               <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
-            <input type="number" id="dues-rate" placeholder="Rate (%)" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <!-- RATE TRIGGERS RECALC -->
+            <input type="number" id="dues-rate" placeholder="Total Rate" oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
             <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
@@ -172,7 +174,6 @@
           </div>
         </div>
 
-        <!-- GLOBAL DISCOUNT & GST -->
         <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
           <div>
             <label class="text-[10px] font-bold text-slate-600 block mb-1">Global Discount (Rs.)</label>
@@ -211,7 +212,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BEAUTIFUL PROFESSIONAL E-BILL) -->
+    <!-- VIEW 3: INVOICE -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -258,7 +259,6 @@
             </div>
           </div>
 
-          <!-- FIXED: RATE RESTORED IN INVOICE TABLE -->
           <div class="mt-3">
             <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
               <thead>
@@ -333,7 +333,6 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // FIXED: COMPRESS RATE
     function compressBill(b) {
         const min = {
             i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-5), 
@@ -346,7 +345,6 @@
         return encodeURIComponent(base64);
     }
 
-    // FIXED: EXPAND RATE
     function expandBill(str) {
         const base64 = decodeURIComponent(str);
         const jsonStr = decodeURIComponent(escape(atob(base64)));
@@ -356,11 +354,20 @@
         const invNo = `SRE-${yr}-${String(min.i).padStart(5, '0')}`;
         
         let gt = 0;
-        min.it.forEach(item => { gt += item[4]; });
+        min.it.forEach(item => { 
+            let amt = item.length === 4 ? item[3] : item[4];
+            gt += amt; 
+        });
         
         return {
             invoiceNo: invNo, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg,
-            items: min.it.map(x => ({name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4]})),
+            items: min.it.map(x => ({
+                name: x[0], 
+                imei: x[1], 
+                qty: x[2], 
+                rate: x.length === 4 ? (x[2] > 0 ? Number((x[3]/x[2]).toFixed(2)) : 0) : x[3], 
+                amount: x.length === 4 ? x[3] : x[4]
+            })),
             grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td, paymentRate: min.pr || ""
         };
     }
@@ -450,12 +457,12 @@
         removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-3 text-rose-600 font-bold text-xs">X Remove</button>`;
       }
 
+      // FIXED: ONLY PRODUCT NAME & QTY. (Rate and Amount completely removed from UI)
       div.innerHTML = `
         ${removeBtn}
-        <input type="text" placeholder="Product Name *" class="item-name w-3/4 p-1.5 border rounded text-xs font-bold outline-none" />
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" placeholder="Amount (Rs.) *" oninput="recalcTotals()" class="item-amount p-1.5 border rounded text-xs font-bold outline-none" />
+        <div class="grid grid-cols-4 gap-2">
+           <div class="col-span-3"><input type="text" placeholder="Product Name *" class="item-name w-full p-1.5 border rounded text-xs font-bold outline-none" /></div>
+           <div class="col-span-1"><input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border rounded text-xs font-bold outline-none" /></div>
         </div>
         <div class="item-imeis-box"></div>
       `;
@@ -467,6 +474,13 @@
 
     function onPrimaryModeChange() {
       document.getElementById("pay-secondary").value = "";
+      
+      // AUTO CLEAR OLD VALUES ON REFRESH
+      ["split-cash", "split-qr", "split-card", "pay-paid"].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.value = "";
+      });
+      
       onPaymentModeChange();
     }
 
@@ -522,36 +536,15 @@
     }
 
     function recalcTotals() {
-      let grand = 0, totalTaxable = 0, totalGst = 0, totalDiscount = 0;
-
-      const globalDisc = Number(document.getElementById("global-discount").value) || 0;
-      const globalGstRate = Number(document.getElementById("global-gst").value) || 0;
-
-      if (currentBillType === "REPAIRING") {
-        grand = Number(document.getElementById("rep-charge").value) || 0;
-      } else {
-        document.querySelectorAll(".item-row").forEach(r => {
-          grand += Number(r.querySelector(".item-amount").value) || 0;
-        });
-      }
-
-      totalDiscount = globalDisc;
-      grand = Math.max(0, grand - totalDiscount);
-      
-      totalTaxable = grand / (1 + (globalGstRate/100));
-      totalGst = grand - totalTaxable;
-
-      grand = Math.round(grand);
-
+      // 1. Calculate the Raw Paid Amount from the input fields
+      let rawPaid = 0;
       const s = document.getElementById("pay-secondary").value;
       const p = document.getElementById("pay-primary").value;
-      
       let activeMode = p;
       if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
       if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
 
       const isSplit = activeMode.includes("+");
-      let rawPaid = 0;
 
       if (isSplit) {
         if (s === "Finance") {
@@ -572,10 +565,35 @@
         rawPaid = Number(document.getElementById("pay-paid").value) || 0;
       }
 
-      const paid = Math.min(grand, rawPaid);
+      // 2. FIXED SMART CALCULATION: Grand Total is pulled directly from Payment Section
+      let grand = 0;
+      if (currentBillType === "REPAIRING") {
+        grand = Number(document.getElementById("rep-charge").value) || 0;
+      } else {
+        if (s === "Finance") {
+            grand = Number(document.getElementById("fin-rate").value) || 0;
+        } else if (s === "Dues") {
+            grand = Number(document.getElementById("dues-rate").value) || 0;
+        } else {
+            // In Primary Mode (Cash, QR), Grand Total IS the Total Amount Paid
+            grand = rawPaid;
+        }
+      }
+
+      // 3. Subtract Global Discount
+      const globalDisc = Number(document.getElementById("global-discount").value) || 0;
+      const totalDiscount = globalDisc;
+      grand = Math.max(0, grand - totalDiscount);
+      
+      const globalGstRate = Number(document.getElementById("global-gst").value) || 0;
+      const totalTaxable = grand / (1 + (globalGstRate/100));
+      const totalGst = grand - totalTaxable;
+
+      grand = Math.round(grand);
+      const paid = rawPaid;
       const due = Math.max(0, grand - paid);
       
-      document.getElementById("fin-loan-display").innerText = "Rs. " + Math.max(0, grand - paid).toLocaleString("en-IN");
+      document.getElementById("fin-loan-display").innerText = "Rs. " + due.toLocaleString("en-IN");
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
       
@@ -603,6 +621,17 @@
         items = [{ name: document.getElementById("rep-device").value.trim(), imei: document.getElementById("rep-issue").value.trim(), qty: 1, rate: totals.grand, amount: totals.grand }];
       } else {
         let err = false; let imeiErr = false;
+        let totalQty = 0;
+        
+        // Count Total Quantity
+        document.querySelectorAll(".item-row").forEach(r => {
+           totalQty += Number(r.querySelector(".item-qty").value) || 1;
+        });
+        
+        // Compute the proper Unit Rate (Re-adding the discount for true item value)
+        const fullGrand = totals.grand + totals.totalDiscount;
+        const unitRate = totalQty > 0 ? Number((fullGrand / totalQty).toFixed(2)) : 0;
+
         document.querySelectorAll(".item-row").forEach(r => {
           const pName = r.querySelector(".item-name").value.trim();
           if(!pName) err = true;
@@ -616,14 +645,12 @@
             });
           }
           
-          // FIXED: CALCULATE RATE AUTOMATICALLY
           const q = Number(r.querySelector(".item-qty").value)||1;
-          const amt = Math.max(0, Number(r.querySelector(".item-amount").value)||0);
-          const computedRate = q > 0 ? Number((amt / q).toFixed(2)) : 0;
+          const amt = q * unitRate;
 
           items.push({ 
             name: pName, imei: validImeis.join(", "), 
-            qty: q, rate: computedRate, amount: amt 
+            qty: q, rate: unitRate, amount: amt 
           });
         });
         if(err) return showPopup("Validation Error", "प्रोडक्ट नाम भरना अनिवार्य है!", true);
@@ -717,7 +744,6 @@
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
-          // FIXED: RATE RESTORED IN HTML TABLE
           tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1.5 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1.5 border border-[#004aad] font-mono text-[9px] text-slate-700 break-all">${it.imei}</td><td class="p-1.5 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1.5 border border-[#004aad] text-right font-semibold">${Number(it.rate).toLocaleString("en-IN")}</td><td class="p-1.5 border border-[#004aad] text-right font-black text-slate-950">${Number(it.amount).toLocaleString("en-IN")}</td></tr>`;
         } else {
           tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center text-slate-300">${i+1}</td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td></tr>`;
@@ -789,7 +815,6 @@
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(8);
       
-      // FIXED: RATE RESTORED IN PDF
       doc.text("S.No", 19, y+4.5); 
       doc.text("Brand / Product", 35, y+4.5); 
       doc.text("Model / IMEI", 95, y+4.5); 
