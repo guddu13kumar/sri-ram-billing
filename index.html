@@ -199,7 +199,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - CLEAN HEADER & PROPER ADDRESS -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -221,17 +221,22 @@
 
           <div class="bg-[#004aad] text-white font-black text-center py-1 text-xs tracking-widest uppercase my-2">TAX INVOICE</div>
 
+          <!-- REFINED CUSTOMER DETAILS WITH ADDRESS -->
           <div class="space-y-1.5 py-0.5 text-[11px] font-bold text-slate-800 border-b border-slate-200 pb-2">
             <div class="flex justify-between">
               <span class="flex-1">Invoice No. : <span id="inv-no" class="font-black border-b border-dotted border-slate-500"></span></span>
-              <span class="w-36">Date : <span id="inv-date" class="border-b border-dotted border-slate-500"></span></span>
+              <span class="w-36 text-right">Date : <span id="inv-date" class="border-b border-dotted border-slate-500"></span></span>
             </div>
             <div class="flex justify-between mt-1">
               <span class="flex-1">Name : <span id="inv-cust-name" class="font-black border-b border-dotted border-slate-500"></span></span>
-              <span class="w-56 text-right">Ph. : <span id="inv-cust-phone" class="border-b border-dotted border-slate-500 font-mono"></span></span>
+              <span class="w-48 text-right">Ph. : <span id="inv-cust-phone" class="border-b border-dotted border-slate-500 font-mono"></span></span>
+            </div>
+            <div class="mt-1">
+              <span class="w-full">Address : <span id="inv-cust-address" class="border-b border-dotted border-slate-500 font-medium"></span></span>
             </div>
           </div>
 
+          <!-- EXACT 8 ROWS TABLE -->
           <div class="mt-2">
             <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
               <thead>
@@ -265,6 +270,7 @@
               </div>
             </div>
 
+            <!-- CLEAN TOTAL BOX -->
             <div class="w-60 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]">
                 <div class="flex justify-between p-1.5"><span>Subtotal</span><span id="inv-calc-subtotal" class="font-black">Rs. 0</span></div>
@@ -540,6 +546,7 @@
       } else {
         name = document.getElementById("cust-name").value.trim() || "Customer";
         phone = document.getElementById("cust-phone").value.trim();
+        address = document.getElementById("cust-address").value.trim() || "-";
         if(currentBillType === "MOBILE" && phone.length !== 10) return alert("10 अंकों का मोबाइल नंबर डालें!");
       }
 
@@ -613,7 +620,7 @@
       const billData = {
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
-        billType: currentBillType, customerName: name, customerMobile: phone, items,
+        billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, items,
         paymentMode: s || p, paymentBreakdown: paymentBreakdown,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
@@ -632,13 +639,14 @@
       document.getElementById("inv-date").innerText = bill.billDate;
       document.getElementById("inv-cust-name").innerText = bill.customerName;
       document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
+      document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
 
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
-          tbody.innerHTML += `<tr><td class="p-1 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1 border border-[#004aad] font-mono text-[8.5px] text-slate-700 break-all">${it.imei}</td><td class="p-1 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1 border border-[#004aad] text-right font-semibold">${it.rate}</td><td class="p-1 border border-[#004aad] text-right font-black text-slate-950">${it.amount}</td></tr>`;
+          tbody.innerHTML += `<tr><td class="p-1 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1 border border-[#004aad] font-mono text-[8.5px] text-slate-700 break-all">${it.imei}</td><td class="p-1 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1 border border-[#004aad] text-right font-semibold">${Number(it.rate).toLocaleString("en-IN")}</td><td class="p-1 border border-[#004aad] text-right font-black text-slate-950">${Number(it.amount).toLocaleString("en-IN")}</td></tr>`;
         } else {
           tbody.innerHTML += `<tr><td class="p-1 border border-[#004aad] text-center text-slate-300">${i+1}</td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td></tr>`;
         }
@@ -648,17 +656,17 @@
       const gst = Number(bill.totalGst) || 0;
       const subtotal = grand + Number(bill.totalDiscount) - gst;
 
-      document.getElementById("inv-calc-subtotal").innerText = "Rs. " + subtotal.toFixed(2);
-      document.getElementById("inv-calc-discount").innerText = bill.totalDiscount || 0;
-      document.getElementById("inv-grand-total").innerText = "Rs. " + grand;
+      document.getElementById("inv-calc-subtotal").innerText = "Rs. " + subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2});
+      document.getElementById("inv-calc-discount").innerText = Number(bill.totalDiscount || 0).toLocaleString("en-IN");
+      document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
 
       const gstBox = document.getElementById("inv-gst-box");
       if(gst > 0){
         gstBox.classList.remove("hidden");
-        document.getElementById("inv-taxable").innerText = Number(bill.totalTaxable).toFixed(2);
-        document.getElementById("inv-cgst").innerText = (gst/2).toFixed(2);
-        document.getElementById("inv-sgst").innerText = (gst/2).toFixed(2);
-        document.getElementById("inv-tot-gst").innerText = gst.toFixed(2);
+        document.getElementById("inv-taxable").innerText = Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2});
+        document.getElementById("inv-cgst").innerText = (gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2});
+        document.getElementById("inv-sgst").innerText = (gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2});
+        document.getElementById("inv-tot-gst").innerText = gst.toLocaleString("en-IN", {minimumFractionDigits: 2});
       } else { gstBox.classList.add("hidden"); }
 
       document.getElementById("inv-qr-container").innerHTML = "";
@@ -692,8 +700,9 @@
       doc.setTextColor(...dark); doc.setFontSize(8.5);
       doc.text(`Invoice No. :  ${b.invoiceNo}`, 20, 52); doc.text(`Date :  ${b.billDate}`, 150, 52);
       doc.text(`Name :  ${b.customerName}`, 20, 58); doc.text(`Ph. :  ${b.customerMobile}`, 150, 58);
+      doc.text(`Address :  ${b.customerAddress || "-"}`, 20, 64);
 
-      let y = 67;
+      let y = 70;
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(8);
       doc.text("S.No", 19, y+4.5); doc.text("Brand / Product", 35, y+4.5); doc.text("Model / IMEI", 95, y+4.5);
@@ -712,17 +721,17 @@
           doc.setFontSize(imeiStr.length > 18 ? 6 : 7.5);
           doc.text(imeiStr.substring(0, 42), 87, y+4.5);
           doc.setFontSize(8); doc.text(String(item.qty), 141, y+5, { align:"center" });
-          doc.text(String(item.rate), 165, y+5, { align:"right" });
-          doc.setFont("helvetica", "bold"); doc.text(String(item.amount), 192, y+5, { align:"right" });
+          doc.text(Number(item.rate).toLocaleString("en-IN"), 165, y+5, { align:"right" });
+          doc.setFont("helvetica", "bold"); doc.text(Number(item.amount).toLocaleString("en-IN"), 192, y+5, { align:"right" });
         }
         y += 7.5;
       }
 
       if(b.totalGst > 0) {
         doc.setFillColor(245, 245, 245); doc.rect(15, y, 180, 6, "F"); doc.rect(15, y, 180, 6);
-        doc.setFontSize(7.5); doc.text(`Taxable: Rs. ${Number(b.totalTaxable).toFixed(2)}`, 20, y+4);
-        doc.text(`CGST: Rs. ${(b.totalGst/2).toFixed(2)}`, 70, y+4); doc.text(`SGST: Rs. ${(b.totalGst/2).toFixed(2)}`, 120, y+4);
-        doc.text(`Total GST: Rs. ${Number(b.totalGst).toFixed(2)}`, 170, y+4);
+        doc.setFontSize(7.5); doc.text(`Taxable: Rs. ${Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 20, y+4);
+        doc.text(`CGST: Rs. ${(b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 70, y+4); doc.text(`SGST: Rs. ${(b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 120, y+4);
+        doc.text(`Total GST: Rs. ${Number(b.totalGst).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 170, y+4);
         y += 6;
       }
 
@@ -734,11 +743,14 @@
       doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       let rY = y;
-      [ {l:"Subtotal", v:grand+Number(b.totalDiscount)-Number(b.totalGst)}, {l:"Discount", v:b.totalDiscount} ].forEach(row => {
+      [ 
+        {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})}, 
+        {l:"Discount", v: Number(b.totalDiscount || 0).toLocaleString("en-IN")} 
+      ].forEach(row => {
         doc.line(130, rY+6.5, 195, rY+6.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
         doc.text(row.l, 133, rY+4.5); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4.5, {align:"right"}); rY += 6.5;
       });
-      doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. "+grand, 192, rY+6, {align:"right"});
+      doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN"), 192, rY+6, {align:"right"});
 
       doc.setDrawColor(120); doc.setLineWidth(0.3); doc.line(22, y+62, 65, y+62); doc.line(145, y+62, 188, y+62);
       doc.setTextColor(...dark); doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.text("Customer's Signature", 43.5, y+66, { align: "center" });
