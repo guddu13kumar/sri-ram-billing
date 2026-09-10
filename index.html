@@ -96,11 +96,11 @@
         <div class="flex space-x-2">
           <input type="number" id="rep-charge" placeholder="Repair Charge (Rs.) *" oninput="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-black outline-none" />
           <select id="rep-gst" onchange="recalcTotals()" class="w-1/2 p-2 border border-amber-400 rounded text-xs font-bold outline-none">
-            <option value="18">18% GST</option>
-            <option value="28">28% GST</option>
-            <option value="12">12% GST</option>
-            <option value="5">5% GST</option>
             <option value="0">0% GST</option>
+            <option value="5">5% GST</option>
+            <option value="12">12% GST</option>
+            <option value="18" selected>18% GST</option>
+            <option value="28">28% GST</option>
           </select>
         </div>
       </div>
@@ -135,7 +135,7 @@
           </div>
         </div>
 
-        <!-- REGULAR SPLIT (CASH + QR + CARD) -->
+        <!-- REGULAR SPLIT -->
         <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
           <input type="number" id="split-cash" placeholder="Cash Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
           <input type="number" id="split-qr" placeholder="QR Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
@@ -181,7 +181,7 @@
           <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none bg-white" placeholder="Enter Amount..." />
         </div>
 
-        <!-- FINANCE LOAN AMOUNT (SHOWN ONLY FOR FINANCE) -->
+        <!-- FINANCE LOAN AMOUNT -->
         <div id="finance-loan-row" class="hidden mt-2 flex justify-between items-center text-[11px] font-bold text-[#004aad] bg-blue-100 px-3 py-2 rounded-lg border border-blue-300">
           <span class="uppercase tracking-wider">Finance Company Loan :</span>
           <span id="fin-loan-display" class="text-sm font-black">Rs. 0</span>
@@ -199,7 +199,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - CLEAN HEADER (NO LOGO) -->
+    <!-- VIEW 3: INVOICE -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -212,7 +212,6 @@
       <div class="w-full flex justify-center overflow-x-auto pb-6">
         <div id="invoice-capture" class="bg-white p-6 border-2 border-[#004aad] text-xs text-slate-900 w-[700px] min-w-[700px]">
           
-          <!-- NEW HEADER - NO LOGO -->
           <div class="text-center w-full pb-3 border-b border-slate-200">
             <h1 class="text-[28px] font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
             <p class="text-[13px] font-bold text-[#004aad] my-1">Mobile • Accessories • Repairing</p>
@@ -233,7 +232,6 @@
             </div>
           </div>
 
-          <!-- EXACT 8 ROWS TABLE -->
           <div class="mt-2">
             <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
               <thead>
@@ -394,7 +392,6 @@
         removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-3 text-rose-600 font-bold text-xs">X Remove</button>`;
       }
 
-      // ADDED ALL INDIAN GST SLABS
       div.innerHTML = `
         ${removeBtn}
         <input type="text" placeholder="Product Name *" class="item-name w-3/4 p-1.5 border rounded text-xs font-bold outline-none" />
@@ -403,11 +400,11 @@
           <input type="number" placeholder="Rate *" oninput="recalcTotals()" class="item-rate p-1.5 border rounded text-xs font-bold outline-none" />
           <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-1.5 border rounded text-xs outline-none" />
           <select class="item-gst p-1.5 border rounded text-xs font-bold outline-none" onchange="recalcTotals()">
-            <option value="18">18% GST</option>
-            <option value="28">28% GST</option>
-            <option value="12">12% GST</option>
-            <option value="5">5% GST</option>
             <option value="0">0% GST</option>
+            <option value="5">5% GST</option>
+            <option value="12">12% GST</option>
+            <option value="18" selected>18% GST</option>
+            <option value="28">28% GST</option>
           </select>
         </div>
         <div class="item-imeis-box"></div>
@@ -680,7 +677,6 @@
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
       
-      // NEW HEADER - NO LOGO
       doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...blue); 
       doc.text("SRI RAM ENTERPRISES", 105, 22, { align: "center" });
       doc.setFontSize(10); 
