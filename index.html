@@ -14,7 +14,6 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;600;700;800;900&display=swap');
     body { font-family: 'Inter', system-ui, sans-serif; }
-    .thank-you-text { font-family: 'Caveat', cursive; }
 
     @media print {
       body * { visibility: hidden; }
@@ -42,7 +41,6 @@
     </div>
   </header>
 
-  <!-- CENTER POPUP MODAL -->
   <div id="center-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-100 transition-transform border-2 border-[#004aad]">
       <div id="popup-icon" class="text-6xl mb-3">✅</div>
@@ -54,7 +52,6 @@
 
   <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4">
 
-    <!-- DASHBOARD -->
     <div id="view-dashboard" class="space-y-3">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S BILLS</span><p id="dash-count" class="text-2xl font-black mt-0.5">0</p></div>
@@ -73,7 +70,6 @@
       </div>
     </div>
 
-    <!-- NEW BILL FORM -->
     <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 space-y-3.5 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
         <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-00001</h2>
@@ -113,13 +109,17 @@
         <div id="items-container" class="space-y-2.5"></div>
       </div>
 
-      <!-- PAYMENT SECTION -->
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-2 gap-2.5">
           <div><label class="text-[10px] font-bold text-slate-600">Primary Mode</label>
             <select id="pay-primary" onchange="onPrimaryModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
-              <option value="Cash">💵 Cash</option><option value="QR">📲 QR</option><option value="Card Swipe">💳 Card Swipe</option>
-              <option value="Cash + QR">💵 Cash + 📲 QR</option><option value="Cash + Card">💵 Cash + 💳 Card</option><option value="QR + Card">📲 QR + 💳 Card</option><option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
+              <option value="Cash">💵 Cash</option>
+              <option value="QR">📲 QR (Paytm/PhonePe)</option>
+              <option value="Card Swipe">💳 Card Swipe</option>
+              <option value="Cash + QR">💵 Cash + 📲 QR</option>
+              <option value="Cash + Card">💵 Cash + 💳 Card</option>
+              <option value="QR + Card">📲 QR + 💳 Card</option>
+              <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
             </select>
           </div>
           <div><label class="text-[10px] font-bold text-rose-700">Secondary Mode</label>
@@ -140,13 +140,14 @@
             <input type="text" id="fin-company" placeholder="Fin Company Name" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
             <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
               <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
+              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
+              <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
             </select>
           </div>
           <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <input type="number" id="fin-split-cash" placeholder="Cash" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="fin-split-qr" placeholder="QR" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="fin-split-card" placeholder="Card" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="fin-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="fin-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="fin-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" />
           </div>
         </div>
 
@@ -154,13 +155,14 @@
           <div class="mb-2">
             <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
               <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
-              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
+              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
+              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
             </select>
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <input type="number" id="dues-split-cash" placeholder="Cash" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="dues-split-qr" placeholder="QR" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="dues-split-card" placeholder="Card" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="dues-split-qr" placeholder="QR (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="dues-split-card" placeholder="Card (Rs.)" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
         </div>
 
@@ -170,11 +172,11 @@
         </div>
 
         <div id="finance-loan-row" class="hidden mt-2 flex justify-between items-center text-[11px] font-bold text-[#004aad] bg-blue-100 px-3 py-2 rounded-lg border border-blue-300">
-          <span class="uppercase tracking-wider">Finance Company Loan :</span><span id="fin-loan-display" class="text-sm font-black">Rs. 0</span>
+          <span class="uppercase tracking-wider">Finance Company Loan :</span>
+          <span id="fin-loan-display" class="text-sm font-black">Rs. 0</span>
         </div>
       </div>
 
-      <!-- TOTAL BANNER -->
       <div class="bg-[#004aad] text-white p-3.5 rounded-xl flex justify-between items-center shadow">
         <div><span class="text-[10px] text-blue-200">GRAND TOTAL</span><p id="total-grand" class="text-2xl font-black text-amber-300 mt-0.5">Rs. 0</p></div>
         <div class="text-right"><span class="text-[10px] text-blue-200">BALANCE DUE</span><p id="total-due" class="text-lg font-bold text-rose-300 mt-0.5">Rs. 0</p></div>
@@ -296,6 +298,44 @@
       document.getElementById("popup-icon").innerText = isError ? "❌" : "✅";
       document.getElementById("popup-title").className = `text-xl font-black uppercase tracking-wide ${isError ? 'text-rose-600' : 'text-[#004aad]'}`;
       document.getElementById("center-popup").classList.remove("hidden");
+    }
+
+    function saveSettings() {
+      const url = document.getElementById("settings-url").value.trim();
+      localStorage.setItem("sre_gas_url", url);
+      gasUrl = url; 
+      showView("dashboard");
+      showPopup("Settings Saved", "Backend URL updated successfully.");
+    }
+
+    function compressBill(b) {
+        const min = {
+            i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-5), 
+            d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress, cg: b.customerGstin,
+            it: b.items.filter(x=>x).map(x => [x.name.substring(0,25), x.imei.substring(0,40), x.qty, x.rate, x.amount]),
+            tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount
+        };
+        const jsonStr = JSON.stringify(min);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+        return encodeURIComponent(base64);
+    }
+
+    function expandBill(str) {
+        const base64 = decodeURIComponent(str);
+        const jsonStr = decodeURIComponent(escape(atob(base64)));
+        const min = JSON.parse(jsonStr);
+        
+        const yr = new Date(min.d).getFullYear() || new Date().getFullYear();
+        const invNo = `SRE-${yr}-${String(min.i).padStart(5, '0')}`;
+        
+        let gt = 0;
+        min.it.forEach(item => { gt += item[4]; });
+        
+        return {
+            invoiceNo: invNo, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg,
+            items: min.it.map(x => ({name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4]})),
+            grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td
+        };
     }
 
     function showView(view) {
@@ -595,7 +635,6 @@
       }
 
       const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
-
       const token = Math.random().toString(36).substring(2, 8).toUpperCase();
       let finData = null;
       if(s === "Finance"){
@@ -612,20 +651,27 @@
         finance: finData, token: token
       };
 
-      // NEW Google Sheet URL strategy - NO heavy data in URL, just the unique Token
-      billData.publicUrl = `${window.location.origin}${window.location.pathname}?b=${token}`;
+      try {
+        const scanPayload = compressBill(billData);
+        billData.publicUrl = `${window.location.origin}${window.location.pathname}?scan=${scanPayload}`;
+      } catch (err) {
+        return showPopup("System Error", "Failed to compress Bill data.", true);
+      }
 
       billsCache.unshift(billData); 
 
-      // IF Google Sheet URL is connected, save the data silently
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
+              mode: "no-cors",
               body: JSON.stringify({ action: "createBill", billData: billData }) 
-          }).catch(()=>{});
+          })
+          .then(() => { showPopup("Bill Generated", "Invoice generated and sent to Cloud Successfully!"); })
+          .catch(err => { showPopup("Sync Error", "Internet problem. Failed to sync to Cloud.", true); });
+      } else {
+          showPopup("Bill Generated", "Invoice generated locally. Add Backend URL in settings to sync.");
       }
       
-      showPopup("Bill Generated", "Invoice Data Saved Successfully!");
       displayInvoice(billData);
     }
 
@@ -666,14 +712,8 @@
       bd.innerHTML = bdHtml;
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
 
-      // NEW SMALL & FAST QR CODE GENERATION
       document.getElementById("inv-qr-container").innerHTML = "";
-      new QRCode(document.getElementById("inv-qr-container"), { 
-          text: bill.publicUrl, 
-          width: 80, height: 80, 
-          colorDark: "#000000", colorLight: "#ffffff", 
-          correctLevel: QRCode.CorrectLevel.M 
-      });
+      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
       showView("invoice");
     }
 
@@ -781,48 +821,21 @@
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent("नमस्ते "+activeInvoiceData.customerName+", आपका बिल: "+activeInvoiceData.publicUrl)}`, "_blank");
     }
 
-    // NEW SYSTEM TO FETCH DATA FROM GOOGLE SHEET VIA TOKEN
     window.addEventListener("DOMContentLoaded", () => {
-      const tokenParam = new URLSearchParams(window.location.search).get("b");
+      const scanParam = new URLSearchParams(window.location.search).get("scan");
       
-      if (tokenParam) {
-          document.getElementById("top-invoice-bar").innerHTML = `
-            <div class="w-full flex justify-between items-center bg-amber-50 px-3 py-2 rounded-xl border border-amber-200">
-               <span class="font-black text-amber-700 text-xs uppercase tracking-wider">⏳ Fetching E-Bill From Server...</span>
-            </div>`;
-          showView("invoice");
-
-          if (gasUrl) {
-              fetch(gasUrl + "?action=getBill&token=" + tokenParam)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.billData) {
-                         document.getElementById("top-invoice-bar").innerHTML = `
-                            <div class="w-full flex justify-between items-center bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
-                               <span class="font-black text-emerald-700 text-xs uppercase tracking-wider">✅ E-Bill Loaded</span>
-                               <button onclick="downloadVectorPDF()" class="px-5 py-2 bg-[#004aad] text-white font-black text-xs rounded-lg shadow-md animate-bounce">📥 DOWNLOAD INVOICE</button>
-                            </div>`;
-                         displayInvoice(data.billData);
-                    } else {
-                         showPopup("Error", "Bill not found on server! Token invalid.", true);
-                    }
-                })
-                .catch(err => {
-                    showPopup("Network Error", "Failed to fetch bill from Google Sheet.", true);
-                });
-          } else {
-              // Fallback to local session cache if backend not setup yet
-              const found = billsCache.find(x => x.token === tokenParam);
-              if (found) {
-                  document.getElementById("top-invoice-bar").innerHTML = `
-                    <div class="w-full flex justify-between items-center bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
-                       <span class="font-black text-emerald-700 text-xs uppercase tracking-wider">✅ E-Bill Loaded (Local)</span>
-                       <button onclick="downloadVectorPDF()" class="px-5 py-2 bg-[#004aad] text-white font-black text-xs rounded-lg shadow-md animate-bounce">📥 DOWNLOAD INVOICE</button>
-                    </div>`;
-                  displayInvoice(found);
-              } else {
-                  showPopup("Configuration Error", "Backend URL not set in settings! Cannot fetch external bill.", true);
-              }
+      if (scanParam) {
+          try {
+             document.getElementById("top-invoice-bar").innerHTML = `
+                <div class="w-full flex justify-between items-center bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                   <span class="font-black text-emerald-700 text-xs uppercase tracking-wider">✅ E-Bill Loaded</span>
+                   <button onclick="downloadVectorPDF()" class="px-5 py-2 bg-[#004aad] text-white font-black text-xs rounded-lg shadow-md animate-bounce">📥 DOWNLOAD INVOICE</button>
+                </div>`;
+             
+             const decBill = expandBill(scanParam);
+             displayInvoice(decBill);
+          } catch(e) { 
+             showPopup("Error", "Invalid or corrupted QR Code data!", true); 
           }
       } else { 
           renderDashboard(); 
