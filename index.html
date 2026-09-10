@@ -141,21 +141,20 @@
             <input type="number" id="fin-split-qr" placeholder="QR (Rs.)" oninput="calcFinSplit()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
             <input type="number" id="fin-split-card" placeholder="Card (Rs.)" oninput="calcFinSplit()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
           </div>
-          <div class="flex justify-between items-center text-xs font-bold text-[#004aad]">
-            <input type="number" id="fin-dp" placeholder="Total DP (Rs.)" oninput="handleFinanceChange()" class="w-1/2 p-1.5 border rounded outline-none" />
-            <span id="fin-loan-display">Loan: Rs. 0</span>
+          <div class="flex justify-between items-center text-[11px] font-bold text-[#004aad] bg-white p-2 rounded border border-blue-200">
+            <span>Finance Company Loan :</span>
+            <span id="fin-loan-display" class="text-sm font-black">Rs. 0</span>
           </div>
         </div>
 
         <!-- DUES SPLIT -->
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <select id="dues-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
+          <div class="mb-2">
+            <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
               <option value="Cash">Token Cash</option><option value="QR">Token QR</option><option value="Card">Token Card</option>
               <option value="Cash + QR">Token Cash + QR</option><option value="Cash + Card">Token Cash + Card</option>
               <option value="QR + Card">Token QR + Card</option><option value="Cash + QR + Card">Token Cash + QR + Card</option>
             </select>
-            <input type="number" id="dues-token" placeholder="Total Token (Rs.)" oninput="handleDuesChange()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
           <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
             <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="calcDuesSplit()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
@@ -164,15 +163,15 @@
           </div>
         </div>
 
-        <!-- REGULAR SPLIT -->
+        <!-- REGULAR SPLIT (CASH + QR + CARD) -->
         <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
-          <input type="number" id="split-cash" placeholder="Cash (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" id="split-qr" placeholder="QR (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" id="split-card" placeholder="Card (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" id="split-cash" placeholder="Cash Amount" oninput="handleSplitChange()" class="hidden p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" id="split-qr" placeholder="QR Amount" oninput="handleSplitChange()" class="hidden p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" id="split-card" placeholder="Card Amount" oninput="handleSplitChange()" class="hidden p-1.5 border rounded text-xs font-bold outline-none" />
         </div>
 
         <div>
-          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
+          <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid / Down Payment (Rs.) *</label>
           <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none" />
         </div>
       </div>
@@ -188,7 +187,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN (NO PAID/DUE/MODE) -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -428,14 +427,6 @@
       if(fMode.includes("Cash")) dp += Number(document.getElementById("fin-split-cash").value) || 0;
       if(fMode.includes("QR")) dp += Number(document.getElementById("fin-split-qr").value) || 0;
       if(fMode.includes("Card")) dp += Number(document.getElementById("fin-split-card").value) || 0;
-      document.getElementById("fin-dp").value = dp;
-      handleFinanceChange();
-    }
-
-    function handleFinanceChange() {
-      const dp = Number(document.getElementById("fin-dp").value) || 0;
-      const grand = recalcTotals().grand;
-      document.getElementById("fin-loan-display").innerText = "Loan: Rs. " + Math.max(0, grand - dp);
       document.getElementById("pay-paid").value = dp;
       recalcTotals();
     }
@@ -446,11 +437,9 @@
       if(dMode.includes("Cash")) t += Number(document.getElementById("dues-split-cash").value) || 0;
       if(dMode.includes("QR")) t += Number(document.getElementById("dues-split-qr").value) || 0;
       if(dMode.includes("Card")) t += Number(document.getElementById("dues-split-card").value) || 0;
-      document.getElementById("dues-token").value = t;
-      handleDuesChange();
+      document.getElementById("pay-paid").value = t;
+      recalcTotals();
     }
-
-    function handleDuesChange() { document.getElementById("pay-paid").value = Number(document.getElementById("dues-token").value) || 0; recalcTotals(); }
     
     function handleSplitChange() {
       const p = document.getElementById("pay-primary").value;
@@ -486,8 +475,12 @@
       grand = Math.round(grand);
       const paid = Math.min(grand, Number(document.getElementById("pay-paid").value) || 0);
       const due = Math.max(0, grand - paid);
+      
+      document.getElementById("fin-loan-display").innerText = "Rs. " + Math.max(0, grand - paid).toLocaleString("en-IN");
+      
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
+      
       return { grand, paid, due, totalTaxable, totalGst, totalDiscount };
     }
 
