@@ -23,6 +23,12 @@
         border: 2px solid #004aad !important; margin: 0 !important;
       }
     }
+    
+    /* Strict Table Alignment Rules */
+    .table-col-qty { width: 55px; text-align: center; }
+    .table-col-rate { width: 75px; text-align: right; }
+    .table-col-amt { width: 95px; text-align: right; }
+    .totals-box { width: 225px; min-width: 225px; } /* 55 + 75 + 95 = 225px Exactly matches Qty+Rate+Amount */
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
@@ -260,12 +266,12 @@
             <table class="w-full border-collapse border-2 border-[#004aad] text-left">
               <thead>
                 <tr class="bg-[#004aad] text-white text-center font-black text-[10.5px]">
-                  <th class="border border-[#004aad] p-1.5 w-10">S.No</th>
-                  <th class="border border-[#004aad] p-1.5 w-48">Brand / Product</th>
-                  <th class="border border-[#004aad] p-1.5">Model / IMEI</th>
-                  <th class="border border-[#004aad] p-1.5 w-12">Qty.</th>
-                  <th class="border border-[#004aad] p-1.5 w-20">Rate</th>
-                  <th class="border border-[#004aad] p-1.5 w-24">Amount</th>
+                  <th class="border border-[#004aad] p-1.5 w-[40px]">S.No</th>
+                  <th class="border border-[#004aad] p-1.5">Brand / Product</th>
+                  <th class="border border-[#004aad] p-1.5 w-[160px]">Model / IMEI</th>
+                  <th class="border border-[#004aad] p-1.5 table-col-qty">Qty.</th>
+                  <th class="border border-[#004aad] p-1.5 table-col-rate">Rate</th>
+                  <th class="border border-[#004aad] p-1.5 table-col-amt">Amount</th>
                 </tr>
               </thead>
               <tbody id="inv-items-body" class="divide-y divide-[#004aad]"></tbody>
@@ -275,12 +281,13 @@
           <div class="flex items-stretch justify-between border-x-2 border-b-2 border-[#004aad]">
             <div class="flex-1 flex items-center p-4">
               <div class="flex items-center space-x-4 ml-4">
-                <div id="inv-qr-container" class="w-[85px] h-[85px] border-2 border-[#004aad] p-1 flex items-center justify-center bg-white"></div>
+                <div id="inv-qr-container" class="w-[90px] h-[90px] border-2 border-[#004aad] p-1 flex items-center justify-center bg-white"></div>
                 <div class="text-[11px] text-slate-600 font-medium leading-snug"><span class="text-[#004aad] block text-[14px] font-black uppercase tracking-wider mb-1">VERIFIED E-BILL</span>Scan QR with any Camera<br/>to verify and open online.</div>
               </div>
             </div>
 
-            <div class="w-64 border-l-2 border-[#004aad] text-[11px] font-bold bg-slate-50 flex flex-col justify-between">
+            <!-- PERFECT VERTICAL ALIGNMENT FIXED HERE -->
+            <div class="totals-box border-l-2 border-[#004aad] text-[11px] font-bold bg-slate-50 flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]" id="inv-total-breakdown"></div>
               <div class="bg-[#004aad] text-white flex justify-between px-2 py-2.5 font-black text-xs mt-auto">
                 <span class="uppercase tracking-wider">Grand Total</span><span id="inv-grand-total" class="text-[14px]">Rs. 0</span>
@@ -341,11 +348,13 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
+    // QR DATA COMPRESSED SAFELY (Skips empty products)
     function compressBill(b) {
+        const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
         const min = {
             i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-3), 
             d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress, cg: b.customerGstin,
-            it: b.items.filter(x=>x).map(x => [x.name.substring(0,25), x.imei.substring(0,40), x.qty, x.rate, x.amount]),
+            it: validItems.map(x => [x.name.substring(0,20), x.imei.substring(0,25), x.qty, x.rate, x.amount]),
             tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount, pr: b.paymentRate, gs: b.gstSlab
         };
         const jsonStr = JSON.stringify(min);
@@ -384,10 +393,14 @@
       else if (view === "settings") { document.getElementById("settings-url").value = gasUrl; document.getElementById("view-settings").classList.remove("hidden"); }
     }
 
-    function renderDashboard() {
+    function getFormattedDate() {
       const d = new Date();
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const today = d.getDate() + " " + months[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
+      return d.getDate() + " " + months[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
+    }
+
+    function renderDashboard() {
+      const today = getFormattedDate();
       
       const todayBills = billsCache.filter(b => b.billDate === today);
       let sales = 0, paid = 0, due = 0;
@@ -718,9 +731,7 @@
         finData = { company: document.getElementById("fin-company").value, dp: totals.paid, loan: totals.grand - totals.paid };
       }
 
-      const dDate = new Date();
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const formattedDate = dDate.getDate() + " " + months[dDate.getMonth()] + " " + String(dDate.getFullYear()).slice(-2);
+      const formattedDate = getFormattedDate();
 
       const billData = {
         invoiceNo: document.getElementById("form-invoice-no").innerText,
@@ -741,15 +752,16 @@
 
       billsCache.unshift(billData); 
 
+      // GOOGLE SHEETS FETCH - 100% FIXED
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
-              mode: "no-cors",
-              headers: { "Content-Type": "text/plain" },
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify({ action: "createBill", billData: billData }) 
           })
           .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!", false, billData); })
-          .catch(err => { showPopup("Sync Error", "Bill generated locally, but failed to sync to Cloud.", true, billData); });
+          .catch(err => { showPopup("Sync Error", "Internet problem. Saved locally but failed to sync.", true, billData); });
       } else {
           showPopup("Bill Generated", "Invoice generated locally. Add Backend URL in settings to sync.", false, billData);
       }
@@ -773,9 +785,9 @@
             <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10px] text-slate-900">${i+1}</td>
             <td class="p-1.5 border border-[#004aad] font-bold text-[10px] text-slate-900">${it.name}</td>
             <td class="p-1.5 border border-[#004aad] font-bold text-[10px] text-slate-900 break-all">${it.imei}</td>
-            <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10px] text-slate-900">${it.qty}</td>
-            <td class="p-1.5 border border-[#004aad] text-right font-bold text-[10px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
-            <td class="p-1.5 border border-[#004aad] text-right font-bold text-[10px] text-slate-900">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-qty font-bold text-[10px] text-slate-900">${it.qty}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-rate font-bold text-[10px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-amt font-bold text-[10px] text-slate-900">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
           </tr>`;
         } else {
           tbody.innerHTML += `<tr>
@@ -804,7 +816,7 @@
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
       document.getElementById("inv-qr-container").innerHTML = "";
-      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
       showView("invoice");
     }
 
@@ -853,7 +865,7 @@
       
       doc.text("S.No", 19, y+4.5); 
       doc.text("Brand / Product", 35, y+4.5); 
-      doc.text("Model / IMEI", 95, y+4.5); 
+      doc.text("Model / IMEI", 88, y+4.5); 
       doc.text("Qty.", 138, y+4.5); 
       doc.text("Rate", 154, y+4.5);
       doc.text("Amount", 177, y+4.5);
@@ -893,7 +905,8 @@
           doc.text("to verify and open online.", 46, y+29);
       }
 
-      doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
+      // PERFECT VERTICAL ALIGNMENT (x=134 perfectly matches Qty left line)
+      doc.rect(134, y, 61, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       
       let rY = y;
@@ -907,10 +920,10 @@
       }
       
       breakdown.forEach(row => {
-        doc.line(130, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
-        doc.text(row.l, 133, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5;
+        doc.line(134, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
+        doc.text(row.l, 137, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5;
       });
-      doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
+      doc.setFillColor(...blue); doc.rect(134, rY, 61, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 137, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
 
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
