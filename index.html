@@ -41,12 +41,13 @@
     </div>
   </header>
 
+  <!-- POPUP RE-DESIGNED TO WAIT FOR USER CLICK -->
   <div id="center-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-100 transition-transform border-2 border-[#004aad]">
       <div id="popup-icon" class="text-6xl mb-3">✅</div>
       <h3 id="popup-title" class="text-xl font-black text-slate-900 uppercase tracking-wide">Success</h3>
       <p id="popup-message" class="text-sm font-bold text-slate-600 mt-2 mb-6">Data saved successfully!</p>
-      <button onclick="document.getElementById('center-popup').classList.add('hidden')" class="w-full py-3 bg-[#004aad] text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-md">OK</button>
+      <button onclick="closePopup()" class="w-full py-3 bg-[#004aad] text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-md">OK</button>
     </div>
   </div>
 
@@ -314,13 +315,25 @@
     let activeInvoiceData = null;
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
+    let pendingBillData = null; // Used for delaying invoice view until popup is closed
 
-    function showPopup(title, msg, isError = false) {
+    // FIXED 3: POPUP BEFORE INVOICE VIEW
+    function showPopup(title, msg, isError = false, billToDisplay = null) {
       document.getElementById("popup-title").innerText = title;
       document.getElementById("popup-message").innerText = msg;
       document.getElementById("popup-icon").innerText = isError ? "❌" : "✅";
       document.getElementById("popup-title").className = `text-xl font-black uppercase tracking-wide ${isError ? 'text-rose-600' : 'text-[#004aad]'}`;
+      
+      pendingBillData = billToDisplay;
       document.getElementById("center-popup").classList.remove("hidden");
+    }
+
+    function closePopup() {
+      document.getElementById("center-popup").classList.add("hidden");
+      if (pendingBillData) {
+          displayInvoice(pendingBillData);
+          pendingBillData = null;
+      }
     }
 
     function saveSettings() {
@@ -336,7 +349,7 @@
             i: String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-5), 
             d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress, cg: b.customerGstin,
             it: b.items.filter(x=>x).map(x => [x.name.substring(0,25), x.imei.substring(0,40), x.qty, x.rate, x.amount]),
-            tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount, pr: b.paymentRate
+            tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount, pr: b.paymentRate, gs: b.gstSlab
         };
         const jsonStr = JSON.stringify(min);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
@@ -351,11 +364,8 @@
         const yr = new Date(min.d).getFullYear() || new Date().getFullYear();
         const invNo = `SRE-${yr}-${String(min.i).padStart(5, '0')}`;
         
-        let gt = 0;
-        min.it.forEach(item => { 
-            let amt = item.length === 4 ? item[3] : item[4];
-            gt += amt; 
-        });
+        // Accurate reconstruction of Grand Total
+        let gt = Math.round(min.tx + min.tg);
         
         return {
             invoiceNo: invNo, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a, customerGstin: min.cg,
@@ -363,10 +373,10 @@
                 name: x[0], 
                 imei: x[1], 
                 qty: x[2], 
-                rate: x.length === 4 ? (x[2] > 0 ? Number((x[3]/x[2]).toFixed(2)) : 0) : x[3], 
-                amount: x.length === 4 ? x[3] : x[4]
+                rate: x[3], 
+                amount: x[4]
             })),
-            grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td, paymentRate: min.pr || ""
+            grandTotal: gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td, paymentRate: min.pr || "", gstSlab: min.gs || 18
         };
     }
 
@@ -574,10 +584,9 @@
       }
 
       const globalDisc = Number(document.getElementById("global-discount").value) || 0;
-      const totalDiscount = globalDisc;
-      grand = Math.max(0, grand - totalDiscount);
-      
       const globalGstRate = Number(document.getElementById("global-gst").value) || 0;
+      
+      const totalDiscount = globalDisc;
       const totalTaxable = grand / (1 + (globalGstRate/100));
       const totalGst = grand - totalTaxable;
 
@@ -589,7 +598,7 @@
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
       
-      return { grand, paid, due, totalTaxable, totalGst, totalDiscount };
+      return { grand, paid, due, totalTaxable, totalGst, totalDiscount, gstSlab: globalGstRate };
     }
 
     function saveBill() {
@@ -605,7 +614,6 @@
         if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       }
 
-      // STRICT VALIDATIONS START
       const s_val = document.getElementById("pay-secondary").value;
       const p_val = document.getElementById("pay-primary").value;
       let aMode = p_val;
@@ -647,7 +655,7 @@
 
       let items = [];
       if (currentBillType === "REPAIRING") {
-        items = [{ name: document.getElementById("rep-device").value.trim(), imei: document.getElementById("rep-issue").value.trim(), qty: 1, rate: totals.grand, amount: totals.grand }];
+        items = [{ name: document.getElementById("rep-device").value.trim(), imei: document.getElementById("rep-issue").value.trim(), qty: 1, rate: totals.totalTaxable + totals.totalDiscount, amount: totals.totalTaxable + totals.totalDiscount }];
       } else {
         let err = false; let imeiErr = false;
         let totalQty = 0;
@@ -656,8 +664,9 @@
            totalQty += Number(r.querySelector(".item-qty").value) || 1;
         });
         
-        const fullGrand = totals.grand + totals.totalDiscount;
-        const unitRate = totalQty > 0 ? Number((fullGrand / totalQty).toFixed(2)) : 0;
+        // FIXED 1: REVERSE CALCULATION OF TRUE BASIC RATE (TAXABLE + DISCOUNT)
+        const totalBasicValue = totals.totalTaxable + totals.totalDiscount;
+        const unitBasicRate = totalQty > 0 ? Number((totalBasicValue / totalQty).toFixed(2)) : 0;
 
         document.querySelectorAll(".item-row").forEach(r => {
           const pName = r.querySelector(".item-name").value.trim();
@@ -673,11 +682,11 @@
           }
           
           const q = Number(r.querySelector(".item-qty").value)||1;
-          const amt = q * unitRate;
+          const amt = q * unitBasicRate;
 
           items.push({ 
             name: pName, imei: validImeis.join(", "), 
-            qty: q, rate: unitRate, amount: amt 
+            qty: q, rate: unitBasicRate, amount: amt 
           });
         });
         if(err) return showPopup("Validation Error", "प्रोडक्ट नाम भरना अनिवार्य है!", true);
@@ -685,19 +694,17 @@
       }
 
       let cashAmt = 0, qrAmt = 0, cardAmt = 0;
-      const s = document.getElementById("pay-secondary").value;
-      const p = document.getElementById("pay-primary").value;
 
       if (!checkSplit) {
         if (aMode.includes("Cash")) cashAmt = totals.paid;
         if (aMode.includes("QR")) qrAmt = totals.paid;
         if (aMode.includes("Card")) cardAmt = totals.paid;
       } else {
-        if (s === "Finance") {
+        if (s_val === "Finance") {
           if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || 0;
           if(aMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || 0;
           if(aMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || 0;
-        } else if (s === "Dues") {
+        } else if (s_val === "Dues") {
           if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || 0;
           if(aMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || 0;
           if(aMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || 0;
@@ -709,11 +716,11 @@
       }
 
       const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
-      const pRate = (s === "Finance") ? document.getElementById("fin-rate").value : (s === "Dues" ? document.getElementById("dues-rate").value : "");
+      const pRate = (s_val === "Finance") ? document.getElementById("fin-rate").value : (s_val === "Dues" ? document.getElementById("dues-rate").value : "");
       
       const token = Math.random().toString(36).substring(2, 8).toUpperCase();
       let finData = null;
-      if(s === "Finance"){
+      if(s_val === "Finance"){
         finData = { company: document.getElementById("fin-company").value, dp: totals.paid, loan: totals.grand - totals.paid };
       }
 
@@ -721,10 +728,10 @@
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
         billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
-        paymentMode: s || p, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
+        paymentMode: s_val || p_val, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
-        finance: finData, token: token
+        gstSlab: totals.gstSlab, finance: finData, token: token
       };
 
       try {
@@ -743,13 +750,11 @@
               headers: { "Content-Type": "text/plain" },
               body: JSON.stringify({ action: "createBill", billData: billData }) 
           })
-          .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!"); })
-          .catch(err => { showPopup("Sync Error", "Bill generated locally, but failed to sync to Cloud.", true); });
+          .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!", false, billData); })
+          .catch(err => { showPopup("Sync Error", "Bill generated locally, but failed to sync to Cloud.", true, billData); });
       } else {
-          showPopup("Bill Generated", "Invoice generated locally. Add Backend URL in settings to sync.");
+          showPopup("Bill Generated", "Invoice generated locally. Add Backend URL in settings to sync.", false, billData);
       }
-      
-      displayInvoice(billData);
     }
 
     function displayInvoice(bill) {
@@ -766,7 +771,7 @@
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
-          tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1.5 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1.5 border border-[#004aad] font-mono text-[9px] text-slate-700 break-all">${it.imei}</td><td class="p-1.5 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1.5 border border-[#004aad] text-right font-semibold">${Number(it.rate).toLocaleString("en-IN")}</td><td class="p-1.5 border border-[#004aad] text-right font-black text-slate-950">${Number(it.amount).toLocaleString("en-IN")}</td></tr>`;
+          tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center font-bold">${i+1}</td><td class="p-1.5 border border-[#004aad] font-bold text-slate-950">${it.name}</td><td class="p-1.5 border border-[#004aad] font-mono text-[9px] text-slate-700 break-all">${it.imei}</td><td class="p-1.5 border border-[#004aad] text-center font-bold">${it.qty}</td><td class="p-1.5 border border-[#004aad] text-right font-semibold">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td><td class="p-1.5 border border-[#004aad] text-right font-black text-slate-950">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td></tr>`;
         } else {
           tbody.innerHTML += `<tr><td class="p-1.5 border border-[#004aad] text-center text-slate-300">${i+1}</td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td></tr>`;
         }
@@ -774,20 +779,22 @@
 
       const grand = Number(bill.grandTotal) || 0;
       const gst = Number(bill.totalGst) || 0;
-      const subtotal = grand + Number(bill.totalDiscount) - gst;
+      const subtotal = bill.totalTaxable + bill.totalDiscount;
 
+      // FIXED 2: 9% CGST & 9% SGST Labels
       const bd = document.getElementById("inv-total-breakdown");
       let bdHtml = `<div class="flex justify-between p-1.5"><span>Subtotal</span><span class="font-black">Rs. ${subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       if(Number(bill.totalDiscount) > 0) {
-        bdHtml += `<div class="flex justify-between p-1.5"><span>Discount</span><span>-${Number(bill.totalDiscount).toLocaleString("en-IN")}</span></div>`;
+        bdHtml += `<div class="flex justify-between p-1.5"><span>Discount</span><span>-${Number(bill.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       }
       if(gst > 0) {
+        const halfGst = (bill.gstSlab / 2) || 9;
         bdHtml += `<div class="flex justify-between p-1.5 text-slate-700"><span>Taxable Value</span><span>Rs. ${Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
-                   <div class="flex justify-between p-1.5 text-slate-700"><span>CGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
-                   <div class="flex justify-between p-1.5 text-slate-700"><span>SGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+                   <div class="flex justify-between p-1.5 text-slate-700"><span>${halfGst}% CGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
+                   <div class="flex justify-between p-1.5 text-slate-700"><span>${halfGst}% SGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       }
       bd.innerHTML = bdHtml;
-      document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
+      document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
       document.getElementById("inv-qr-container").innerHTML = "";
       new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
@@ -862,8 +869,8 @@
           doc.setFontSize(imeiStr.length > 18 ? 6 : 7.5);
           doc.text(imeiStr.substring(0, 42), 87, y+4.5);
           doc.setFontSize(8); doc.text(String(item.qty), 141, y+5, { align:"center" });
-          doc.text(Number(item.rate).toLocaleString("en-IN"), 165, y+5, { align:"right" });
-          doc.setFont("helvetica", "bold"); doc.text(Number(item.amount).toLocaleString("en-IN"), 192, y+5, { align:"right" });
+          doc.text(Number(item.rate).toLocaleString("en-IN", {minimumFractionDigits: 2}), 165, y+5, { align:"right" });
+          doc.setFont("helvetica", "bold"); doc.text(Number(item.amount).toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, y+5, { align:"right" });
         }
         y += 7.5;
       }
@@ -883,19 +890,20 @@
       const grand = Number(b.grandTotal);
       
       let rY = y;
-      let breakdown = [ {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
-      if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: "-"+Number(b.totalDiscount).toLocaleString("en-IN")});
+      let breakdown = [ {l:"Subtotal", v: (b.totalTaxable+Number(b.totalDiscount)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
+      if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: "-"+Number(b.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})});
       if(Number(b.totalGst) > 0) {
+          const halfGst = (b.gstSlab / 2) || 9;
           breakdown.push({l:"Taxable Value", v: Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})});
-          breakdown.push({l:"CGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
-          breakdown.push({l:"SGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          breakdown.push({l: halfGst + "% CGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          breakdown.push({l: halfGst + "% SGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
       }
       
       breakdown.forEach(row => {
         doc.line(130, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
         doc.text(row.l, 133, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5;
       });
-      doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN"), 192, rY+6, {align:"right"});
+      doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
 
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
