@@ -92,15 +92,13 @@
         <div><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
+      <!-- FIXED: REPAIR CHARGE REMOVED -->
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
         <div class="grid grid-cols-2 gap-2.5">
           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Customer Mobile *</label><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Mobile No" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Device / Model *</label><input type="text" id="rep-device" placeholder="Model Name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
         </div>
         <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Issue Description *</label><textarea id="rep-issue" rows="2" placeholder="Issue Details..." class="w-full p-2 border rounded text-xs outline-none uppercase"></textarea></div>
-        <div class="flex space-x-2">
-          <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Repair Charge (Rs.) *</label><input type="number" id="rep-charge" placeholder="Amount" oninput="recalcTotals()" class="w-full p-2 border border-amber-400 rounded text-xs font-black outline-none" /></div>
-        </div>
       </div>
 
       <div id="items-box" class="space-y-2.5">
@@ -456,7 +454,6 @@
       document.getElementById("repair-box").classList.toggle("hidden", type !== "REPAIRING");
       document.getElementById("items-container").innerHTML = "";
       
-      // Dynamic Labels Logic (Removing mandatory '*' for Accessories)
       if (type === "ACCESSORIES") {
         document.getElementById("lbl-cust-name").innerText = "Customer Name";
         document.getElementById("lbl-cust-phone").innerText = "Mobile";
@@ -472,13 +469,13 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("cust-gstin").value = "";
 
-      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount", "rep-phone", "rep-device", "rep-charge", "rep-issue"].forEach(id => {
+      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount", "rep-phone", "rep-device", "rep-issue"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
       });
       document.getElementById("pay-primary").value = "Cash";
       document.getElementById("pay-secondary").value = "";
-      document.getElementById("global-gst").value = "0"; // Default GST 0%
+      document.getElementById("global-gst").value = "0"; 
       onPaymentModeChange();
 
       if(type !== "REPAIRING") addNewItemRow(true);
@@ -491,10 +488,12 @@
 
     function changeBillType(type) { startNewBill(type); }
 
+    // FIXED: RENDER IMEI OR SERIAL NO BASED ON BILL TYPE
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
-      if (currentBillType !== "MOBILE") { imeiBox.innerHTML = ""; return; }
+      if (currentBillType === "REPAIRING") { imeiBox.innerHTML = ""; return; }
       
+      const isMobile = currentBillType === "MOBILE";
       const existingImeis = Array.from(imeiBox.querySelectorAll(".item-imei")).map(inp => inp.value);
       let qty = Math.max(1, Number(row.querySelector(".item-qty").value) || 1);
       if (qty > 10) qty = 10; 
@@ -502,10 +501,17 @@
       let html = '<div class="grid grid-cols-2 gap-2 mt-2">';
       for(let i=0; i < qty; i++){ 
         const val = existingImeis[i] || "";
-        html += `<div>
-                   <label class="text-[10px] font-bold text-slate-600 block mb-1">IMEI ${i+1} *</label>
-                   <input type="text" maxlength="15" value="${val}" placeholder="15 Digit IMEI" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none uppercase" />
-                 </div>`; 
+        if (isMobile) {
+          html += `<div>
+                     <label class="text-[10px] font-bold text-slate-600 block mb-1">IMEI ${i+1} *</label>
+                     <input type="text" maxlength="15" value="${val}" placeholder="15 Digit IMEI" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none uppercase" />
+                   </div>`; 
+        } else {
+          html += `<div>
+                     <label class="text-[10px] font-bold text-slate-600 block mb-1">Serial No ${i+1}</label>
+                     <input type="text" value="${val}" placeholder="Serial Number" class="item-imei w-full p-1.5 border rounded text-xs font-mono font-bold outline-none uppercase" />
+                   </div>`;
+        }
       }
       html += '</div>';
       imeiBox.innerHTML = html;
@@ -603,6 +609,7 @@
       recalcTotals();
     }
 
+    // FIXED: UNIFIED GRAND TOTAL CALCULATION (Repairing uses main payment UI too)
     function recalcTotals() {
       let rawPaid = 0;
       const s = document.getElementById("pay-secondary").value;
@@ -633,16 +640,12 @@
       }
 
       let grand = 0;
-      if (currentBillType === "REPAIRING") {
-        grand = Number(document.getElementById("rep-charge").value) || 0;
+      if (s === "Finance") {
+          grand = Number(document.getElementById("fin-rate").value) || 0;
+      } else if (s === "Dues") {
+          grand = Number(document.getElementById("dues-rate").value) || 0;
       } else {
-        if (s === "Finance") {
-            grand = Number(document.getElementById("fin-rate").value) || 0;
-        } else if (s === "Dues") {
-            grand = Number(document.getElementById("dues-rate").value) || 0;
-        } else {
-            grand = rawPaid;
-        }
+          grand = rawPaid;
       }
 
       const globalDisc = Number(document.getElementById("global-discount").value) || 0;
@@ -734,11 +737,15 @@
           if(!pName) err = true;
           
           let validImeis = [];
-          if(currentBillType === "MOBILE"){
+          if(currentBillType === "MOBILE" || currentBillType === "ACCESSORIES"){
             Array.from(r.querySelectorAll(".item-imei")).forEach(inp => {
                const val = inp.value.trim().toUpperCase();
-               if(val.length !== 15) imeiErr = true;
-               validImeis.push(val);
+               if(currentBillType === "MOBILE") {
+                   if(val.length !== 15) imeiErr = true;
+                   validImeis.push(val);
+               } else {
+                   if(val) validImeis.push(val); 
+               }
             });
           }
           
@@ -746,7 +753,7 @@
           const amt = q * unitBasicRate;
 
           items.push({ 
-            name: pName, imei: validImeis.join(", "), 
+            name: pName, imei: validImeis.length > 0 ? validImeis.join(", ") : "-", 
             qty: q, rate: unitBasicRate, amount: amt 
           });
         });
