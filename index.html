@@ -348,7 +348,7 @@
       showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // QR DATA COMPRESSED SAFELY (Skips empty products)
+    // QR DATA COMPRESSED SAFELY
     function compressBill(b) {
         const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
         const min = {
@@ -752,12 +752,11 @@
 
       billsCache.unshift(billData); 
 
-      // GOOGLE SHEETS FETCH - 100% FIXED
+      // 100% FIXED GOOGLE SHEETS FETCH (Uses mode: 'no-cors' to bypass CORS completely)
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
-              redirect: "follow",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              mode: "no-cors",
               body: JSON.stringify({ action: "createBill", billData: billData }) 
           })
           .then(() => { showPopup("Bill Generated", "Invoice generated and synced to Cloud successfully!", false, billData); })
@@ -782,16 +781,16 @@
         const it = bill.items[i];
         if (it) {
           tbody.innerHTML += `<tr>
-            <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10px] text-slate-900">${i+1}</td>
-            <td class="p-1.5 border border-[#004aad] font-bold text-[10px] text-slate-900">${it.name}</td>
-            <td class="p-1.5 border border-[#004aad] font-bold text-[10px] text-slate-900 break-all">${it.imei}</td>
-            <td class="p-1.5 border border-[#004aad] table-col-qty font-bold text-[10px] text-slate-900">${it.qty}</td>
-            <td class="p-1.5 border border-[#004aad] table-col-rate font-bold text-[10px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
-            <td class="p-1.5 border border-[#004aad] table-col-amt font-bold text-[10px] text-slate-900">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
+            <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10.5px] text-slate-900">${i+1}</td>
+            <td class="p-1.5 border border-[#004aad] font-bold text-[10.5px] text-slate-900">${it.name}</td>
+            <td class="p-1.5 border border-[#004aad] font-bold text-[10.5px] text-slate-900 break-all">${it.imei}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-qty font-bold text-[10.5px] text-slate-900">${it.qty}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-rate font-bold text-[10.5px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
+            <td class="p-1.5 border border-[#004aad] table-col-amt font-bold text-[10.5px] text-slate-900">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
           </tr>`;
         } else {
           tbody.innerHTML += `<tr>
-            <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10px] text-slate-300">${i+1}</td>
+            <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10.5px] text-slate-300">${i+1}</td>
             <td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td>
           </tr>`;
         }
@@ -816,7 +815,7 @@
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
       document.getElementById("inv-qr-container").innerHTML = "";
-      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
+      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
       showView("invoice");
     }
 
