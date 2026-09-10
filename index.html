@@ -30,7 +30,7 @@
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <!-- TOP HEADER -->
-  <header class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
+  <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
       <div class="border-2 border-white rounded-full w-8 h-8 flex items-center justify-center font-black text-xs">SRE</div>
       <div>
@@ -63,7 +63,7 @@
         <button onclick="startNewBill('REPAIRING')" class="p-3 bg-slate-800 text-white rounded-xl shadow font-bold text-xs">🔧 Repairing</button>
       </div>
       <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs">Recent Invoices</div>
+        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs">Current Session Invoices</div>
         <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto"></div>
       </div>
     </div>
@@ -135,14 +135,12 @@
           </div>
         </div>
 
-        <!-- REGULAR SPLIT -->
         <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
           <input type="number" id="split-cash" placeholder="Cash Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
           <input type="number" id="split-qr" placeholder="QR Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
           <input type="number" id="split-card" placeholder="Card Amount" oninput="recalcTotals()" class="hidden w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" />
         </div>
 
-        <!-- FINANCE SPLIT -->
         <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-2 gap-2 mb-2">
             <input type="text" id="fin-company" placeholder="Fin Company Name" class="p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" />
@@ -159,7 +157,6 @@
           </div>
         </div>
 
-        <!-- DUES SPLIT -->
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
           <div class="mb-2">
             <select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
@@ -175,13 +172,11 @@
           </div>
         </div>
 
-        <!-- TOTAL PAID (SMART INPUT) -->
         <div>
           <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
           <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none bg-white" placeholder="Enter Amount..." />
         </div>
 
-        <!-- FINANCE LOAN AMOUNT -->
         <div id="finance-loan-row" class="hidden mt-2 flex justify-between items-center text-[11px] font-bold text-[#004aad] bg-blue-100 px-3 py-2 rounded-lg border border-blue-300">
           <span class="uppercase tracking-wider">Finance Company Loan :</span>
           <span id="fin-loan-display" class="text-sm font-black">Rs. 0</span>
@@ -199,41 +194,50 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - CLEAN HEADER & PROPER ADDRESS -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) -->
     <div id="view-invoice" class="space-y-3.5 hidden">
-      <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
+      <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
           <button onclick="downloadVectorPDF()" class="px-4 py-2 bg-[#004aad] text-white font-bold text-xs rounded shadow">📥 DOWNLOAD PDF</button>
-          <button onclick="shareWhatsApp()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded shadow">💬 WHATSAPP</button>
+          <button onclick="shareWhatsApp()" id="btn-whatsapp" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded shadow">💬 WHATSAPP</button>
         </div>
-        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600">← Back</button>
+        <button onclick="showView('dashboard')" id="btn-back" class="text-xs font-bold text-slate-600">← Back</button>
       </div>
 
       <div class="w-full flex justify-center overflow-x-auto pb-6">
         <div id="invoice-capture" class="bg-white p-6 border-2 border-[#004aad] text-xs text-slate-900 w-[700px] min-w-[700px]">
           
-          <div class="text-center w-full pb-3 border-b border-slate-200">
-            <h1 class="text-[28px] font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
-            <p class="text-[13px] font-bold text-[#004aad] my-1">Mobile • Accessories • Repairing</p>
-            <p class="text-[10px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
-            <p class="text-[11px] font-bold text-slate-800 mt-0.5">GSTIN: 20APOPK6864K1ZH • Ph: 9334765000, 9334237111</p>
+          <!-- FIXED HEADER: Logo Left, Text Center, Contacts Right -->
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div class="w-1/4 text-left">
+              <div class="w-14 h-14 border-2 border-[#004aad] rounded-full flex flex-col items-center justify-center text-center">
+                <span class="text-[6px] font-bold text-[#004aad] leading-none">ENTERPRISES</span>
+                <span class="text-sm font-black text-[#004aad] leading-none my-0.5">SRE</span>
+              </div>
+            </div>
+            <div class="w-1/2 text-center">
+              <h1 class="text-2xl font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
+              <p class="text-[11px] font-bold text-[#004aad] my-0.5">Mobile • Accessories • Repairing</p>
+              <p class="text-[9px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
+            </div>
+            <div class="w-1/4 text-right">
+              <p class="text-[10px] font-bold text-slate-800">GSTIN: 20APOPK6864K1ZH</p>
+              <p class="text-[10px] font-bold text-slate-800 mt-1">Ph: 9334765000</p>
+              <p class="text-[10px] font-bold text-slate-800">9334237111</p>
+            </div>
           </div>
 
           <div class="bg-[#004aad] text-white font-black text-center py-1 text-xs tracking-widest uppercase my-2">TAX INVOICE</div>
 
-          <!-- REFINED CUSTOMER DETAILS WITH ADDRESS -->
-          <div class="space-y-1.5 py-0.5 text-[11px] font-bold text-slate-800 border-b border-slate-200 pb-2">
-            <div class="flex justify-between">
-              <span class="flex-1">Invoice No. : <span id="inv-no" class="font-black border-b border-dotted border-slate-500"></span></span>
-              <span class="w-36 text-right">Date : <span id="inv-date" class="border-b border-dotted border-slate-500"></span></span>
+          <!-- FIXED CUSTOMER DETAILS (Aligned Grid) -->
+          <div class="py-1.5 text-[11px] font-bold text-slate-800 border-b border-slate-200 pb-2">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              <div class="flex"><span class="w-16">Invoice No.</span><span class="mx-1">:</span><span id="inv-no" class="font-black border-b border-dotted border-slate-500 flex-1"></span></div>
+              <div class="flex"><span class="w-12 text-right">Date</span><span class="mx-1">:</span><span id="inv-date" class="border-b border-dotted border-slate-500 flex-1 text-center"></span></div>
+              <div class="flex"><span class="w-16">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-black border-b border-dotted border-slate-500 flex-1"></span></div>
+              <div class="flex"><span class="w-12 text-right">Mobile</span><span class="mx-1">:</span><span id="inv-cust-phone" class="font-mono border-b border-dotted border-slate-500 flex-1 text-center"></span></div>
             </div>
-            <div class="flex justify-between mt-1">
-              <span class="flex-1">Name : <span id="inv-cust-name" class="font-black border-b border-dotted border-slate-500"></span></span>
-              <span class="w-48 text-right">Ph. : <span id="inv-cust-phone" class="border-b border-dotted border-slate-500 font-mono"></span></span>
-            </div>
-            <div class="mt-1">
-              <span class="w-full">Address : <span id="inv-cust-address" class="border-b border-dotted border-slate-500 font-medium"></span></span>
-            </div>
+            <div class="flex mt-1.5"><span class="w-16">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="border-b border-dotted border-slate-500 flex-1 font-medium"></span></div>
           </div>
 
           <!-- EXACT 8 ROWS TABLE -->
@@ -253,14 +257,6 @@
             </table>
           </div>
 
-          <!-- GST SUMMARY -->
-          <div id="inv-gst-box" class="flex justify-between border-x-2 border-b-2 border-[#004aad] p-1.5 text-[9.5px] font-bold bg-slate-50 hidden">
-            <span>Taxable: <span id="inv-taxable">0</span></span>
-            <span>CGST: <span id="inv-cgst">0</span></span>
-            <span>SGST: <span id="inv-sgst">0</span></span>
-            <span>Total GST: <span id="inv-tot-gst">0</span></span>
-          </div>
-
           <div class="flex items-stretch justify-between border-x-2 border-b-2 border-[#004aad]">
             <div class="flex-1 flex flex-col justify-between p-3">
               <p class="thank-you-text text-4xl text-[#004aad] -rotate-6">Thank You<br />for your Business!</p>
@@ -270,11 +266,10 @@
               </div>
             </div>
 
-            <!-- CLEAN TOTAL BOX -->
-            <div class="w-60 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
-              <div class="divide-y divide-[#004aad]">
-                <div class="flex justify-between p-1.5"><span>Subtotal</span><span id="inv-calc-subtotal" class="font-black">Rs. 0</span></div>
-                <div class="flex justify-between p-1.5"><span>Discount</span><span id="inv-calc-discount">0</span></div>
+            <!-- FIXED GST INCLUDED IN RIGHT TOTAL BOX -->
+            <div class="w-64 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
+              <div class="divide-y divide-[#004aad]" id="inv-total-breakdown">
+                <!-- GST data injected via JS -->
               </div>
               <div class="bg-[#004aad] text-white flex justify-between p-2 font-black text-xs mt-auto">
                 <span class="uppercase">Grand Total</span><span id="inv-grand-total">Rs. 0</span>
@@ -282,12 +277,9 @@
             </div>
           </div>
 
-          <div class="flex justify-between items-end mt-7 pt-1 text-[10px] font-bold text-slate-800">
-            <div class="border-t border-slate-500 pt-0.5 w-36 text-center">Customer's Signature</div>
-            <div class="text-right">
-              <span class="text-[#004aad] font-black block">For SRI RAM ENTERPRISES</span><div class="h-6"></div>
-              <span class="border-t border-slate-500 pt-0.5 inline-block w-40 text-center">Authorized Signatory</span>
-            </div>
+          <!-- FIXED E-BILL TEXT (NO SIGNATURE) -->
+          <div class="mt-7 text-center text-[10px] font-bold text-slate-500 italic">
+            * This is a computer-generated electronic invoice and does not require physical signatures.
           </div>
 
         </div>
@@ -309,8 +301,28 @@
   <script>
     let currentBillType = "MOBILE";
     let activeInvoiceData = null;
-    let billsCache = JSON.parse(localStorage.getItem("sre_bills_cache") || "[]");
+    // FIX (vi): Browser local storage se load/save hataya gaya hai. Session caching in variable only.
+    let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
+
+    // QR Data Compression
+    function compressBill(b) {
+        const min = {
+            i: b.invoiceNo, d: b.billDate, c: b.customerName, m: b.customerMobile, a: b.customerAddress,
+            it: b.items.filter(x=>x).map(x => [x.name, x.imei, x.qty, x.rate, x.amount]),
+            gt: b.grandTotal, tx: b.totalTaxable, tg: b.totalGst, td: b.totalDiscount
+        };
+        return encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(min)))));
+    }
+
+    function expandBill(str) {
+        const min = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(str)))));
+        return {
+            invoiceNo: min.i, billDate: min.d, customerName: min.c, customerMobile: min.m, customerAddress: min.a,
+            items: min.it.map(x => ({name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4]})),
+            grandTotal: min.gt, totalTaxable: min.tx, totalGst: min.tg, totalDiscount: min.td
+        };
+    }
 
     function showToast(msg) {
       const t = document.getElementById("toast");
@@ -341,8 +353,8 @@
       document.getElementById("dash-paid").innerText = "Rs. " + paid.toLocaleString("en-IN");
       document.getElementById("dash-due").innerText = "Rs. " + due.toLocaleString("en-IN");
       const list = document.getElementById("recent-bills-list");
-      list.innerHTML = billsCache.length === 0 ? '<p class="p-4 text-center text-xs text-slate-400">No bills generated yet.</p>' :
-        billsCache.slice(0, 15).map(b => `<div onclick='openSavedBill("${b.token}")' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-xs">${b.customerName}</p></div><div class="font-black text-xs">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}</div></div>`).join("");
+      list.innerHTML = billsCache.length === 0 ? '<p class="p-4 text-center text-xs text-slate-400">No bills in current session.</p>' :
+        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-xs">${b.customerName}</p></div><div class="font-black text-xs">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}</div></div>`).join("");
     }
 
     function startNewBill(type) {
@@ -580,37 +592,8 @@
         if(imeiErr) return alert("IMEI नंबर पूरे 15 अंकों का होना चाहिए!");
       }
 
-      let cashAmt = 0, qrAmt = 0, cardAmt = 0;
       const s = document.getElementById("pay-secondary").value;
       const p = document.getElementById("pay-primary").value;
-      let activeMode = p;
-      if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
-      if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
-
-      const isSplit = activeMode.includes("+");
-
-      if (!isSplit) {
-        if (activeMode.includes("Cash")) cashAmt = totals.paid;
-        if (activeMode.includes("QR")) qrAmt = totals.paid;
-        if (activeMode.includes("Card")) cardAmt = totals.paid;
-      } else {
-        if (s === "Finance") {
-          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || 0;
-          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || 0;
-          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || 0;
-        } else if (s === "Dues") {
-          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || 0;
-          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || 0;
-          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || 0;
-        } else {
-          if(activeMode.includes("Cash")) cashAmt = Number(document.getElementById("split-cash").value) || 0;
-          if(activeMode.includes("QR")) qrAmt = Number(document.getElementById("split-qr").value) || 0;
-          if(activeMode.includes("Card")) cardAmt = Number(document.getElementById("split-card").value) || 0;
-        }
-      }
-
-      const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
-
       const token = Math.random().toString(36).substring(2, 8);
       let finData = null;
       if(s === "Finance"){
@@ -621,14 +604,17 @@
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
         billType: currentBillType, customerName: name, customerMobile: phone, customerAddress: address, items,
-        paymentMode: s || p, paymentBreakdown: paymentBreakdown,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
-        finance: finData, token, publicUrl: `${window.location.origin}${window.location.pathname}?b=${token}`
+        finance: finData, token
       };
 
-      billsCache = [billData, ...billsCache];
-      localStorage.setItem("sre_bills_cache", JSON.stringify(billsCache));
+      // FIX (iv): Compress data for QR Code logic directly
+      const scanPayload = compressBill(billData);
+      billData.publicUrl = `${window.location.origin}${window.location.pathname}?scan=${scanPayload}`;
+
+      billsCache.unshift(billData); // Save to in-memory only (Fix vi)
+      
       if (gasUrl) fetch(gasUrl, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "createBill", billData }) }).catch(()=>{});
       displayInvoice(billData);
     }
@@ -656,25 +642,24 @@
       const gst = Number(bill.totalGst) || 0;
       const subtotal = grand + Number(bill.totalDiscount) - gst;
 
-      document.getElementById("inv-calc-subtotal").innerText = "Rs. " + subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2});
-      document.getElementById("inv-calc-discount").innerText = Number(bill.totalDiscount || 0).toLocaleString("en-IN");
+      // FIX (i): Render GST in main total box perfectly
+      const bd = document.getElementById("inv-total-breakdown");
+      let bdHtml = `<div class="flex justify-between p-1.5"><span>Subtotal</span><span class="font-black">Rs. ${subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+      if(Number(bill.totalDiscount) > 0) {
+        bdHtml += `<div class="flex justify-between p-1.5"><span>Discount</span><span>${Number(bill.totalDiscount).toLocaleString("en-IN")}</span></div>`;
+      }
+      if(gst > 0) {
+        bdHtml += `<div class="flex justify-between p-1.5 text-slate-700"><span>Taxable Value</span><span>Rs. ${Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
+                   <div class="flex justify-between p-1.5 text-slate-700"><span>CGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>
+                   <div class="flex justify-between p-1.5 text-slate-700"><span>SGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+      }
+      bd.innerHTML = bdHtml;
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
-
-      const gstBox = document.getElementById("inv-gst-box");
-      if(gst > 0){
-        gstBox.classList.remove("hidden");
-        document.getElementById("inv-taxable").innerText = Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2});
-        document.getElementById("inv-cgst").innerText = (gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2});
-        document.getElementById("inv-sgst").innerText = (gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2});
-        document.getElementById("inv-tot-gst").innerText = gst.toLocaleString("en-IN", {minimumFractionDigits: 2});
-      } else { gstBox.classList.add("hidden"); }
 
       document.getElementById("inv-qr-container").innerHTML = "";
       new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 68, height: 68, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
       showView("invoice");
     }
-
-    function openSavedBill(token) { displayInvoice(billsCache.find(x => x.token === token)); }
 
     function downloadVectorPDF() {
       if (!activeInvoiceData) return;
@@ -685,22 +670,32 @@
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
       
-      doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(...blue); 
-      doc.text("SRI RAM ENTERPRISES", 105, 22, { align: "center" });
-      doc.setFontSize(10); 
-      doc.text("Mobile • Accessories • Repairing", 105, 28, { align: "center" });
-      doc.setFontSize(8); doc.setTextColor(70, 70, 70); 
-      doc.text("GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)", 105, 33, { align: "center" });
-      doc.setTextColor(...dark); 
-      doc.text("GSTIN: 20APOPK6864K1ZH • Ph: 9334765000, 9334237111", 105, 38, { align: "center" });
+      // FIX (ii): PDF Header Layout Left/Right Balance
+      doc.setLineWidth(0.5); doc.circle(28, 24, 9);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(...blue); doc.text("ENTERPRISES", 28, 20, { align: "center" });
+      doc.setFontSize(11); doc.text("SRE", 28, 25, { align: "center" }); doc.setFontSize(6); doc.text("SINCE 2004", 28, 29, { align: "center" });
+      
+      doc.setFontSize(16); doc.text("SRI RAM ENTERPRISES", 105, 20, { align: "center" });
+      doc.setFontSize(9); doc.text("Mobile • Accessories • Repairing", 105, 25, { align: "center" });
+      doc.setFontSize(7.5); doc.setTextColor(70, 70, 70); doc.text("GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)", 105, 29, { align: "center" });
+      
+      doc.setTextColor(...dark); doc.setFontSize(8.5); 
+      doc.text("GSTIN: 20APOPK6864K1ZH", 185, 20, { align: "right" });
+      doc.text("Ph: 9334765000", 185, 25, { align: "right" });
+      doc.text("9334237111", 185, 29, { align: "right" });
       
       doc.setFillColor(...blue); doc.rect(15, 41, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("TAX INVOICE", 105, 45.5, { align: "center" });
 
+      // FIX (iii): Exact Alignment equivalent for PDF
       doc.setTextColor(...dark); doc.setFontSize(8.5);
-      doc.text(`Invoice No. :  ${b.invoiceNo}`, 20, 52); doc.text(`Date :  ${b.billDate}`, 150, 52);
-      doc.text(`Name :  ${b.customerName}`, 20, 58); doc.text(`Ph. :  ${b.customerMobile}`, 150, 58);
-      doc.text(`Address :  ${b.customerAddress || "-"}`, 20, 64);
+      doc.text("Invoice No. :", 20, 52); doc.setFont("helvetica", "bold"); doc.text(b.invoiceNo, 40, 52);
+      doc.setFont("helvetica", "normal"); doc.text("Date :", 140, 52); doc.setFont("helvetica", "bold"); doc.text(b.billDate, 155, 52);
+      
+      doc.setFont("helvetica", "normal"); doc.text("Name :", 20, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerName, 40, 58);
+      doc.setFont("helvetica", "normal"); doc.text("Mobile :", 140, 58); doc.setFont("helvetica", "bold"); doc.text(b.customerMobile || "-", 155, 58);
+      
+      doc.setFont("helvetica", "normal"); doc.text("Address :", 20, 64); doc.setFont("helvetica", "bold"); doc.text(b.customerAddress || "-", 40, 64);
 
       let y = 70;
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
@@ -727,14 +722,6 @@
         y += 7.5;
       }
 
-      if(b.totalGst > 0) {
-        doc.setFillColor(245, 245, 245); doc.rect(15, y, 180, 6, "F"); doc.rect(15, y, 180, 6);
-        doc.setFontSize(7.5); doc.text(`Taxable: Rs. ${Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 20, y+4);
-        doc.text(`CGST: Rs. ${(b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 70, y+4); doc.text(`SGST: Rs. ${(b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 120, y+4);
-        doc.text(`Total GST: Rs. ${Number(b.totalGst).toLocaleString("en-IN", {minimumFractionDigits: 2})}`, 170, y+4);
-        y += 6;
-      }
-
       doc.rect(15, y, 115, 42); doc.setTextColor(...blue); doc.setFont("helvetica", "bold"); doc.setFontSize(14);
       doc.text("Thank You", 22, y+12); doc.text("for your Business!", 22, y+18);
       const qrCanvas = document.querySelector("#inv-qr-container canvas");
@@ -742,19 +729,26 @@
 
       doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
+      
+      // FIX (i) GST Logic PDF
       let rY = y;
-      [ 
-        {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})}, 
-        {l:"Discount", v: Number(b.totalDiscount || 0).toLocaleString("en-IN")} 
-      ].forEach(row => {
-        doc.line(130, rY+6.5, 195, rY+6.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
-        doc.text(row.l, 133, rY+4.5); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4.5, {align:"right"}); rY += 6.5;
+      let breakdown = [ {l:"Subtotal", v: (grand+Number(b.totalDiscount)-Number(b.totalGst)).toLocaleString("en-IN", {minimumFractionDigits: 2})} ];
+      if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: Number(b.totalDiscount).toLocaleString("en-IN")});
+      if(Number(b.totalGst) > 0) {
+          breakdown.push({l:"Taxable Value", v: Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          breakdown.push({l:"CGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          breakdown.push({l:"SGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+      }
+      
+      breakdown.forEach(row => {
+        doc.line(130, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
+        doc.text(row.l, 133, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5;
       });
       doc.setFillColor(...blue); doc.rect(130, rY, 65, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 133, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN"), 192, rY+6, {align:"right"});
 
-      doc.setDrawColor(120); doc.setLineWidth(0.3); doc.line(22, y+62, 65, y+62); doc.line(145, y+62, 188, y+62);
-      doc.setTextColor(...dark); doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.text("Customer's Signature", 43.5, y+66, { align: "center" });
-      doc.setFont("helvetica", "bold"); doc.setTextColor(...blue); doc.text("For SRI RAM ENTERPRISES", 166.5, y+54, { align: "center" }); doc.setFont("helvetica", "normal"); doc.setTextColor(...dark); doc.text("Authorized Signatory", 166.5, y+66, { align: "center" });
+      // FIX (v) E-bill format NO SIGNATURES
+      doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
+      doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
 
       doc.save(`SRE_Invoice_${b.invoiceNo}.pdf`);
     }
@@ -764,17 +758,19 @@
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent("नमस्ते "+activeInvoiceData.customerName+", आपका बिल: "+activeInvoiceData.publicUrl)}`, "_blank");
     }
 
-    function saveSettings() {
-      localStorage.setItem("sre_gas_url", document.getElementById("settings-url").value.trim());
-      showView("dashboard");
-    }
-
     window.addEventListener("DOMContentLoaded", () => {
-      const token = new URLSearchParams(window.location.search).get("b");
-      if (token) {
-        document.getElementById("login-modal").classList.add("hidden");
-        const found = billsCache.find(x => x.token === token);
-        if (found) displayInvoice(found);
+      // FIX (iv): Auto Decode from QR URL
+      const scanParam = new URLSearchParams(window.location.search).get("scan");
+      if (scanParam) {
+          try {
+             const decBill = expandBill(scanParam);
+             document.getElementById("top-invoice-bar").innerHTML = `
+                <div class="w-full flex justify-between items-center bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                   <span class="font-black text-emerald-700 text-xs uppercase tracking-wider">✅ E-Bill Loaded</span>
+                   <button onclick="downloadVectorPDF()" class="px-5 py-2 bg-[#004aad] text-white font-black text-xs rounded-lg shadow-md animate-bounce">📥 DOWNLOAD INVOICE</button>
+                </div>`;
+             displayInvoice(decBill);
+          } catch(e) { alert("Invalid QR Code!"); }
       } else { renderDashboard(); }
     });
   </script>
