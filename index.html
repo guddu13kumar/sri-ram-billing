@@ -105,12 +105,18 @@
         <div id="items-container" class="space-y-2.5"></div>
       </div>
 
-      <!-- PAYMENT -->
+      <!-- PAYMENT SECTION -->
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-2 gap-2.5">
           <div><label class="text-[10px] font-bold text-slate-600">Primary Mode</label>
             <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
-              <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card Swipe">Card Swipe</option><option value="Cash + QR">Cash + QR</option>
+              <option value="Cash">💵 Cash</option>
+              <option value="QR">📲 QR (Paytm/PhonePe)</option>
+              <option value="Card Swipe">💳 Card Swipe</option>
+              <option value="Cash + QR">💵 Cash + 📲 QR</option>
+              <option value="Cash + Card">💵 Cash + 💳 Card</option>
+              <option value="QR + Card">📲 QR + 💳 Card</option>
+              <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
             </select>
           </div>
           <div><label class="text-[10px] font-bold text-rose-700">Secondary Mode</label>
@@ -124,11 +130,16 @@
         <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-2 gap-2 mb-2">
             <input type="text" id="fin-company" placeholder="Fin Company" class="p-1.5 border rounded text-xs font-bold outline-none" />
-            <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border rounded text-xs font-bold outline-none"><option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Cash + QR">DP Cash + QR</option></select>
+            <select id="fin-dp-mode" onchange="onPaymentModeChange()" class="p-1.5 border rounded text-xs font-bold outline-none">
+              <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
+              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
+              <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
+            </select>
           </div>
-          <div id="fin-split-container" class="grid grid-cols-2 gap-2 hidden mb-2">
-            <input type="number" id="fin-split-cash" placeholder="Cash DP (Rs.)" oninput="calcFinSplit()" class="p-1.5 border rounded text-xs font-bold outline-none" />
-            <input type="number" id="fin-split-qr" placeholder="QR DP (Rs.)" oninput="calcFinSplit()" class="p-1.5 border rounded text-xs font-bold outline-none" />
+          <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden mb-2">
+            <input type="number" id="fin-split-cash" placeholder="Cash (Rs.)" oninput="calcFinSplit()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
+            <input type="number" id="fin-split-qr" placeholder="QR (Rs.)" oninput="calcFinSplit()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
+            <input type="number" id="fin-split-card" placeholder="Card (Rs.)" oninput="calcFinSplit()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
           </div>
           <div class="flex justify-between items-center text-xs font-bold text-[#004aad]">
             <input type="number" id="fin-dp" placeholder="Total DP (Rs.)" oninput="handleFinanceChange()" class="w-1/2 p-1.5 border rounded outline-none" />
@@ -139,24 +150,30 @@
         <!-- DUES SPLIT -->
         <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
           <div class="grid grid-cols-2 gap-2 mb-2">
-            <select id="dues-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none"><option value="Cash">Cash Token</option><option value="QR">QR Token</option><option value="Cash + QR">Cash + QR Token</option></select>
+            <select id="dues-mode" onchange="onPaymentModeChange()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
+              <option value="Cash">Token Cash</option><option value="QR">Token QR</option><option value="Card">Token Card</option>
+              <option value="Cash + QR">Token Cash + QR</option><option value="Cash + Card">Token Cash + Card</option>
+              <option value="QR + Card">Token QR + Card</option><option value="Cash + QR + Card">Token Cash + QR + Card</option>
+            </select>
             <input type="number" id="dues-token" placeholder="Total Token (Rs.)" oninput="handleDuesChange()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
-          <div id="dues-split-container" class="grid grid-cols-2 gap-2 hidden">
-            <input type="number" id="dues-split-cash" placeholder="Cash Part (Rs.)" oninput="calcDuesSplit()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
-            <input type="number" id="dues-split-qr" placeholder="QR Part (Rs.)" oninput="calcDuesSplit()" class="p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+          <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
+            <input type="number" id="dues-split-cash" placeholder="Cash (Rs.)" oninput="calcDuesSplit()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="dues-split-qr" placeholder="QR (Rs.)" oninput="calcDuesSplit()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
+            <input type="number" id="dues-split-card" placeholder="Card (Rs.)" oninput="calcDuesSplit()" class="hidden w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" />
           </div>
         </div>
 
         <!-- REGULAR SPLIT -->
-        <div id="split-box" class="pt-2 border-t grid grid-cols-2 gap-2 hidden">
-          <input type="number" id="split-cash" placeholder="Cash Amount (Rs.)" oninput="handleSplitChange()" class="p-1.5 border rounded text-xs font-bold outline-none" />
-          <input type="number" id="split-qr" placeholder="QR Amount (Rs.)" oninput="handleSplitChange()" class="p-1.5 border rounded text-xs font-bold outline-none" />
+        <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
+          <input type="number" id="split-cash" placeholder="Cash (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" id="split-qr" placeholder="QR (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
+          <input type="number" id="split-card" placeholder="Card (Rs.)" oninput="handleSplitChange()" class="hidden w-full p-1.5 border rounded text-xs font-bold outline-none" />
         </div>
 
         <div>
           <label class="text-[10px] font-bold text-slate-600 block mb-1">Total Amount Paid (Rs.) *</label>
-          <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded font-black text-emerald-700 text-sm outline-none" />
+          <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 text-sm outline-none" />
         </div>
       </div>
 
@@ -171,7 +188,7 @@
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) -->
+    <!-- VIEW 3: INVOICE (BLUE VECTOR REPLICA) - COMPLETELY CLEAN (NO PAID/DUE/MODE) -->
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
@@ -206,14 +223,10 @@
               <span class="flex-1">Invoice No. : <span id="inv-no" class="font-black border-b border-dotted border-slate-500"></span></span>
               <span class="w-36">Date : <span id="inv-date" class="border-b border-dotted border-slate-500"></span></span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between mt-1">
               <span class="flex-1">Name : <span id="inv-cust-name" class="font-black border-b border-dotted border-slate-500"></span></span>
-              <span class="w-56 text-right" id="inv-pay-mode"></span>
+              <span class="w-56 text-right">Ph. : <span id="inv-cust-phone" class="border-b border-dotted border-slate-500 font-mono"></span></span>
             </div>
-            <div class="flex justify-between">
-              <span class="flex-1">Ph. : <span id="inv-cust-phone" class="border-b border-dotted border-slate-500 font-mono"></span></span>
-            </div>
-            <div id="inv-fin-text" class="text-blue-900 font-black hidden mt-1"></div>
           </div>
 
           <!-- EXACT 8 ROWS TABLE -->
@@ -250,14 +263,13 @@
               </div>
             </div>
 
+            <!-- CLEAN TOTAL BOX (NO PAID, NO DUE) -->
             <div class="w-60 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
               <div class="divide-y divide-[#004aad]">
                 <div class="flex justify-between p-1.5"><span>Subtotal</span><span id="inv-calc-subtotal" class="font-black">Rs. 0</span></div>
                 <div class="flex justify-between p-1.5"><span>Discount</span><span id="inv-calc-discount">0</span></div>
-                <div class="flex justify-between p-1.5 text-emerald-600"><span>Paid Amount</span><span id="inv-paid-amt">0</span></div>
-                <div class="flex justify-between p-1.5 text-rose-600"><span>Balance Due</span><span id="inv-due-amt">0</span></div>
               </div>
-              <div class="bg-[#004aad] text-white flex justify-between p-2 font-black text-xs">
+              <div class="bg-[#004aad] text-white flex justify-between p-2 font-black text-xs mt-auto">
                 <span class="uppercase">Grand Total</span><span id="inv-grand-total">Rs. 0</span>
               </div>
             </div>
@@ -343,7 +355,6 @@
 
     function changeBillType(type) { startNewBill(type); }
 
-    // DYNAMIC IMEI LOGIC
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
       if (currentBillType !== "MOBILE") { imeiBox.innerHTML = ""; return; }
@@ -377,19 +388,47 @@
     function onPaymentModeChange() {
       const p = document.getElementById("pay-primary").value;
       const s = document.getElementById("pay-secondary").value;
+      
       document.getElementById("fin-box").classList.toggle("hidden", s !== "Finance");
       document.getElementById("dues-box").classList.toggle("hidden", s !== "Dues");
-      document.getElementById("split-box").classList.toggle("hidden", p !== "Cash + QR");
       
-      document.getElementById("fin-split-container").classList.toggle("hidden", document.getElementById("fin-dp-mode").value !== "Cash + QR");
-      document.getElementById("dues-split-container").classList.toggle("hidden", document.getElementById("dues-mode").value !== "Cash + QR");
+      const isSplit = p.includes("+");
+      document.getElementById("split-box").classList.toggle("hidden", s !== "" || !isSplit);
+      
+      if(s === "" && isSplit) {
+        document.getElementById("split-cash").classList.toggle("hidden", !p.includes("Cash"));
+        document.getElementById("split-qr").classList.toggle("hidden", !p.includes("QR"));
+        document.getElementById("split-card").classList.toggle("hidden", !p.includes("Card"));
+      }
+
+      const fMode = document.getElementById("fin-dp-mode").value;
+      const isFinSplit = fMode.includes("+");
+      document.getElementById("fin-split-container").classList.toggle("hidden", !isFinSplit);
+      if(s === "Finance" && isFinSplit) {
+        document.getElementById("fin-split-cash").classList.toggle("hidden", !fMode.includes("Cash"));
+        document.getElementById("fin-split-qr").classList.toggle("hidden", !fMode.includes("QR"));
+        document.getElementById("fin-split-card").classList.toggle("hidden", !fMode.includes("Card"));
+      }
+
+      const dMode = document.getElementById("dues-mode").value;
+      const isDuesSplit = dMode.includes("+");
+      document.getElementById("dues-split-container").classList.toggle("hidden", !isDuesSplit);
+      if(s === "Dues" && isDuesSplit) {
+        document.getElementById("dues-split-cash").classList.toggle("hidden", !dMode.includes("Cash"));
+        document.getElementById("dues-split-qr").classList.toggle("hidden", !dMode.includes("QR"));
+        document.getElementById("dues-split-card").classList.toggle("hidden", !dMode.includes("Card"));
+      }
+      
       recalcTotals();
     }
 
     function calcFinSplit() {
-      const c = Number(document.getElementById("fin-split-cash").value) || 0;
-      const q = Number(document.getElementById("fin-split-qr").value) || 0;
-      document.getElementById("fin-dp").value = c + q;
+      const fMode = document.getElementById("fin-dp-mode").value;
+      let dp = 0;
+      if(fMode.includes("Cash")) dp += Number(document.getElementById("fin-split-cash").value) || 0;
+      if(fMode.includes("QR")) dp += Number(document.getElementById("fin-split-qr").value) || 0;
+      if(fMode.includes("Card")) dp += Number(document.getElementById("fin-split-card").value) || 0;
+      document.getElementById("fin-dp").value = dp;
       handleFinanceChange();
     }
 
@@ -402,18 +441,24 @@
     }
 
     function calcDuesSplit() {
-      const c = Number(document.getElementById("dues-split-cash").value) || 0;
-      const q = Number(document.getElementById("dues-split-qr").value) || 0;
-      document.getElementById("dues-token").value = c + q;
+      const dMode = document.getElementById("dues-mode").value;
+      let t = 0;
+      if(dMode.includes("Cash")) t += Number(document.getElementById("dues-split-cash").value) || 0;
+      if(dMode.includes("QR")) t += Number(document.getElementById("dues-split-qr").value) || 0;
+      if(dMode.includes("Card")) t += Number(document.getElementById("dues-split-card").value) || 0;
+      document.getElementById("dues-token").value = t;
       handleDuesChange();
     }
 
     function handleDuesChange() { document.getElementById("pay-paid").value = Number(document.getElementById("dues-token").value) || 0; recalcTotals(); }
     
     function handleSplitChange() {
-      const c = Number(document.getElementById("split-cash").value) || 0;
-      const q = Number(document.getElementById("split-qr").value) || 0;
-      document.getElementById("pay-paid").value = c + q;
+      const p = document.getElementById("pay-primary").value;
+      let paid = 0;
+      if(p.includes("Cash")) paid += Number(document.getElementById("split-cash").value) || 0;
+      if(p.includes("QR")) paid += Number(document.getElementById("split-qr").value) || 0;
+      if(p.includes("Card")) paid += Number(document.getElementById("split-card").value) || 0;
+      document.getElementById("pay-paid").value = paid;
       recalcTotals();
     }
 
@@ -468,17 +513,36 @@
         document.querySelectorAll(".item-row").forEach(r => {
           const pName = r.querySelector(".item-name").value.trim();
           if(!pName) err = true;
-          // SAVE ALL IMEIs
           const imeis = Array.from(r.querySelectorAll(".item-imei")).map(i => i.value).filter(v=>v).join(", ");
           items.push({ name: pName, imei: imeis, qty: Number(r.querySelector(".item-qty").value)||1, rate: Number(r.querySelector(".item-rate").value)||0, amount: Math.max(0, (Number(r.querySelector(".item-qty").value)||1)*(Number(r.querySelector(".item-rate").value)||0)-Number(r.querySelector(".item-disc").value)||0) });
         });
         if(err) return alert("प्रोडक्ट नाम भरें!");
       }
 
-      const token = Math.random().toString(36).substring(2, 8);
-      let finData = null;
+      let cashAmt = 0, qrAmt = 0, cardAmt = 0;
       const pMode = document.getElementById("pay-secondary").value || document.getElementById("pay-primary").value;
 
+      if (pMode === "Finance") {
+          const dpMode = document.getElementById("fin-dp-mode").value;
+          if (dpMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || totals.paid;
+          if (dpMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || totals.paid;
+          if (dpMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || totals.paid;
+      } else if (pMode === "Dues") {
+          const dMode = document.getElementById("dues-mode").value;
+          if (dMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || totals.paid;
+          if (dMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || totals.paid;
+          if (dMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || totals.paid;
+      } else {
+          const p = document.getElementById("pay-primary").value;
+          if (p.includes("Cash")) cashAmt = Number(document.getElementById("split-cash").value) || totals.paid;
+          if (p.includes("QR")) qrAmt = Number(document.getElementById("split-qr").value) || totals.paid;
+          if (p.includes("Card")) cardAmt = Number(document.getElementById("split-card").value) || totals.paid;
+      }
+
+      const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
+
+      const token = Math.random().toString(36).substring(2, 8);
+      let finData = null;
       if(document.getElementById("pay-secondary").value === "Finance"){
         finData = { company: document.getElementById("fin-company").value, dp: totals.paid, loan: totals.grand - totals.paid };
       }
@@ -487,7 +551,7 @@
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: new Date().toISOString().substring(0, 10),
         billType: currentBillType, customerName: name, customerMobile: phone, items,
-        paymentMode: pMode,
+        paymentMode: pMode, paymentBreakdown: paymentBreakdown,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
         totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
         finance: finData, token, publicUrl: `${window.location.origin}${window.location.pathname}?b=${token}`
@@ -505,13 +569,7 @@
       document.getElementById("inv-date").innerText = bill.billDate;
       document.getElementById("inv-cust-name").innerText = bill.customerName;
       document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
-      document.getElementById("inv-pay-mode").innerText = "Mode: " + bill.paymentMode;
-      
-      const finText = document.getElementById("inv-fin-text");
-      if(bill.finance) { finText.classList.remove("hidden"); finText.innerText = `Finance: ${bill.finance.company} (DP: ${bill.finance.dp}, Loan: ${bill.finance.loan})`; }
-      else { finText.classList.add("hidden"); }
 
-      // 8 ROWS FOR TABLE
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
       for (let i = 0; i < 8; i++) {
@@ -529,8 +587,6 @@
 
       document.getElementById("inv-calc-subtotal").innerText = "Rs. " + subtotal.toFixed(2);
       document.getElementById("inv-calc-discount").innerText = bill.totalDiscount || 0;
-      document.getElementById("inv-paid-amt").innerText = "Rs. " + bill.paid;
-      document.getElementById("inv-due-amt").innerText = "Rs. " + bill.due;
       document.getElementById("inv-grand-total").innerText = "Rs. " + grand;
 
       const gstBox = document.getElementById("inv-gst-box");
@@ -549,7 +605,7 @@
 
     function openSavedBill(token) { displayInvoice(billsCache.find(x => x.token === token)); }
 
-    // VECTOR PDF 
+    // CLEAN VECTOR PDF (NO PAID, NO DUE, NO PAYMENT MODE)
     function downloadVectorPDF() {
       if (!activeInvoiceData) return;
       const { jsPDF } = window.jspdf;
@@ -571,12 +627,9 @@
 
       doc.setTextColor(...dark); doc.setFontSize(8.5);
       doc.text(`Invoice No. :  ${b.invoiceNo}`, 20, 52); doc.text(`Date :  ${b.billDate}`, 150, 52);
-      doc.text(`Name :  ${b.customerName}`, 20, 58); doc.text(`Mode :  ${b.paymentMode}`, 150, 58);
-      doc.text("GSTIN :  -", 20, 64); doc.text(`Ph. :  ${b.customerMobile}`, 150, 64);
-      
-      if(b.finance) { doc.setFontSize(7.5); doc.setTextColor(0,74,173); doc.text(`Finance: ${b.finance.company} (DP: ${b.finance.dp}, Loan: ${b.finance.loan})`, 20, 70); }
+      doc.text(`Name :  ${b.customerName}`, 20, 58); doc.text(`Ph. :  ${b.customerMobile}`, 150, 58);
 
-      let y = 73;
+      let y = 67;
       doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(8);
       doc.text("S.No", 19, y+4.5); doc.text("Brand / Product", 35, y+4.5); doc.text("Model / IMEI", 95, y+4.5);
@@ -593,7 +646,6 @@
           doc.setFont("helvetica", "bold"); doc.text(String(item.name).substring(0,24), 28, y+5);
           doc.setFont("helvetica", "normal"); 
           
-          // DYNAMIC IMEI SIZE FIX
           const imeiStr = String(item.imei || "-");
           doc.setFontSize(imeiStr.length > 18 ? 6 : 7.5);
           doc.text(imeiStr.substring(0, 42), 87, y+4.5);
@@ -621,7 +673,7 @@
       doc.rect(130, y, 65, 42); doc.setLineWidth(0.2);
       const grand = Number(b.grandTotal);
       let rY = y;
-      [ {l:"Subtotal", v:grand+Number(b.totalDiscount)-Number(b.totalGst)}, {l:"Discount", v:b.totalDiscount}, {l:"Paid Amount", v:b.paid}, {l:"Balance Due", v:b.due} ].forEach(row => {
+      [ {l:"Subtotal", v:grand+Number(b.totalDiscount)-Number(b.totalGst)}, {l:"Discount", v:b.totalDiscount} ].forEach(row => {
         doc.line(130, rY+6.5, 195, rY+6.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
         doc.text(row.l, 133, rY+4.5); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4.5, {align:"right"}); rY += 6.5;
       });
