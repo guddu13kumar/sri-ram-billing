@@ -3,1735 +3,748 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sri Ram Enterprises - Billing & POS</title>
-  
-  <!-- PWA Metadata -->
-  <meta name="theme-color" content="#1e3a8a" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  
-  <!-- Tailwind CSS Engine -->
+  <title>SRI RAM ENTERPRISES - POS & Billing</title>
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Tailwind CSS & Fast QR -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Core Libraries -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    @media print {
-      body * { visibility: hidden; }
-      #printable-area, #printable-area * { visibility: visible; }
-      #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
-      .no-print { display: none !important; }
-    }
-    
-    /* 80mm Thermal Receipt Geometry (Continuous Roll) */
-    .thermal-receipt {
-      width: 76mm;
-      margin: 0 auto;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 11px;
-      line-height: 1.2;
-      color: #000;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    /* PWA Touch Optimizations */
-    input, button, select { touch-action: manipulation; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    /* Print Setup */
+    @media print {
+      @page { size: portrait; margin: 5mm; }
+      body { background: #ffffff !important; margin: 0 !important; }
+      header, #view-dashboard, #view-new-bill, #view-settings, #top-invoice-bar { display: none !important; }
+      #view-invoice { display: block !important; padding: 0 !important; }
+      #invoice-capture { 
+        box-shadow: none !important; 
+        border: 2px solid #0f172a !important; 
+        width: 100% !important; 
+        max-width: 100% !important;
+      }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
-  <div id="root"></div>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
-  <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
+  <!-- TOP HEADER -->
+  <header id="main-header" class="bg-slate-900 text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex items-center justify-between">
+    <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
+      <div class="bg-amber-400 text-slate-950 font-black px-2 py-1 rounded text-xs">SRE</div>
+      <div>
+        <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none">SRI RAM ENTERPRISES</h1>
+        <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Mobile • Accessories • Repairing</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="showView('settings')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-bold border border-slate-700">
+        ⚙️ Settings
+      </button>
+      <button onclick="logout()" class="px-2 py-1 bg-rose-900 text-white rounded text-xs font-bold">
+        Exit
+      </button>
+    </div>
+  </header>
 
-    // Default Fallback Configuration
-    const DEFAULT_CONFIG = {
-      gasUrl: localStorage.getItem("SRE_GAS_URL") || "",
-      businessName: "SRI RAM ENTERPRISES",
-      tagline: "Mobile • Accessories • Repairing",
-      address: "GB-15, CITY CENTRE, SECTOR-4, B.S. CITY, NEAR INDIAN BANK, BOKARO, JHARKHAND",
-      phones: "9334765000, 9334237111, 9335136000",
-      gstin: "20APOPK6864K1ZH",
-      terms: "1. Goods once sold will not be returned.\n2. Brand warranty handled at service centers.\n3. Water/Physical damage voids all claim.\n4. Original tax invoice compulsory for claims."
-    };
+  <!-- LOGIN OVERLAY -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+    <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl p-6 space-y-4 border border-slate-200">
+      <div class="text-center">
+        <span class="inline-block bg-amber-400 text-slate-950 font-black px-2.5 py-1 rounded text-xs mb-1">SRE POS</span>
+        <h2 class="text-lg font-black text-slate-900">SRI RAM ENTERPRISES</h2>
+        <p class="text-xs text-slate-500">Bokaro Sector-4 Billing Terminal</p>
+      </div>
 
-    // -------------------------------------------------------------
-    // MAIN APP CONTROLLER
-    // -------------------------------------------------------------
-    function App() {
-      const [staff, setStaff] = useState(() => JSON.parse(sessionStorage.getItem("SRE_AUTH") || "null"));
-      const [view, setView] = useState("dashboard"); // dashboard, new_bill, bills, dues, reports, settings, public_bill
-      const [appConfig, setAppConfig] = useState(DEFAULT_CONFIG);
-      const [toast, setToast] = useState(null);
-      const [isOnline, setIsOnline] = useState(navigator.onLine);
-      const [draftCount, setDraftCount] = useState(0);
-
-      useEffect(() => {
-        const handleOnline = () => setIsOnline(true);
-        const handleOffline = () => setIsOnline(false);
-        window.addEventListener("online", handleOnline);
-        window.addEventListener("offline", handleOffline);
-        refreshDraftCount();
-        return () => {
-          window.removeEventListener("online", handleOnline);
-          window.removeEventListener("offline", handleOffline);
-        };
-      }, []);
-
-      const showToast = (message, type = "info") => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 4500);
-      };
-
-      const refreshDraftCount = () => {
-        const drafts = JSON.parse(localStorage.getItem("SRE_DRAFTS") || "[]");
-        setDraftCount(drafts.length);
-      };
-
-      // Check URL for Public Bill View Token (#/bill/:token)
-      useEffect(() => {
-        const hash = window.location.hash;
-        if (hash.startsWith("#/bill/")) {
-          const token = hash.replace("#/bill/", "");
-          if (token) {
-            setView("public_bill");
-          }
-        }
-      }, []);
-
-      if (view === "public_bill") {
-        const token = window.location.hash.replace("#/bill/", "");
-        return <PublicBillView token={token} config={appConfig} />;
-      }
-
-      if (!staff) {
-        return <LoginScreen setStaff={setStaff} config={appConfig} showToast={showToast} setAppConfig={setAppConfig} />;
-      }
-
-      return (
-        <div class="flex flex-col md:flex-row min-h-screen">
-          {/* Top Bar on Mobile */}
-          <div class="md:hidden bg-blue-950 text-white flex items-center justify-between p-3 sticky top-0 z-40">
-            <div class="flex items-center space-x-2">
-              <span class="bg-amber-400 text-blue-950 font-black px-2 py-0.5 rounded text-xs">SRE</span>
-              <span class="font-bold text-sm truncate">{appConfig.businessName}</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              {!isOnline && <span class="bg-rose-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">OFFLINE</span>}
-              <button onClick={() => setView("new_bill")} class="bg-amber-400 text-blue-950 px-2.5 py-1 rounded text-xs font-bold">+ BILL</button>
-            </div>
-          </div>
-
-          {/* Desktop Navigation Sidebar */}
-          <aside class="hidden md:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800">
-            <div class="p-4 border-b border-slate-800 flex items-center space-x-3">
-              <div class="bg-amber-400 text-blue-950 font-black p-2 rounded-lg text-sm">SRE</div>
-              <div>
-                <h1 class="font-bold text-white text-sm leading-none">{appConfig.businessName}</h1>
-                <p class="text-[10px] text-slate-400 mt-1">Bokaro Sector-4</p>
-              </div>
-            </div>
-
-            <nav class="flex-1 p-3 space-y-1 text-sm">
-              <NavItem active={view === "dashboard"} onClick={() => setView("dashboard")} label="Dashboard" icon="layout-dashboard" />
-              <NavItem active={view === "new_bill"} onClick={() => setView("new_bill")} label="New Invoice" icon="receipt" />
-              <NavItem active={view === "bills"} onClick={() => setView("bills")} label="All Bills & Register" icon="archive" />
-              <NavItem active={view === "dues"} onClick={() => setView("dues")} label="Due Collection" icon="credit-card" />
-              <NavItem active={view === "reports"} onClick={() => setView("reports")} label="Sales & GST Reports" icon="bar-chart-3" />
-              {staff.role === "ADMIN" && (
-                <NavItem active={view === "settings"} onClick={() => setView("settings")} label="Master Settings" icon="settings" />
-              )}
-            </nav>
-
-            <div class="p-3 border-t border-slate-800 text-xs">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-slate-400">Status:</span>
-                <span class={isOnline ? "text-emerald-400 flex items-center font-bold" : "text-rose-400 font-bold"}>
-                  <span class={`inline-block w-2 h-2 rounded-full mr-1 ${isOnline ? "bg-emerald-400" : "bg-rose-400"}`}></span>
-                  {isOnline ? "Live Cloud" : "Offline Drafts"}
-                </span>
-              </div>
-              <div class="bg-slate-800/80 p-2.5 rounded-lg mb-2">
-                <p class="font-bold text-white">{staff.fullName}</p>
-                <p class="text-[11px] text-amber-400">{staff.role} ({staff.staffId})</p>
-              </div>
-              <button 
-                onClick={() => { sessionStorage.removeItem("SRE_AUTH"); setStaff(null); }} 
-                class="w-full text-center py-1.5 bg-slate-800 hover:bg-rose-950 hover:text-rose-300 rounded transition font-medium"
-              >
-                Log Out
-              </button>
-            </div>
-          </aside>
-
-          {/* Core Content Area */}
-          <div class="flex-1 flex flex-col min-w-0">
-            <main class="flex-1 p-3 sm:p-6 overflow-y-auto">
-              {view === "dashboard" && <DashboardView setView={setView} config={appConfig} staff={staff} showToast={showToast} draftCount={draftCount} />}
-              {view === "new_bill" && <NewBillView setView={setView} config={appConfig} staff={staff} showToast={showToast} refreshDraftCount={refreshDraftCount} />}
-              {view === "bills" && <BillsRegisterView config={appConfig} staff={staff} showToast={showToast} />}
-              {view === "dues" && <DuesManagementView config={appConfig} staff={staff} showToast={showToast} />}
-              {view === "reports" && <ReportsView config={appConfig} staff={staff} showToast={showToast} />}
-              {view === "settings" && <SettingsView config={appConfig} setConfig={setAppConfig} staff={staff} showToast={showToast} />}
-            </main>
-
-            {/* Mobile Bottom Navigation Bar */}
-            <div class="md:hidden bg-white border-t border-slate-200 grid grid-cols-5 text-[10px] text-center p-1.5 sticky bottom-0 z-30 font-medium">
-              <button onClick={() => setView("dashboard")} class={`p-1 ${view === "dashboard" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
-                Dashboard
-              </button>
-              <button onClick={() => setView("new_bill")} class={`p-1 ${view === "new_bill" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
-                + Bill
-              </button>
-              <button onClick={() => setView("bills")} class={`p-1 ${view === "bills" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
-                Register
-              </button>
-              <button onClick={() => setView("dues")} class={`p-1 ${view === "dues" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
-                Dues
-              </button>
-              <button onClick={() => setView("reports")} class={`p-1 ${view === "reports" ? "text-blue-900 font-bold" : "text-slate-500"}`}>
-                Reports
-              </button>
-            </div>
-          </div>
-
-          {/* Floating Toast Notification Engine */}
-          {toast && (
-            <div class={`fixed bottom-14 md:bottom-5 right-5 z-50 px-4 py-2.5 rounded-lg shadow-xl text-white text-xs font-semibold flex items-center space-x-2 ${
-              toast.type === "error" ? "bg-rose-600" : (toast.type === "success" ? "bg-emerald-600" : "bg-blue-900")
-            }`}>
-              <span>{toast.message}</span>
-            </div>
-          )}
+      <div class="space-y-3 pt-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+          <input type="text" id="login-username" value="admin" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-slate-900" />
         </div>
-      );
-    }
-
-    function NavItem({ active, onClick, label, icon }) {
-      return (
-        <button
-          onClick={onClick}
-          class={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg font-medium transition ${
-            active ? "bg-blue-900 text-white shadow" : "hover:bg-slate-800 text-slate-400 hover:text-white"
-          }`}
-        >
-          <span>{label}</span>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+          <input type="password" id="login-password" value="admin123" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-slate-900" />
+        </div>
+        <button onclick="handleLogin()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-lg text-sm transition">
+          Sign In to Register
         </button>
-      );
-    }
+      </div>
 
-    // -------------------------------------------------------------
-    // LOGIN SCREEN COMPONENT
-    // -------------------------------------------------------------
-    function LoginScreen({ setStaff, config, showToast, setAppConfig }) {
-      const [username, setUsername] = useState("admin");
-      const [password, setPassword] = useState("admin123");
-      const [gasUrl, setGasUrl] = useState(config.gasUrl);
-      const [loading, setLoading] = useState(false);
-      const [showConfig, setShowConfig] = useState(!config.gasUrl);
+      <div class="pt-2 border-t text-center">
+        <p class="text-[11px] text-slate-400">Default: <b>admin</b> / <b>admin123</b></p>
+      </div>
+    </div>
+  </div>
 
-      const handleLogin = async (e) => {
-        e.preventDefault();
-        if (!gasUrl) {
-          showToast("Backend Google Apps Script URL is required.", "error");
-          setShowConfig(true);
-          return;
-        }
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-xl hidden"></div>
 
-        setLoading(true);
-        try {
-          const res = await fetch(gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "login", username, password })
-          });
-          const data = await res.json();
-          if (data.success) {
-            sessionStorage.setItem("SRE_AUTH", JSON.stringify(data.staff));
-            setStaff(data.staff);
-            showToast(`Welcome back, ${data.staff.fullName}!`, "success");
-          } else {
-            showToast(data.error || "Authentication failed.", "error");
-          }
-        } catch (err) {
-          showToast("Network / CORS error: Verify Google Script deployment permissions.", "error");
-        } finally {
-          setLoading(false);
-        }
-      };
+  <!-- MAIN WRAPPER -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-5">
 
-      const handleSaveGasUrl = () => {
-        localStorage.setItem("SRE_GAS_URL", gasUrl);
-        setAppConfig(prev => ({ ...prev, gasUrl }));
-        showToast("Cloud Backend URL updated.", "success");
-        setShowConfig(false);
-      };
-
-      return (
-        <div class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-          <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
-            <div class="text-center">
-              <span class="inline-block bg-amber-400 text-blue-950 font-black px-3 py-1 rounded-lg text-sm mb-2">SRE</span>
-              <h1 class="text-xl font-black text-slate-900 tracking-tight">{config.businessName}</h1>
-              <p class="text-xs text-slate-500 font-medium">Bokaro Sector-4 • Enterprise POS</p>
-            </div>
-
-            <form onSubmit={handleLogin} class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Staff Username</label>
-                <input 
-                  type="text" 
-                  value={username} 
-                  onChange={e => setUsername(e.target.value)} 
-                  required 
-                  class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-900 outline-none" 
-                />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
-                <input 
-                  type="password" 
-                  value={password} 
-                  onChange={e => setPassword(e.target.value)} 
-                  required 
-                  class="w-full p-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-900 outline-none" 
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                class="w-full bg-blue-950 hover:bg-blue-900 text-white font-bold py-3 rounded-lg text-sm shadow transition flex items-center justify-center space-x-2"
-              >
-                {loading ? <span>Verifying Credentials...</span> : <span>Open Register / Sign In</span>}
-              </button>
-            </form>
-
-            <div class="pt-4 border-t border-slate-100 text-center">
-              <button 
-                onClick={() => setShowConfig(!showConfig)} 
-                class="text-xs text-slate-500 hover:text-blue-900 font-medium underline"
-              >
-                {showConfig ? "Hide Cloud Gateway" : "Configure Cloud Backend Gateway"}
-              </button>
-            </div>
-
-            {showConfig && (
-              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                <label class="block text-[11px] font-bold text-slate-700">Google Apps Script Web App URL</label>
-                <input 
-                  type="url" 
-                  value={gasUrl} 
-                  onChange={e => setGasUrl(e.target.value)} 
-                  placeholder="https://script.google.com/macros/s/.../exec"
-                  class="w-full p-2 border border-slate-300 rounded text-xs font-mono"
-                />
-                <button 
-                  type="button" 
-                  onClick={handleSaveGasUrl}
-                  class="w-full py-1.5 bg-slate-800 text-white text-xs font-bold rounded hover:bg-slate-700"
-                >
-                  Save Gateway Connection
-                </button>
-              </div>
-            )}
-          </div>
+    <!-- VIEW 1: DASHBOARD -->
+    <div id="view-dashboard" class="space-y-4">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Today's Bills</span>
+          <p id="dash-count" class="text-2xl font-black text-slate-900 mt-0.5">0</p>
         </div>
-      );
-    }
-
-    // -------------------------------------------------------------
-    // DASHBOARD COMPONENT
-    // -------------------------------------------------------------
-    function DashboardView({ setView, config, staff, showToast, draftCount }) {
-      const [stats, setStats] = useState(null);
-      const [loading, setLoading] = useState(true);
-
-      useEffect(() => {
-        loadDashboardReports();
-      }, []);
-
-      const loadDashboardReports = async () => {
-        if (!config.gasUrl) return;
-        const todayStr = new Date().toISOString().substring(0, 10);
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "getReports", startDate: todayStr, endDate: todayStr })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setStats(data.report);
-          }
-        } catch (err) {
-          showToast("Could not load real-time cloud metrics.", "error");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      return (
-        <div class="space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h1 class="text-xl font-black text-slate-900">Today's POS Overview</h1>
-              <p class="text-xs text-slate-500 font-medium">Bokaro Steel City Hub • Shift Operator: {staff.fullName}</p>
-            </div>
-            <div class="flex items-center space-x-2">
-              <button 
-                onClick={() => setView("new_bill")}
-                class="bg-blue-950 hover:bg-blue-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow transition"
-              >
-                + Create New Invoice
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Metrics */}
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard title="Today's Bills" value={loading ? "..." : (stats?.totalBills || 0)} subtext="Transactions Generated" color="blue" />
-            <StatCard title="Gross Sales" value={loading ? "..." : `₹${(stats?.grossSales || 0).toLocaleString('en-IN')}`} subtext="Total Booked Value" color="amber" />
-            <StatCard title="Collection" value={loading ? "..." : `₹${(stats?.totalCollection || 0).toLocaleString('en-IN')}`} subtext="Cash, QR & Bank" color="emerald" />
-            <StatCard title="Today's Due" value={loading ? "..." : `₹${(stats?.totalDue || 0).toLocaleString('en-IN')}`} subtext="Pending Recovery" color="rose" />
-          </div>
-
-          {/* Breakdown by Revenue Vertical */}
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <VerticalCard title="Mobile Phones" amount={stats?.mobileSales || 0} icon="📱" onClick={() => setView("new_bill")} />
-            <VerticalCard title="Accessories" amount={stats?.accessoriesSales || 0} icon="🎧" onClick={() => setView("new_bill")} />
-            <VerticalCard title="Repair Services" amount={stats?.repairSales || 0} icon="🔧" onClick={() => setView("new_bill")} />
-          </div>
-
-          {/* Offline Draft Alert Banner */}
-          {draftCount > 0 && (
-            <div class="p-4 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between">
-              <div>
-                <p class="text-xs font-bold text-amber-900">Offline Drafts Pending ({draftCount})</p>
-                <p class="text-[11px] text-amber-700">Invoices saved locally while offline require atomic cloud synchronization.</p>
-              </div>
-              <button onClick={() => setView("bills")} class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow">
-                Review & Sync
-              </button>
-            </div>
-          )}
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Today's Sales</span>
+          <p id="dash-sales" class="text-2xl font-black text-blue-900 mt-0.5">Rs. 0</p>
         </div>
-      );
-    }
-
-    function StatCard({ title, value, subtext, color }) {
-      const colors = {
-        blue: "border-blue-200 bg-blue-50/50 text-blue-950",
-        amber: "border-amber-200 bg-amber-50/50 text-amber-950",
-        emerald: "border-emerald-200 bg-emerald-50/50 text-emerald-950",
-        rose: "border-rose-200 bg-rose-50/50 text-rose-950"
-      };
-      return (
-        <div class={`p-4 rounded-xl border bg-white shadow-sm flex flex-col justify-between ${colors[color] || ""}`}>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">{title}</span>
-          <p class="text-2xl font-black my-1">{value}</p>
-          <span class="text-[10px] text-slate-400 font-medium">{subtext}</span>
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Collection</span>
+          <p id="dash-paid" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p>
         </div>
-      );
-    }
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Total Due</span>
+          <p id="dash-due" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p>
+        </div>
+      </div>
 
-    function VerticalCard({ title, amount, icon, onClick }) {
-      return (
-        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+      <div class="grid grid-cols-3 gap-2.5">
+        <button onclick="startNewBill('MOBILE')" class="p-3 bg-slate-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+          <span class="text-xl mb-0.5">📱</span>
+          <span>Mobile Sale</span>
+        </button>
+        <button onclick="startNewBill('ACCESSORIES')" class="p-3 bg-blue-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+          <span class="text-xl mb-0.5">🎧</span>
+          <span>Accessories</span>
+        </button>
+        <button onclick="startNewBill('REPAIRING')" class="p-3 bg-indigo-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+          <span class="text-xl mb-0.5">🔧</span>
+          <span>Repairing</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs text-slate-700 flex justify-between">
+          <span>Recent Invoices</span>
+          <span class="text-[10px] text-slate-400">Offline Cache & Cloud</span>
+        </div>
+        <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: BILLING FORM -->
+    <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 sm:p-6 space-y-4 border hidden">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <span class="text-[9px] font-black text-blue-900 uppercase">INVOICE</span>
+          <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-00001</h2>
+        </div>
+        <div class="flex bg-slate-100 p-0.5 rounded-lg border" id="pills-container">
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-slate-900 text-white">MOBILE</button>
+          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-3 py-1 rounded text-xs font-bold text-slate-600">ACCESSORIES</button>
+          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-3 py-1 rounded text-xs font-bold text-slate-600">REPAIRING</button>
+        </div>
+      </div>
+
+      <!-- CUSTOMER DETAILS -->
+      <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3 rounded-xl border">
+        <div>
+          <label id="lbl-cust-name" class="text-[10px] font-bold text-slate-600 uppercase">Customer Name *</label>
+          <input type="text" id="cust-name" placeholder="ग्राहक का नाम" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold" />
+        </div>
+        <div>
+          <label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 uppercase">Mobile Number *</label>
+          <input type="tel" id="cust-phone" maxlength="10" placeholder="10 अंक मोबाइल" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold" />
+        </div>
+        <div>
+          <label id="lbl-cust-address" class="text-[10px] font-bold text-slate-600 uppercase">Customer Address *</label>
+          <input type="text" id="cust-address" placeholder="पूरा पता" class="w-full mt-1 p-2 bg-white border rounded-lg text-xs font-semibold" />
+        </div>
+      </div>
+
+      <!-- REPAIR DETAILS -->
+      <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <input type="tel" id="rep-phone" maxlength="10" placeholder="कस्टमर मोबाइल *" class="p-2 bg-white border rounded-lg text-xs font-semibold" />
+          <input type="text" id="rep-device" placeholder="डिवाइस / मॉडल नाम *" class="p-2 bg-white border rounded-lg text-xs font-semibold" />
+        </div>
+        <textarea id="rep-issue" rows="2" placeholder="समस्या / रिपेयर विवरण..." class="w-full p-2 bg-white border rounded-lg text-xs"></textarea>
+        <input type="number" id="rep-charge" placeholder="रिपेयरिंग चार्ज (Rs.) *" oninput="recalcTotals()" class="w-48 p-2 bg-white border rounded-lg text-xs font-black" />
+      </div>
+
+      <!-- ITEMS SECTION -->
+      <div id="items-box" class="space-y-2.5">
+        <div class="flex justify-between items-center">
+          <h3 id="items-title" class="font-bold text-xs text-slate-800 uppercase">Products / Handsets</h3>
+          <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">+ Add Item</button>
+        </div>
+        <div id="items-container" class="space-y-2.5"></div>
+      </div>
+
+      <!-- PAYMENT MODULE -->
+      <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
-            <span class="text-2xl mb-1 block">{icon}</span>
-            <p class="text-xs font-bold text-slate-600">{title}</p>
-            <p class="text-lg font-black text-slate-900">₹{amount.toLocaleString('en-IN')}</p>
+            <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Primary Mode *</label>
+            <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2 bg-white border rounded-lg text-xs font-bold">
+              <option value="Cash">💵 Cash</option>
+              <option value="QR">📲 QR</option>
+              <option value="Card Swipe">💳 Card Swipe</option>
+              <option value="Cash + QR">💵 Cash + 📲 QR</option>
+              <option value="Card + QR">💳 Card + 📲 QR</option>
+            </select>
           </div>
-          <button onClick={onClick} class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100">
-            + Bill
-          </button>
+          <div>
+            <label class="text-[10px] font-bold text-rose-700 uppercase block mb-1">Secondary Mode</label>
+            <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2 bg-rose-50 border border-rose-200 rounded-lg text-xs font-bold text-rose-900">
+              <option value="">-- None (Keep Primary) --</option>
+              <option value="Finance">🏦 Finance / EMI</option>
+              <option value="Dues">📝 Dues / Udhar</option>
+            </select>
+          </div>
         </div>
-      );
-    }
 
-    // -------------------------------------------------------------
-    // NEW BILL GENERATION ENGINE (MOBILE, ACCESSORIES, REPAIRS)
-    // -------------------------------------------------------------
-    function NewBillView({ setView, config, staff, showToast, refreshDraftCount }) {
-      const [billType, setBillType] = useState("MOBILE SALE"); // MOBILE SALE, ACCESSORIES SALE, REPAIRING
-      const [customer, setCustomer] = useState({ name: "", mobile: "", address: "", gstin: "" });
-      const [items, setItems] = useState([createEmptyItem("MOBILE SALE")]);
-      const [payments, setPayments] = useState({ cash: 0, qr: 0, card: 0, finance: 0, other: 0 });
-      const [finance, setFinance] = useState({ company: "", downPayment: 0, loanAmount: 0, reference: "" });
-      const [repair, setRepair] = useState({ deviceBrand: "", deviceModel: "", imei: "", complaint: "", repairingWork: "", partsUsed: "", labourCharge: 0 });
-      const [isSaving, setIsSaving] = useState(false);
-      const [savedSuccessData, setSavedSuccessData] = useState(null);
+        <!-- FINANCE SUB-BOX -->
+        <div id="fin-box" class="pt-2 border-t space-y-2 bg-blue-50 p-2.5 rounded-lg hidden">
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="fin-company" placeholder="Finance Co. (Bajaj, TVS, HDB)" class="p-1.5 bg-white border rounded text-xs font-bold" />
+            <input type="number" id="fin-dp" placeholder="Down Payment (Rs.)" oninput="handleFinanceChange()" class="p-1.5 bg-white border rounded text-xs font-bold" />
+          </div>
+          <div class="text-[11px] text-blue-900 font-bold flex justify-between">
+            <span>Loan Amount:</span>
+            <span id="fin-loan-display">Rs. 0</span>
+          </div>
+        </div>
 
-      function createEmptyItem(type) {
-        return {
-          itemType: type,
-          brand: "",
-          productName: "",
-          model: "",
-          colour: "",
-          ram: "",
-          storage: "",
-          imei1: "",
-          imei2: "",
-          serialNumber: "",
-          quantity: 1,
-          rate: 0,
-          discount: 0,
-          gstPercent: 18
-        };
-      }
+        <!-- DUES SUB-BOX -->
+        <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded-lg hidden">
+          <input type="number" id="dues-token" placeholder="Advance / Token Paid (Rs.)" oninput="handleDuesChange()" class="w-full p-1.5 bg-white border rounded text-xs font-bold" />
+        </div>
 
-      // Auto-load customer profile when 10 digits entered
-      const handleMobileChange = async (mobileVal) => {
-        const clean = mobileVal.replace(/\D/g, "");
-        setCustomer(prev => ({ ...prev, mobile: clean }));
+        <!-- SPLIT PAYMENT -->
+        <div id="split-box" class="pt-2 border-t grid grid-cols-2 gap-2 hidden">
+          <input type="number" id="split-cash" placeholder="Cash Amount (Rs.)" oninput="handleSplitChange()" class="p-1.5 bg-white border rounded text-xs font-bold" />
+          <input type="number" id="split-qr" placeholder="QR / UPI Amount (Rs.)" oninput="handleSplitChange()" class="p-1.5 bg-white border rounded text-xs font-bold" />
+        </div>
 
-        if (clean.length === 10 && config.gasUrl) {
-          try {
-            const res = await fetch(config.gasUrl, {
-              method: "POST",
-              body: JSON.stringify({ action: "getCustomers", query: clean })
-            });
-            const data = await res.json();
-            if (data.success && data.customers && data.customers.length > 0) {
-              const matched = data.customers[0];
-              setCustomer({
-                name: matched.name,
-                mobile: matched.mobile,
-                address: matched.address,
-                gstin: matched.gstin || ""
-              });
-              showToast("Existing customer found & autofilled!", "info");
-            }
-          } catch (e) {
-            // Non-blocking query failure
-          }
-        }
-      };
+        <div>
+          <label class="text-[10px] font-bold text-slate-600 uppercase block mb-1">Total Amount Paid (Rs.) *</label>
+          <input type="number" id="pay-paid" placeholder="कुल जमा राशि" oninput="recalcTotals()" class="w-full p-2 border rounded-lg font-black text-emerald-700 bg-white text-sm" />
+        </div>
+      </div>
 
-      // Math Engine
-      const totals = useMemo(() => {
-        let subtotal = 0;
-        let discount = 0;
-        let taxable = 0;
-        let totalGst = 0;
+      <!-- TOTAL BANNER -->
+      <div class="bg-slate-900 text-white p-3.5 rounded-xl flex justify-between items-center shadow">
+        <div>
+          <span class="text-[10px] text-slate-400 uppercase">Total Bill Amount</span>
+          <p id="total-grand" class="text-2xl font-black text-amber-400 leading-none mt-0.5">Rs. 0</p>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400 uppercase">Balance Due</span>
+          <p id="total-due" class="text-lg font-bold text-rose-400 leading-none mt-0.5">Rs. 0</p>
+        </div>
+      </div>
 
-        const isInterstate = customer.gstin && !customer.gstin.startsWith("20");
+      <div class="flex space-x-2 pt-1">
+        <button type="button" onclick="showView('dashboard')" class="flex-1 py-2.5 bg-slate-200 font-bold rounded-xl text-xs">Cancel</button>
+        <button type="button" onclick="saveBill()" class="flex-[2] py-2.5 bg-slate-900 text-white font-black rounded-xl text-xs shadow">SAVE & GENERATE BILL</button>
+      </div>
+    </div>
 
-        items.forEach(it => {
-          const lineGross = (it.quantity || 1) * (it.rate || 0);
-          const lineTaxable = Math.max(0, lineGross - (it.discount || 0));
-          const gstRate = parseFloat(it.gstPercent) || 0;
-          const lineGst = lineTaxable * (gstRate / 100);
+    <!-- VIEW 3: INVOICE VIEW -->
+    <div id="view-invoice" class="space-y-4 hidden">
+      <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-3 rounded-xl border shadow-sm">
+        <div class="flex space-x-2">
+          <button onclick="window.print()" class="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-lg shadow">🖨️ PRINT / SAVE PDF</button>
+          <button onclick="shareWhatsApp()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow">💬 WHATSAPP</button>
+        </div>
+        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600">← Back to Dashboard</button>
+      </div>
 
-          subtotal += lineGross;
-          discount += (it.discount || 0);
-          taxable += lineTaxable;
-          totalGst += lineGst;
-        });
-
-        if (billType === "REPAIRING") {
-          const labour = parseFloat(repair.labourCharge) || 0;
-          taxable += labour;
-          totalGst += (labour * 0.18); // Standard 18% on Labour Service
-          subtotal += labour;
-        }
-
-        const grandTotal = Math.round(taxable + totalGst);
-        const totalPaid = (parseFloat(payments.cash) || 0) + 
-                          (parseFloat(payments.qr) || 0) + 
-                          (parseFloat(payments.card) || 0) + 
-                          (parseFloat(payments.finance) || 0) + 
-                          (parseFloat(payments.other) || 0);
-        const dueAmount = Math.max(0, grandTotal - totalPaid);
-
-        return {
-          subtotal: Math.round(subtotal * 100) / 100,
-          discount: Math.round(discount * 100) / 100,
-          taxable: Math.round(taxable * 100) / 100,
-          totalGst: Math.round(totalGst * 100) / 100,
-          grandTotal: grandTotal,
-          totalPaid: Math.round(totalPaid * 100) / 100,
-          dueAmount: Math.round(dueAmount * 100) / 100
-        };
-      }, [items, payments, billType, repair, customer.gstin]);
-
-      const handleSaveBill = async () => {
-        // Validation Checks
-        if (!customer.name.trim()) return showToast("Customer Name is required.", "error");
-        if (customer.mobile.length !== 10) return showToast("Valid 10-Digit Mobile is required.", "error");
-
-        if (billType === "MOBILE SALE") {
-          for (let i = 0; i < items.length; i++) {
-            const it = items[i];
-            if (!it.productName) return showToast(`Line ${i + 1}: Model/Product Name is required.`, "error");
-            if (!it.imei1 || it.imei1.length !== 15) {
-              return showToast(`Line ${i + 1}: IMEI 1 must be strictly 15 digits.`, "error");
-            }
-          }
-        }
-
-        if (totals.totalPaid > totals.grandTotal) {
-          return showToast("Total Paid exceeds Grand Total. Adjust payments.", "error");
-        }
-
-        const billPayload = {
-          billType,
-          billDate: new Date().toISOString().substring(0, 10),
-          customer,
-          items,
-          payments,
-          finance: payments.finance > 0 ? finance : null,
-          repairDetails: billType === "REPAIRING" ? repair : null,
-          appDomain: window.location.origin + window.location.pathname
-        };
-
-        // Offline Guard
-        if (!navigator.onLine) {
-          const drafts = JSON.parse(localStorage.getItem("SRE_DRAFTS") || "[]");
-          drafts.push({ ...billPayload, localDraftId: "DRAFT-" + Date.now() });
-          localStorage.setItem("SRE_DRAFTS", JSON.stringify(drafts));
-          refreshDraftCount();
-          showToast("Internet unavailable: Saved as Local Draft!", "info");
-          setView("dashboard");
-          return;
-        }
-
-        setIsSaving(true);
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "createBill", billData: billPayload, staff })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setSavedSuccessData(data);
-            showToast("Invoice recorded and synchronized with Google Cloud!", "success");
-          } else {
-            showToast(data.error || "Server validation rejected invoice.", "error");
-          }
-        } catch (err) {
-          showToast("Cloud sync failed. Connection timeout.", "error");
-        } finally {
-          setIsSaving(false);
-        }
-      };
-
-      if (savedSuccessData) {
-        return (
-          <SuccessReceiptScreen 
-            data={savedSuccessData} 
-            config={config} 
-            onReset={() => {
-              setSavedSuccessData(null);
-              setCustomer({ name: "", mobile: "", address: "", gstin: "" });
-              setItems([createEmptyItem("MOBILE SALE")]);
-              setPayments({ cash: 0, qr: 0, card: 0, finance: 0, other: 0 });
-            }} 
-          />
-        );
-      }
-
-      return (
-        <div class="max-w-4xl mx-auto space-y-4 pb-20">
-          {/* Top Bar Switcher */}
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-3">
-            <div class="flex space-x-1 bg-slate-100 p-1 rounded-lg">
-              {["MOBILE SALE", "ACCESSORIES SALE", "REPAIRING"].map(type => (
-                <button
-                  key={type}
-                  onClick={() => { setBillType(type); setItems([createEmptyItem(type)]); }}
-                  class={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
-                    billType === type ? "bg-blue-950 text-white shadow" : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
+      <div class="w-full flex justify-center overflow-x-auto pb-6">
+        <div id="invoice-capture" class="bg-white p-6 border-2 border-slate-900 shadow-xl text-xs text-slate-900 w-[640px] max-w-[640px] rounded-lg">
+          
+          <!-- HEADER -->
+          <div class="border-b-2 border-slate-900 pb-3 flex justify-between items-start">
+            <div>
+              <h1 class="text-2xl font-black text-slate-900 tracking-tight leading-none">SRI RAM ENTERPRISES</h1>
+              <p class="text-xs font-semibold text-slate-700 mt-1">Mobile • Accessories • Repairing</p>
+              <p class="text-[10px] text-slate-600 mt-0.5">GB-15, City Centre, Sector-4, Bokaro Steel City (Near Indian Bank)</p>
+              <p class="text-[10px] text-slate-800 font-bold mt-0.5">GSTIN: 20APOPK6864K1ZH • Mob: 9334765000, 9334237111</p>
             </div>
             <div class="text-right">
-              <span class="text-xs text-slate-400 font-bold block">DATE</span>
-              <span class="text-xs font-bold text-slate-800">{new Date().toLocaleDateString('en-IN')}</span>
+              <span class="bg-slate-900 text-white font-black px-2 py-0.5 text-[10px] tracking-widest uppercase rounded">TAX INVOICE</span>
+              <p id="inv-no" class="font-black text-sm text-slate-900 mt-2">SRE-2026-00001</p>
+              <p id="inv-date" class="text-slate-500 text-[10px] font-semibold mt-0.5"></p>
             </div>
           </div>
 
-          {/* Customer Metadata Card */}
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Customer Specifications</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Mobile Number *</label>
-                <input 
-                  type="tel" 
-                  maxLength="10" 
-                  value={customer.mobile} 
-                  onChange={e => handleMobileChange(e.target.value)} 
-                  placeholder="9876543210"
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono font-bold"
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Customer Name *</label>
-                <input 
-                  type="text" 
-                  value={customer.name} 
-                  onChange={e => setCustomer({ ...customer, name: e.target.value })} 
-                  placeholder="Full Name"
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold"
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Address / City</label>
-                <input 
-                  type="text" 
-                  value={customer.address} 
-                  onChange={e => setCustomer({ ...customer, address: e.target.value })} 
-                  placeholder="Bokaro Steel City"
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs"
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Customer GSTIN (Optional)</label>
-                <input 
-                  type="text" 
-                  maxLength="15" 
-                  value={customer.gstin} 
-                  onChange={e => setCustomer({ ...customer, gstin: e.target.value.toUpperCase() })} 
-                  placeholder="20AAAAA0000A1Z5"
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Repair Vertical Meta */}
-          {billType === "REPAIRING" && (
-            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
-              <h2 class="text-xs font-black uppercase text-amber-900 tracking-wider">Device Intake & Diagnostics</h2>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input 
-                  type="text" 
-                  placeholder="Device Brand (e.g. Vivo, Redmi)" 
-                  value={repair.deviceBrand} 
-                  onChange={e => setRepair({ ...repair, deviceBrand: e.target.value })}
-                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold" 
-                />
-                <input 
-                  type="text" 
-                  placeholder="Model Name / Number" 
-                  value={repair.deviceModel} 
-                  onChange={e => setRepair({ ...repair, deviceModel: e.target.value })}
-                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold" 
-                />
-                <input 
-                  type="text" 
-                  placeholder="IMEI / Serial Number" 
-                  value={repair.imei} 
-                  onChange={e => setRepair({ ...repair, imei: e.target.value })}
-                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs font-mono" 
-                />
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <textarea 
-                  rows="2" 
-                  placeholder="Customer Reported Fault / Complaint..." 
-                  value={repair.complaint} 
-                  onChange={e => setRepair({ ...repair, complaint: e.target.value })}
-                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs" 
-                />
-                <textarea 
-                  rows="2" 
-                  placeholder="Engineer Work Description / Parts Replaced..." 
-                  value={repair.repairingWork} 
-                  onChange={e => setRepair({ ...repair, repairingWork: e.target.value })}
-                  class="p-2 bg-white border border-amber-300 rounded-lg text-xs" 
-                />
-              </div>
-              <div class="max-w-xs">
-                <label class="block text-[11px] font-bold text-amber-950">Labour Service Charge (₹)</label>
-                <input 
-                  type="number" 
-                  value={repair.labourCharge || ""} 
-                  onChange={e => setRepair({ ...repair, labourCharge: parseFloat(e.target.value) || 0 })}
-                  class="w-full p-2 bg-white border border-amber-300 rounded-lg text-sm font-bold text-amber-950" 
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Product Items Table */}
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <div class="flex justify-between items-center">
-              <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Line Items Ledger</h2>
-              <button 
-                type="button" 
-                onClick={() => setItems([...items, createEmptyItem(billType)])}
-                class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-lg"
-              >
-                + Add Another Product
-              </button>
-            </div>
-
-            <div class="space-y-3">
-              {items.map((item, index) => (
-                <div key={index} class="p-3 bg-slate-50/70 border border-slate-200 rounded-xl space-y-2 relative">
-                  {items.length > 1 && (
-                    <button 
-                      onClick={() => setItems(items.filter((_, idx) => idx !== index))}
-                      class="absolute top-2 right-2 text-rose-600 hover:text-rose-800 font-bold text-xs"
-                    >
-                      Remove
-                    </button>
-                  )}
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="Brand (e.g. Samsung)" 
-                      value={item.brand} 
-                      onChange={e => {
-                        const copy = [...items]; copy[index].brand = e.target.value; setItems(copy);
-                      }}
-                      class="p-2 border border-slate-300 bg-white rounded-lg text-xs font-bold" 
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Product / Model Description *" 
-                      value={item.productName} 
-                      onChange={e => {
-                        const copy = [...items]; copy[index].productName = e.target.value; setItems(copy);
-                      }}
-                      class="p-2 border border-slate-300 bg-white rounded-lg text-xs font-bold sm:col-span-2" 
-                    />
-                  </div>
-
-                  {billType === "MOBILE SALE" && (
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      <input 
-                        type="text" 
-                        placeholder="Colour" 
-                        value={item.colour} 
-                        onChange={e => { const copy = [...items]; copy[index].colour = e.target.value; setItems(copy); }}
-                        class="p-1.5 border border-slate-300 bg-white rounded text-xs" 
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="RAM / Storage" 
-                        value={item.ram} 
-                        onChange={e => { const copy = [...items]; copy[index].ram = e.target.value; setItems(copy); }}
-                        class="p-1.5 border border-slate-300 bg-white rounded text-xs" 
-                      />
-                      <input 
-                        type="text" 
-                        maxLength="15" 
-                        placeholder="IMEI 1 (15-digit) *" 
-                        value={item.imei1} 
-                        onChange={e => { const copy = [...items]; copy[index].imei1 = e.target.value.replace(/\D/g, ""); setItems(copy); }}
-                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono font-bold" 
-                      />
-                      <input 
-                        type="text" 
-                        maxLength="15" 
-                        placeholder="IMEI 2" 
-                        value={item.imei2} 
-                        onChange={e => { const copy = [...items]; copy[index].imei2 = e.target.value.replace(/\D/g, ""); setItems(copy); }}
-                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono font-bold" 
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="Serial Number" 
-                        value={item.serialNumber} 
-                        onChange={e => { const copy = [...items]; copy[index].serialNumber = e.target.value; setItems(copy); }}
-                        class="p-1.5 border border-slate-300 bg-white rounded text-xs font-mono" 
-                      />
-                    </div>
-                  )}
-
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-bold">Qty</label>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        value={item.quantity} 
-                        onChange={e => { const copy = [...items]; copy[index].quantity = parseInt(e.target.value, 10) || 1; setItems(copy); }}
-                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold" 
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-bold">Unit Rate (₹)</label>
-                      <input 
-                        type="number" 
-                        value={item.rate || ""} 
-                        onChange={e => { const copy = [...items]; copy[index].rate = parseFloat(e.target.value) || 0; setItems(copy); }}
-                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold" 
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-bold">Discount (₹)</label>
-                      <input 
-                        type="number" 
-                        value={item.discount || ""} 
-                        onChange={e => { const copy = [...items]; copy[index].discount = parseFloat(e.target.value) || 0; setItems(copy); }}
-                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs" 
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-bold">GST Slab</label>
-                      <select 
-                        value={item.gstPercent} 
-                        onChange={e => { const copy = [...items]; copy[index].gstPercent = parseFloat(e.target.value); setItems(copy); }}
-                        class="w-full p-1.5 border border-slate-300 bg-white rounded text-xs font-bold"
-                      >
-                        <option value="0">0% (Nil)</option>
-                        <option value="5">5% (Tax)</option>
-                        <option value="12">12% (Tax)</option>
-                        <option value="18">18% (Standard)</option>
-                        <option value="28">28% (Luxury)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Multi-Split Payment Engine */}
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <h2 class="text-xs font-black uppercase text-slate-500 tracking-wider">Multi-Method Payment Settlement</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Cash (₹)</label>
-                <input 
-                  type="number" 
-                  value={payments.cash || ""} 
-                  onChange={e => setPayments({ ...payments, cash: parseFloat(e.target.value) || 0 })}
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">QR / UPI (₹)</label>
-                <input 
-                  type="number" 
-                  value={payments.qr || ""} 
-                  onChange={e => setPayments({ ...payments, qr: parseFloat(e.target.value) || 0 })}
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">POS Card (₹)</label>
-                <input 
-                  type="number" 
-                  value={payments.card || ""} 
-                  onChange={e => setPayments({ ...payments, card: parseFloat(e.target.value) || 0 })}
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Finance Disbursal (₹)</label>
-                <input 
-                  type="number" 
-                  value={payments.finance || ""} 
-                  onChange={e => {
-                    const finAmt = parseFloat(e.target.value) || 0;
-                    setPayments({ ...payments, finance: finAmt });
-                    setFinance(prev => ({ ...prev, loanAmount: finAmt }));
-                  }}
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-indigo-900" 
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700">Other / Portal (₹)</label>
-                <input 
-                  type="number" 
-                  value={payments.other || ""} 
-                  onChange={e => setPayments({ ...payments, other: parseFloat(e.target.value) || 0 })}
-                  class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-900" 
-                />
-              </div>
-            </div>
-
-            {/* If Finance Active, Show Meta */}
-            {payments.finance > 0 && (
-              <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl space-y-2">
-                <span class="text-[11px] font-bold text-indigo-950 uppercase block">Finance Partner Specification</span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input 
-                    type="text" 
-                    placeholder="Company (Bajaj, TVS, HDB)" 
-                    value={finance.company} 
-                    onChange={e => setFinance({ ...finance, company: e.target.value })}
-                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-bold" 
-                  />
-                  <input 
-                    type="number" 
-                    placeholder="Down Payment (₹)" 
-                    value={finance.downPayment || ""} 
-                    onChange={e => setFinance({ ...finance, downPayment: parseFloat(e.target.value) || 0 })}
-                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-bold" 
-                  />
-                  <input 
-                    type="text" 
-                    placeholder="Approval Code / Ref" 
-                    value={finance.reference} 
-                    onChange={e => setFinance({ ...finance, reference: e.target.value })}
-                    class="p-2 border border-indigo-300 rounded bg-white text-xs font-mono" 
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Real-Time Total Sheet */}
-          <div class="bg-slate-900 text-white p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <!-- CUSTOMER DETAILS -->
+          <div class="grid grid-cols-2 gap-3 py-3 border-b border-slate-200">
             <div>
-              <span class="text-xs text-slate-400 font-bold">TOTAL PAYABLE BILL</span>
-              <p class="text-3xl font-black text-amber-400 leading-none mt-1">₹{totals.grandTotal.toLocaleString('en-IN')}</p>
-              <div class="flex space-x-3 text-[11px] text-slate-300 mt-2">
-                <span>Taxable: ₹{totals.taxable}</span>
-                <span>GST: ₹{totals.totalGst}</span>
-                <span>Paid: ₹{totals.totalPaid}</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase">Customer Details:</span>
+              <p id="inv-cust-name" class="font-extrabold text-sm text-slate-900"></p>
+              <p id="inv-cust-phone" class="text-slate-600 font-mono text-[11px]"></p>
+              <p id="inv-cust-address" class="text-slate-600 text-[10px]"></p>
+            </div>
+            <div class="text-right flex flex-col justify-end">
+              <p id="inv-pay-mode" class="font-bold text-xs text-slate-800"></p>
+              <div id="inv-fin-details" class="text-[10px] text-blue-900 font-bold mt-0.5 hidden"></div>
+            </div>
+          </div>
+
+          <!-- ITEMS TABLE -->
+          <div class="my-3 overflow-hidden rounded border border-slate-200">
+            <table class="w-full border-collapse text-left text-[11px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
+                  <th class="p-1.5 w-8 text-center">#</th>
+                  <th class="p-1.5">Product Description</th>
+                  <th class="p-1.5">IMEI / Remarks</th>
+                  <th class="p-1.5 text-center w-12">Qty</th>
+                  <th class="p-1.5 text-right w-20">Rate</th>
+                  <th class="p-1.5 text-right w-24">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="inv-items-body" class="divide-y divide-slate-200 font-medium"></tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER: QR CODE & GRAND TOTAL -->
+          <div class="flex justify-between items-end pt-3 border-t-2 border-slate-900 mt-3">
+            <div class="flex items-center space-x-3">
+              <div id="inv-qr" class="w-16 h-16 bg-white border border-slate-300 p-0.5 flex items-center justify-center rounded"></div>
+              <div class="text-[9px] text-slate-500 leading-tight">
+                <span class="font-black text-slate-900 block text-[10px]">SCAN TO VERIFY</span>
+                Scan with any Camera<br />to open bill online.
               </div>
             </div>
 
-            <div class="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-              <div class="text-right">
-                <span class="text-xs text-slate-400 font-bold block">OUTSTANDING DUE</span>
-                <span class={`text-lg font-black ${totals.dueAmount > 0 ? "text-rose-400" : "text-emerald-400"}`}>
-                  ₹{totals.dueAmount.toLocaleString('en-IN')}
-                </span>
-              </div>
-              <button
-                onClick={handleSaveBill}
-                disabled={isSaving}
-                class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-3 rounded-lg text-sm shadow-xl transition active:scale-95 flex items-center space-x-2"
-              >
-                {isSaving ? <span>Syncing Cloud...</span> : <span>Confirm & Save Bill</span>}
-              </button>
+            <div class="text-right">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block">Grand Total</span>
+              <p id="inv-grand-total" class="text-2xl font-black text-slate-900 leading-none mt-0.5">Rs. 0</p>
             </div>
           </div>
+
+          <!-- SIGNATURES -->
+          <div class="mt-8 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
+            <div>
+              <p class="font-bold text-slate-700">Terms & Conditions:</p>
+              <p>• Goods once sold will not be returned without warranty terms.</p>
+            </div>
+            <div class="text-center">
+              <div class="h-6"></div>
+              <span class="border-t border-slate-400 pt-0.5 inline-block w-36 font-bold text-slate-800">Authorized Signatory</span>
+            </div>
+          </div>
+
         </div>
-      );
+      </div>
+    </div>
+
+    <!-- VIEW 4: SETTINGS -->
+    <div id="view-settings" class="space-y-3 bg-white p-5 rounded-xl border max-w-md mx-auto hidden">
+      <h2 class="font-bold text-sm text-slate-900">Backend Cloud URL</h2>
+      <input type="text" id="settings-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2 border rounded text-xs font-mono" />
+      <div class="flex space-x-2 pt-1">
+        <button onclick="showView('dashboard')" class="flex-1 py-1.5 bg-slate-200 font-bold rounded text-xs">Back</button>
+        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-slate-900 text-white font-bold rounded text-xs">SAVE SETTINGS</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let currentBillType = "MOBILE";
+    let activeBill = null;
+    let billsCache = JSON.parse(localStorage.getItem("sre_bills_cache") || "[]");
+    let gasUrl = localStorage.getItem("sre_gas_url") || "";
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.classList.remove("hidden");
+      setTimeout(() => t.classList.add("hidden"), 3000);
     }
 
-    // -------------------------------------------------------------
-    // POST-SALE TRANSACTION SUCCESS & EXPORT ENGINE
-    // -------------------------------------------------------------
-    function SuccessReceiptScreen({ data, config, onReset }) {
-      const qrCanvasRef = useRef(null);
-      const [qrGenerated, setQrGenerated] = useState(false);
+    // LOGIN LOGIC - ZERO BLOCKING FALLBACK
+    function handleLogin() {
+      const u = document.getElementById("login-username").value.trim();
+      const p = document.getElementById("login-password").value.trim();
 
-      useEffect(() => {
-        if (data.publicUrl && qrCanvasRef.current) {
-          qrCanvasRef.current.innerHTML = "";
-          new QRCode(qrCanvasRef.current, {
-            text: data.publicUrl,
-            width: 140,
-            height: 140,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.M
-          });
-          setQrGenerated(true);
-        }
-      }, [data.publicUrl]);
-
-      const handleWhatsAppShare = () => {
-        const phone = "91" + data.customer.mobile;
-        const msg = `Hello ${data.customer.name} 👋\n\nThank you for shopping with *Sri Ram Enterprises*.\n\n*Invoice No:* ${data.invoiceNo}\n*Total Amount:* ₹${data.totals.grandTotal}\n*Paid:* ₹${data.totals.totalPaid}\n*Due:* ₹${data.totals.dueAmount}\n\nView / Download Official Invoice:\n${data.publicUrl}\n\nThank you for your business! 🙏`;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
-      };
-
-      const handleA4PdfDownload = () => {
-        const doc = new jspdf.jsPDF();
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text(config.businessName, 105, 15, { align: "center" });
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text(config.tagline, 105, 21, { align: "center" });
-        doc.text(config.address, 105, 26, { align: "center" });
-        doc.text(`GSTIN: ${config.gstin} | Contact: ${config.phones}`, 105, 31, { align: "center" });
-        doc.line(10, 35, 200, 35);
-
-        doc.setFont("helvetica", "bold");
-        doc.text(`TAX INVOICE: ${data.invoiceNo}`, 10, 42);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 150, 42);
-        doc.text(`Customer: ${data.customer.name} (${data.customer.mobile})`, 10, 48);
-        doc.text(`Address: ${data.customer.address || "Bokaro"}`, 10, 54);
-
-        doc.line(10, 58, 200, 58);
-        doc.text("Grand Total:", 130, 70);
-        doc.setFont("helvetica", "bold");
-        doc.text(`Rs. ${data.totals.grandTotal.toLocaleString('en-IN')}`, 170, 70);
-        doc.text("Paid Amount:", 130, 76);
-        doc.text(`Rs. ${data.totals.totalPaid.toLocaleString('en-IN')}`, 170, 76);
-        doc.text("Balance Due:", 130, 82);
-        doc.text(`Rs. ${data.totals.dueAmount.toLocaleString('en-IN')}`, 170, 82);
-
-        doc.save(`${data.invoiceNo}.pdf`);
-      };
-
-      const handleThermalPrint = () => {
-        window.print();
-      };
-
-      return (
-        <div class="max-w-md mx-auto bg-white p-6 rounded-2xl border border-slate-200 shadow-xl space-y-5 text-center">
-          <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-black">
-            ✓
-          </div>
-
-          <div>
-            <h1 class="text-xl font-black text-slate-900">BILL CREATED & STORED</h1>
-            <p class="text-xs font-mono font-bold text-blue-900 mt-1">{data.invoiceNo}</p>
-          </div>
-
-          <div class="p-3.5 bg-slate-50 rounded-xl space-y-1 text-xs text-left font-medium">
-            <div class="flex justify-between">
-              <span class="text-slate-500">Customer:</span>
-              <span class="font-bold text-slate-800">{data.customer.name}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Grand Total:</span>
-              <span class="font-bold text-slate-900">₹{data.totals.grandTotal.toLocaleString('en-IN')}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Amount Paid:</span>
-              <span class="font-bold text-emerald-600">₹{data.totals.totalPaid.toLocaleString('en-IN')}</span>
-            </div>
-            <div class="flex justify-between border-t pt-1">
-              <span class="text-slate-500">Outstanding Due:</span>
-              <span class="font-bold text-rose-600">₹{data.totals.dueAmount.toLocaleString('en-IN')}</span>
-            </div>
-          </div>
-
-          {/* QR Container */}
-          <div class="flex flex-col items-center justify-center space-y-1">
-            <div ref={qrCanvasRef} class="p-2 border rounded-lg bg-white shadow-sm"></div>
-            <span class="text-[10px] text-slate-400 font-bold">Public Verification QR</span>
-          </div>
-
-          {/* Action Row */}
-          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
-            <button onClick={handleWhatsAppShare} class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow">
-              Send WhatsApp
-            </button>
-            <button onClick={handleThermalPrint} class="p-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow">
-              Print 80mm
-            </button>
-            <button onClick={handleA4PdfDownload} class="p-2.5 bg-blue-950 hover:bg-blue-900 text-white rounded-lg shadow">
-              Download PDF
-            </button>
-            <button onClick={() => { navigator.clipboard.writeText(data.publicUrl); alert("Copied!"); }} class="p-2.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
-              Copy Bill Link
-            </button>
-          </div>
-
-          <button onClick={onReset} class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg transition">
-            + Start Next Invoice
-          </button>
-
-          {/* Hidden Thermal Structure for System Print Dialog */}
-          <div id="printable-area" class="hidden">
-            <div class="thermal-receipt p-2 text-center">
-              <p class="font-bold text-sm">{config.businessName}</p>
-              <p class="text-[10px]">{config.tagline}</p>
-              <p class="text-[9px]">{config.address}</p>
-              <p class="text-[9px]">Ph: {config.phones}</p>
-              <p class="text-[9px]">GSTIN: {config.gstin}</p>
-              <p class="border-b border-dashed my-1"></p>
-              <div class="text-left text-[10px]">
-                <p>INV: {data.invoiceNo}</p>
-                <p>Date: {new Date().toLocaleDateString('en-IN')}</p>
-                <p>Cust: {data.customer.name}</p>
-                <p>Mob: {data.customer.mobile}</p>
-              </div>
-              <p class="border-b border-dashed my-1"></p>
-              <div class="text-left text-[10px]">
-                <p class="flex justify-between font-bold"><span>Total:</span><span>Rs. {data.totals.grandTotal}</span></p>
-                <p class="flex justify-between"><span>Paid:</span><span>Rs. {data.totals.totalPaid}</span></p>
-                <p class="flex justify-between"><span>Due:</span><span>Rs. {data.totals.dueAmount}</span></p>
-              </div>
-              <p class="border-b border-dashed my-1"></p>
-              <p class="text-[9px]">Scan to view official bill online:</p>
-              <p class="text-[8px] break-all">{data.publicUrl}</p>
-              <p class="text-[9px] mt-2">Thank you! Visit Again.</p>
-            </div>
-          </div>
-        </div>
-      );
+      if (u === "admin" && p === "admin123") {
+        document.getElementById("login-modal").classList.add("hidden");
+        sessionStorage.setItem("SRE_LOGGED", "true");
+        showToast("Logged in successfully!");
+        renderDashboard();
+      } else {
+        alert("Invalid credentials! Default is admin / admin123");
+      }
     }
 
-    // -------------------------------------------------------------
-    // REGISTER & BILL AUDIT COMPONENT
-    // -------------------------------------------------------------
-    function BillsRegisterView({ config, staff, showToast }) {
-      const [bills, setBills] = useState([]);
-      const [search, setSearch] = useState("");
-      const [loading, setLoading] = useState(true);
-
-      useEffect(() => {
-        fetchBills();
-      }, []);
-
-      const fetchBills = async () => {
-        if (!config.gasUrl) return;
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "getBills", staff })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setBills(data.bills);
-          }
-        } catch (e) {
-          showToast("Failed to fetch cloud register records.", "error");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      const filtered = bills.filter(b => 
-        b.invoiceNo.toLowerCase().includes(search.toLowerCase()) ||
-        b.customerName.toLowerCase().includes(search.toLowerCase()) ||
-        b.customerMobile.includes(search)
-      );
-
-      return (
-        <div class="space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h1 class="text-xl font-black text-slate-900">Invoices & Sales Register</h1>
-              <p class="text-xs text-slate-500 font-medium">Relational Records Stored in Google Sheets</p>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Search Invoice, Name, Mobile..." 
-              value={search} 
-              onChange={e => setSearch(e.target.value)} 
-              class="p-2 border rounded-lg text-xs w-full sm:w-64 outline-none font-medium"
-            />
-          </div>
-
-          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 border-b text-slate-500 font-bold uppercase">
-                  <tr>
-                    <th class="p-3">Invoice No</th>
-                    <th class="p-3">Date</th>
-                    <th class="p-3">Customer</th>
-                    <th class="p-3">Total</th>
-                    <th class="p-3">Paid</th>
-                    <th class="p-3">Due</th>
-                    <th class="p-3">Staff</th>
-                    <th class="p-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-medium">
-                  {filtered.map(b => (
-                    <tr key={b.invoiceNo} class="hover:bg-slate-50">
-                      <td class="p-3 font-mono font-bold text-blue-900">{b.invoiceNo}</td>
-                      <td class="p-3 text-slate-500">{b.billDate}</td>
-                      <td class="p-3 font-bold text-slate-900">
-                        {b.customerName}
-                        <span class="block text-[10px] text-slate-400 font-normal">{b.customerMobile}</span>
-                      </td>
-                      <td class="p-3 font-bold">₹{b.grandTotal}</td>
-                      <td class="p-3 text-emerald-600 font-bold">₹{b.paid}</td>
-                      <td class="p-3 text-rose-600 font-bold">₹{b.due}</td>
-                      <td class="p-3 text-slate-500 text-[11px]">{b.createdBy}</td>
-                      <td class="p-3 text-right space-x-1 whitespace-nowrap">
-                        <a href={b.publicUrl} target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded font-bold text-[10px]">
-                          View
-                        </a>
-                        <a href={b.pdfUrl} target="_blank" class="px-2 py-1 bg-blue-900 text-white rounded font-bold text-[10px]">
-                          PDF
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
-                    <tr>
-                      <td colspan="8" class="p-6 text-center text-slate-400">No records found.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      );
+    function logout() {
+      sessionStorage.removeItem("SRE_LOGGED");
+      document.getElementById("login-modal").classList.remove("hidden");
     }
 
-    // -------------------------------------------------------------
-    // DUES RECOVERY ENGINE
-    // -------------------------------------------------------------
-    function DuesManagementView({ config, staff, showToast }) {
-      const [dueBills, setDueBills] = useState([]);
-      const [selectedBill, setSelectedBill] = useState(null);
-      const [paymentAmount, setPaymentAmount] = useState("");
-      const [paymentType, setPaymentType] = useState("Cash");
+    function showView(view) {
+      document.getElementById("view-dashboard").classList.add("hidden");
+      document.getElementById("view-new-bill").classList.add("hidden");
+      document.getElementById("view-invoice").classList.add("hidden");
+      document.getElementById("view-settings").classList.add("hidden");
 
-      useEffect(() => {
-        fetchDues();
-      }, []);
-
-      const fetchDues = async () => {
-        if (!config.gasUrl) return;
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "getBills", staff })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setDueBills(data.bills.filter(b => parseFloat(b.due) > 0));
-          }
-        } catch (e) {
-          showToast("Failed to load outstanding ledger.", "error");
-        }
-      };
-
-      const handleAddPayment = async () => {
-        if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
-          return showToast("Enter a valid installment amount.", "error");
-        }
-        if (parseFloat(paymentAmount) > parseFloat(selectedBill.due)) {
-          return showToast("Payment exceeds current outstanding due balance.", "error");
-        }
-
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({
-              action: "addDuePayment",
-              paymentData: {
-                invoiceNo: selectedBill.invoiceNo,
-                amount: parseFloat(paymentAmount),
-                paymentType: paymentType
-              },
-              staff
-            })
-          });
-          const data = await res.json();
-          if (data.success) {
-            showToast("Installment payment credited successfully!", "success");
-            setSelectedBill(null);
-            setPaymentAmount("");
-            fetchDues();
-          } else {
-            showToast(data.error || "Update transaction failed.", "error");
-          }
-        } catch (e) {
-          showToast("Network error submitting installment.", "error");
-        }
-      };
-
-      return (
-        <div class="space-y-4">
-          <div>
-            <h1 class="text-xl font-black text-slate-900">Outstanding Due Recovery</h1>
-            <p class="text-xs text-slate-500 font-medium">Customer Credit Management & Payment Allocation</p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-              <div class="p-3 bg-slate-50 border-b font-bold text-xs text-slate-700">Pending Accounts Receivable</div>
-              <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
-                {dueBills.map(b => (
-                  <div key={b.invoiceNo} onClick={() => setSelectedBill(b)} class={`p-3 cursor-pointer transition ${selectedBill?.invoiceNo === b.invoiceNo ? "bg-blue-50/70" : "hover:bg-slate-50"}`}>
-                    <div class="flex justify-between items-start">
-                      <div>
-                        <p class="font-bold text-xs text-slate-900">{b.customerName}</p>
-                        <p class="text-[10px] text-slate-500 font-mono">{b.customerMobile}</p>
-                        <p class="text-[10px] text-blue-900 font-bold mt-1">{b.invoiceNo}</p>
-                      </div>
-                      <div class="text-right">
-                        <span class="text-xs font-black text-rose-600 block">Due: ₹{b.due}</span>
-                        <span class="text-[10px] text-slate-400">Total: ₹{b.grandTotal}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {dueBills.length === 0 && <p class="p-4 text-center text-xs text-slate-400">All customer dues cleared!</p>}
-              </div>
-            </div>
-
-            {/* Payment Input Card */}
-            <div>
-              {selectedBill ? (
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                  <h3 class="text-xs font-black uppercase text-slate-500 tracking-wider">Record Installment: {selectedBill.invoiceNo}</h3>
-                  <div class="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-                    <p><span class="text-slate-500">Customer:</span> <strong>{selectedBill.customerName}</strong> ({selectedBill.customerMobile})</p>
-                    <p><span class="text-slate-500">Remaining Balance:</span> <strong class="text-rose-600">₹{selectedBill.due}</strong></p>
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Installment Amount (₹)</label>
-                    <input 
-                      type="number" 
-                      value={paymentAmount} 
-                      onChange={e => setPaymentAmount(e.target.value)} 
-                      placeholder="0.00"
-                      class="w-full p-2.5 border rounded-lg text-sm font-bold"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
-                    <select value={paymentType} onChange={e => setPaymentType(e.target.value)} class="w-full p-2.5 border rounded-lg text-xs font-bold">
-                      <option value="Cash">Cash</option>
-                      <option value="QR">QR / UPI</option>
-                      <option value="Card">Card</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-
-                  <button 
-                    onClick={handleAddPayment}
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs shadow transition"
-                  >
-                    Credit Installment Payment
-                  </button>
-                </div>
-              ) : (
-                <div class="bg-white p-8 rounded-xl border border-dashed text-center text-xs text-slate-400">
-                  Select a bill from the left list to settle pending dues.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      );
+      if (view === "dashboard") {
+        renderDashboard();
+        document.getElementById("view-dashboard").classList.remove("hidden");
+      } else if (view === "new-bill") {
+        document.getElementById("view-new-bill").classList.remove("hidden");
+      } else if (view === "invoice") {
+        document.getElementById("view-invoice").classList.remove("hidden");
+      } else if (view === "settings") {
+        document.getElementById("settings-url").value = gasUrl;
+        document.getElementById("view-settings").classList.remove("hidden");
+      }
     }
 
-    // -------------------------------------------------------------
-    // FINANCIAL & GST AUDIT REPORTS COMPONENT
-    // -------------------------------------------------------------
-    function ReportsView({ config, staff, showToast }) {
-      const [startDate, setStartDate] = useState(() => new Date().toISOString().substring(0, 10));
-      const [endDate, setEndDate] = useState(() => new Date().toISOString().substring(0, 10));
-      const [rep, setRep] = useState(null);
-      const [loading, setLoading] = useState(false);
+    function renderDashboard() {
+      const today = new Date().toISOString().substring(0, 10);
+      const todayBills = billsCache.filter(b => b.billDate === today);
 
-      const fetchReport = async () => {
-        if (!config.gasUrl) return;
-        setLoading(true);
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "getReports", startDate, endDate })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setRep(data.report);
-          }
-        } catch (e) {
-          showToast("Failed to aggregate reports.", "error");
-        } finally {
-          setLoading(false);
-        }
-      };
+      let sales = 0, paid = 0, due = 0;
+      todayBills.forEach(b => {
+        sales += Number(b.grandTotal) || 0;
+        paid += Number(b.paid) || 0;
+        due += Number(b.due) || 0;
+      });
 
-      useEffect(() => {
-        fetchReport();
-      }, []);
+      document.getElementById("dash-count").innerText = todayBills.length;
+      document.getElementById("dash-sales").innerText = "Rs. " + sales.toLocaleString("en-IN");
+      document.getElementById("dash-paid").innerText = "Rs. " + paid.toLocaleString("en-IN");
+      document.getElementById("dash-due").innerText = "Rs. " + due.toLocaleString("en-IN");
 
-      return (
-        <div class="space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h1 class="text-xl font-black text-slate-900">Taxation & Sales Reports</h1>
-              <p class="text-xs text-slate-500 font-medium">GST Breakdown (CGST, SGST, IGST) and Revenue Analytics</p>
-            </div>
-            <div class="flex items-center space-x-2">
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} class="p-1.5 border rounded text-xs font-bold" />
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} class="p-1.5 border rounded text-xs font-bold" />
-              <button onClick={fetchReport} class="px-3 py-1.5 bg-blue-950 text-white rounded text-xs font-bold">Filter</button>
-            </div>
-          </div>
-
-          {rep && (
-            <div class="space-y-4">
-              {/* Top Sales Figures */}
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="bg-white p-3 rounded-xl border">
-                  <span class="text-[10px] text-slate-400 font-bold uppercase">Total Gross Sales</span>
-                  <p class="text-lg font-black text-slate-900">₹{rep.grossSales.toLocaleString('en-IN')}</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border">
-                  <span class="text-[10px] text-slate-400 font-bold uppercase">Taxable Turnover</span>
-                  <p class="text-lg font-black text-blue-900">₹{rep.taxableSales.toLocaleString('en-IN')}</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border">
-                  <span class="text-[10px] text-slate-400 font-bold uppercase">GST Collected</span>
-                  <p class="text-lg font-black text-emerald-600">₹{rep.totalGst.toLocaleString('en-IN')}</p>
-                </div>
-                <div class="bg-white p-3 rounded-xl border">
-                  <span class="text-[10px] text-slate-400 font-bold uppercase">Net Recovered</span>
-                  <p class="text-lg font-black text-slate-900">₹{rep.totalCollection.toLocaleString('en-IN')}</p>
-                </div>
-              </div>
-
-              {/* GST Breakdown Table */}
-              <div class="bg-white p-4 rounded-xl border shadow-sm">
-                <h3 class="text-xs font-black uppercase text-slate-500 mb-3 tracking-wider">GST Output Liability Register</h3>
-                <div class="grid grid-cols-3 gap-3 text-center">
-                  <div class="p-3 bg-slate-50 rounded-lg">
-                    <span class="text-xs text-slate-500 font-bold">CGST (Intrastate)</span>
-                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalCgst.toLocaleString('en-IN')}</p>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-lg">
-                    <span class="text-xs text-slate-500 font-bold">SGST (Jharkhand)</span>
-                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalSgst.toLocaleString('en-IN')}</p>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-lg">
-                    <span class="text-xs text-slate-500 font-bold">IGST (Interstate)</span>
-                    <p class="text-base font-black text-slate-800 mt-1">₹{rep.totalIgst.toLocaleString('en-IN')}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Collection by Tender Method */}
-              <div class="bg-white p-4 rounded-xl border shadow-sm">
-                <h3 class="text-xs font-black uppercase text-slate-500 mb-3 tracking-wider">Payment Method Reconciliations</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs">
-                  <div class="p-2 border rounded">Cash: <strong class="block text-sm">₹{rep.cashCollection}</strong></div>
-                  <div class="p-2 border rounded">QR/UPI: <strong class="block text-sm">₹{rep.qrCollection}</strong></div>
-                  <div class="p-2 border rounded">Cards: <strong class="block text-sm">₹{rep.cardCollection}</strong></div>
-                  <div class="p-2 border rounded">Finance: <strong class="block text-sm">₹{rep.financeCollection}</strong></div>
-                  <div class="p-2 border rounded">Other: <strong class="block text-sm">₹{rep.otherCollection}</strong></div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // -------------------------------------------------------------
-    // ENTERPRISE PARAMETER CONFIGURATION (ADMIN ONLY)
-    // -------------------------------------------------------------
-    function SettingsView({ config, setConfig, staff, showToast }) {
-      const [form, setForm] = useState(config);
-
-      const handleSave = async (e) => {
-        e.preventDefault();
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({
-              action: "saveSettings",
-              settings: {
-                BUSINESS_NAME: form.businessName,
-                TAGLINE: form.tagline,
-                ADDRESS: form.address,
-                PHONE: form.phones,
-                GSTIN: form.gstin,
-                TERMS: form.terms
-              },
-              staff
-            })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setConfig(form);
-            showToast("Master business settings updated on cloud.", "success");
-          }
-        } catch (err) {
-          showToast("Failed to save remote settings.", "error");
-        }
-      };
-
-      return (
-        <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl border shadow-sm space-y-4">
-          <div>
-            <h1 class="text-lg font-black text-slate-900">Master Enterprise Settings</h1>
-            <p class="text-xs text-slate-500">Configure parameters printed on physical invoices and documents.</p>
-          </div>
-
-          <form onSubmit={handleSave} class="space-y-3 text-xs">
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Business Name</label>
-              <input type="text" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} class="w-full p-2 border rounded font-bold" />
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Tagline</label>
-              <input type="text" value={form.tagline} onChange={e => setForm({ ...form, tagline: e.target.value })} class="w-full p-2 border rounded" />
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Shop Address</label>
-              <textarea rows="2" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} class="w-full p-2 border rounded" />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block font-bold text-slate-700 uppercase mb-1">Phone Numbers</label>
-                <input type="text" value={form.phones} onChange={e => setForm({ ...form, phones: e.target.value })} class="w-full p-2 border rounded font-mono" />
-              </div>
-              <div>
-                <label class="block font-bold text-slate-700 uppercase mb-1">GSTIN</label>
-                <input type="text" value={form.gstin} onChange={e => setForm({ ...form, gstin: e.target.value })} class="w-full p-2 border rounded font-mono font-bold" />
-              </div>
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Invoice Terms & Conditions</label>
-              <textarea rows="4" value={form.terms} onChange={e => setForm({ ...form, terms: e.target.value })} class="w-full p-2 border rounded" />
-            </div>
-
-            <button type="submit" class="w-full py-2.5 bg-blue-950 text-white font-bold rounded shadow hover:bg-blue-900">
-              Save All Business Configuration
-            </button>
-          </form>
-        </div>
-      );
-    }
-
-    // -------------------------------------------------------------
-    // PUBLIC CUSTOMER PORTAL (TOKEN VERIFIED, NO LOGIN REQUIRED)
-    // -------------------------------------------------------------
-    function PublicBillView({ token, config }) {
-      const [bill, setBill] = useState(null);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
-
-      useEffect(() => {
-        fetchBill();
-      }, [token]);
-
-      const fetchBill = async () => {
-        try {
-          const res = await fetch(config.gasUrl, {
-            method: "POST",
-            body: JSON.stringify({ action: "getBillByToken", token })
-          });
-          const data = await res.json();
-          if (data.success) {
-            setBill(data.bill);
-          } else {
-            setError(data.error || "Invoice not found or link expired.");
-          }
-        } catch (e) {
-          setError("Network connection error. Please refresh.");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      if (loading) {
-        return (
-          <div class="min-h-screen flex items-center justify-center p-4">
-            <p class="text-sm font-bold text-slate-500">Retrieving official digital invoice...</p>
-          </div>
-        );
+      const list = document.getElementById("recent-bills-list");
+      if (billsCache.length === 0) {
+        list.innerHTML = '<p class="p-4 text-center text-xs text-slate-400">No bills generated yet.</p>';
+        return;
       }
 
-      if (error) {
-        return (
-          <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white p-6 rounded-xl border border-rose-200 text-center space-y-2 max-w-sm">
-              <p class="text-rose-600 font-bold text-sm">Invoice Unavailable</p>
-              <p class="text-xs text-slate-500">{error}</p>
-            </div>
+      list.innerHTML = billsCache.slice(0, 15).map(b => `
+        <div onclick='openSavedBill("${b.token}")' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center">
+          <div>
+            <p class="font-bold text-slate-900 text-xs">${b.invoiceNo}</p>
+            <p class="text-xs text-slate-600">${b.customerName}</p>
+            <span class="text-[9px] text-slate-400">${b.billDate}</span>
           </div>
-        );
-      }
-
-      return (
-        <div class="min-h-screen bg-slate-100 p-2 sm:p-6">
-          <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border">
-            <div class="bg-blue-950 text-white p-4 text-center">
-              <h1 class="text-base font-black">{config.businessName}</h1>
-              <p class="text-[10px] text-blue-200">{config.address}</p>
-            </div>
-
-            <div class="p-5 space-y-4 text-xs">
-              <div class="flex justify-between items-center border-b pb-2">
-                <div>
-                  <p class="text-slate-400 font-bold text-[10px]">INVOICE NO</p>
-                  <p class="font-mono font-bold text-slate-900">{bill.invoiceNo}</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-slate-400 font-bold text-[10px]">DATE</p>
-                  <p class="font-bold text-slate-900">{bill.billDate}</p>
-                </div>
-              </div>
-
-              <div>
-                <p class="text-slate-400 font-bold text-[10px]">CUSTOMER</p>
-                <p class="font-bold text-slate-900">{bill.customer.name}</p>
-                <p class="text-slate-500">{bill.customer.mobile}</p>
-              </div>
-
-              {/* Items */}
-              <div class="border rounded-lg overflow-hidden">
-                <table class="w-full text-left">
-                  <thead class="bg-slate-50 text-slate-500 font-bold border-b">
-                    <tr>
-                      <th class="p-2">Item</th>
-                      <th class="p-2 text-center">Qty</th>
-                      <th class="p-2 text-right">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y">
-                    {bill.items.map((it, idx) => (
-                      <tr key={idx}>
-                        <td class="p-2">
-                          <p class="font-bold text-slate-900">{it.brand} {it.productName}</p>
-                          {it.imei1 && <p class="text-[10px] font-mono text-slate-400">IMEI: {it.imei1}</p>}
-                        </td>
-                        <td class="p-2 text-center">{it.quantity}</td>
-                        <td class="p-2 text-right font-bold">₹{it.lineTotal}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Payment Summary */}
-              <div class="p-3 bg-slate-50 rounded-lg space-y-1">
-                <div class="flex justify-between">
-                  <span>Grand Total:</span>
-                  <span class="font-bold">₹{bill.totals.grandTotal}</span>
-                </div>
-                <div class="flex justify-between text-emerald-600 font-bold">
-                  <span>Paid Amount:</span>
-                  <span>₹{bill.totals.paid}</span>
-                </div>
-                <div class="flex justify-between text-rose-600 font-bold border-t pt-1">
-                  <span>Balance Due:</span>
-                  <span>₹{bill.totals.due}</span>
-                </div>
-              </div>
-
-              {bill.pdfUrl && (
-                <a
-                  href={bill.pdfUrl}
-                  target="_blank"
-                  class="block w-full text-center py-2.5 bg-blue-950 text-white font-bold rounded-lg shadow"
-                >
-                  Download Original PDF Document
-                </a>
-              )}
-            </div>
+          <div class="text-right font-black text-xs">
+            Rs. ${(Number(b.grandTotal) || 0).toLocaleString("en-IN")}
           </div>
         </div>
-      );
+      `).join("");
     }
 
-    // Mount Virtual DOM
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    function startNewBill(type) {
+      currentBillType = type;
+      changeBillType(type);
+
+      document.getElementById("cust-name").value = "";
+      document.getElementById("cust-phone").value = "";
+      document.getElementById("cust-address").value = "";
+      document.getElementById("rep-phone").value = "";
+      document.getElementById("rep-device").value = "";
+      document.getElementById("rep-issue").value = "";
+      document.getElementById("rep-charge").value = "";
+      document.getElementById("pay-paid").value = "";
+      document.getElementById("pay-primary").value = "Cash";
+      document.getElementById("pay-secondary").value = "";
+      onPaymentModeChange();
+
+      document.getElementById("items-container").innerHTML = "";
+      addNewItemRow();
+
+      // Sequential Safe Invoice Number
+      const year = new Date().getFullYear();
+      const seq = (billsCache.length + 1).toString().padStart(5, "0");
+      document.getElementById("form-invoice-no").innerText = `SRE-${year}-${seq}`;
+
+      recalcTotals();
+      showView("new-bill");
+    }
+
+    function changeBillType(type) {
+      currentBillType = type;
+      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
+        const btn = document.getElementById(`pill-${t}`);
+        btn.className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-slate-900 text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600";
+      });
+
+      const custBox = document.getElementById("cust-box");
+      const itemsBox = document.getElementById("items-box");
+      const repairBox = document.getElementById("repair-box");
+
+      if (type === "REPAIRING") {
+        custBox.classList.add("hidden");
+        itemsBox.classList.add("hidden");
+        repairBox.classList.remove("hidden");
+      } else {
+        custBox.classList.remove("hidden");
+        itemsBox.classList.remove("hidden");
+        repairBox.classList.add("hidden");
+
+        const lblName = document.getElementById("lbl-cust-name");
+        const lblPhone = document.getElementById("lbl-cust-phone");
+        const lblAddr = document.getElementById("lbl-cust-address");
+
+        if (type === "ACCESSORIES") {
+          lblName.innerText = "Customer Name (Optional)";
+          lblPhone.innerText = "Mobile Number (Optional)";
+          lblAddr.innerText = "Customer Address (Optional)";
+        } else {
+          lblName.innerText = "Customer Name *";
+          lblPhone.innerText = "Mobile Number *";
+          lblAddr.innerText = "Customer Address *";
+        }
+      }
+      recalcTotals();
+    }
+
+    function addNewItemRow() {
+      const container = document.getElementById("items-container");
+      const div = document.createElement("div");
+      div.className = "item-row p-2.5 bg-slate-50 rounded-xl border space-y-2";
+      div.innerHTML = `
+        <input type="text" placeholder="Product Name / Model *" class="item-name w-full p-1.5 bg-white border rounded text-xs font-bold" />
+        <div class="grid grid-cols-3 gap-2">
+          <input type="number" min="1" value="1" placeholder="Qty" oninput="recalcTotals()" class="item-qty p-1.5 bg-white border rounded text-xs font-bold" />
+          <input type="number" placeholder="Rate (Rs.) *" oninput="recalcTotals()" class="item-rate p-1.5 bg-white border rounded text-xs font-bold" />
+          <input type="number" placeholder="Discount" oninput="recalcTotals()" class="item-disc p-1.5 bg-white border rounded text-xs" />
+        </div>
+        <input type="text" maxlength="15" placeholder="IMEI Number (15 अंक) *" oninput="this.value=this.value.replace(/\\D/g,'')" class="item-imei w-full p-1.5 bg-white border rounded text-xs font-mono font-bold" />
+      `;
+      container.appendChild(div);
+    }
+
+    function onPaymentModeChange() {
+      const p = document.getElementById("pay-primary").value;
+      const s = document.getElementById("pay-secondary").value;
+
+      document.getElementById("fin-box").classList.toggle("hidden", s !== "Finance");
+      document.getElementById("dues-box").classList.toggle("hidden", s !== "Dues");
+      document.getElementById("split-box").classList.toggle("hidden", p !== "Cash + QR");
+
+      if (s === "Finance") handleFinanceChange();
+      else if (s === "Dues") handleDuesChange();
+      else if (p === "Cash + QR") handleSplitChange();
+      else recalcTotals();
+    }
+
+    function handleFinanceChange() {
+      const dp = Number(document.getElementById("fin-dp").value) || 0;
+      const grand = recalcTotals().grand;
+      document.getElementById("fin-loan-display").innerText = "Rs. " + Math.max(0, grand - dp).toLocaleString("en-IN");
+      document.getElementById("pay-paid").value = dp;
+      recalcTotals();
+    }
+
+    function handleDuesChange() {
+      const t = Number(document.getElementById("dues-token").value) || 0;
+      document.getElementById("pay-paid").value = t;
+      recalcTotals();
+    }
+
+    function handleSplitChange() {
+      const c = Number(document.getElementById("split-cash").value) || 0;
+      const q = Number(document.getElementById("split-qr").value) || 0;
+      document.getElementById("pay-paid").value = (c + q) > 0 ? (c + q) : "";
+      recalcTotals();
+    }
+
+    function recalcTotals() {
+      let grand = 0;
+      if (currentBillType === "REPAIRING") {
+        grand = Number(document.getElementById("rep-charge").value) || 0;
+      } else {
+        document.querySelectorAll(".item-row").forEach(r => {
+          const q = Number(r.querySelector(".item-qty").value) || 1;
+          const rate = Number(r.querySelector(".item-rate").value) || 0;
+          const disc = Number(r.querySelector(".item-disc").value) || 0;
+          grand += Math.max(0, (q * rate) - disc);
+        });
+      }
+
+      grand = Math.round(grand);
+      const paidVal = document.getElementById("pay-paid").value;
+      const paid = paidVal === "" ? 0 : Math.min(grand, Number(paidVal) || 0);
+      const due = Math.max(0, grand - paid);
+
+      document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
+      document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
+
+      return { grand, paid, due };
+    }
+
+    function saveBill() {
+      let name = "", phone = "", address = "";
+
+      if (currentBillType === "REPAIRING") {
+        phone = document.getElementById("rep-phone").value.trim();
+        name = "Repair Customer";
+        address = "Bokaro";
+        const dev = document.getElementById("rep-device").value.trim();
+        const charge = Number(document.getElementById("rep-charge").value) || 0;
+
+        if (phone.length !== 10) return alert("10 अंकों का मोबाइल नंबर दर्ज करें!");
+        if (!dev || charge <= 0) return alert("डिवाइस नाम और चार्ज अवश्य भरें!");
+      } else if (currentBillType === "ACCESSORIES") {
+        name = document.getElementById("cust-name").value.trim() || "Cash Customer";
+        phone = document.getElementById("cust-phone").value.trim();
+        address = document.getElementById("cust-address").value.trim() || "Local";
+      } else {
+        name = document.getElementById("cust-name").value.trim();
+        phone = document.getElementById("cust-phone").value.trim();
+        address = document.getElementById("cust-address").value.trim();
+
+        if (!name) return alert("Customer Name भरें!");
+        if (phone.length !== 10) return alert("10 अंकों का मोबाइल नंबर भरें!");
+      }
+
+      const totals = recalcTotals();
+      if (totals.grand <= 0) return alert("बिल की कुल राशि 0 से अधिक होनी चाहिए!");
+
+      let items = [];
+      if (currentBillType === "REPAIRING") {
+        items = [{
+          name: document.getElementById("rep-device").value.trim(),
+          imei: document.getElementById("rep-issue").value.trim() || "Repair Service",
+          qty: 1,
+          rate: totals.grand,
+          amount: totals.grand
+        }];
+      } else {
+        let err = false;
+        document.querySelectorAll(".item-row").forEach(r => {
+          const pName = r.querySelector(".item-name").value.trim();
+          const rate = Number(r.querySelector(".item-rate").value) || 0;
+          if (!pName || rate <= 0) { err = true; return; }
+          items.push({
+            name: pName,
+            imei: r.querySelector(".item-imei").value.trim() || "-",
+            qty: Number(r.querySelector(".item-qty").value) || 1,
+            rate: rate,
+            amount: rate * (Number(r.querySelector(".item-qty").value) || 1)
+          });
+        });
+        if (err) return alert("कृपया प्रोडक्ट नाम और रेट सही भरें!");
+      }
+
+      const token = Math.random().toString(36).substring(2, 8);
+      const invoiceNo = document.getElementById("form-invoice-no").innerText;
+      const billDate = new Date().toISOString().substring(0, 10);
+      const pMode = document.getElementById("pay-secondary").value || document.getElementById("pay-primary").value;
+
+      const billData = {
+        invoiceNo,
+        billDate,
+        billType: currentBillType,
+        customerName: name,
+        customerMobile: phone,
+        customerAddress: address,
+        items,
+        paymentMode: pMode,
+        grandTotal: totals.grand,
+        paid: totals.paid,
+        due: totals.due,
+        token,
+        publicUrl: `${window.location.origin}${window.location.pathname}?b=${token}`
+      };
+
+      billsCache = [billData, ...billsCache];
+      localStorage.setItem("sre_bills_cache", JSON.stringify(billsCache));
+
+      // Background safe Google Sheets Sync (Never blocks)
+      if (gasUrl) {
+        fetch(gasUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "createBill", billData: billData, staff: { staffId: "STAFF-01", fullName: "Admin" } })
+        }).catch(() => {});
+      }
+
+      displayInvoice(billData);
+    }
+
+    function displayInvoice(bill) {
+      activeBill = bill;
+
+      document.getElementById("inv-no").innerText = bill.invoiceNo;
+      document.getElementById("inv-date").innerText = bill.billDate;
+      document.getElementById("inv-cust-name").innerText = bill.customerName;
+      document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
+      document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
+      document.getElementById("inv-pay-mode").innerText = "Payment: " + bill.paymentMode;
+      document.getElementById("inv-grand-total").innerText = "Rs. " + (Number(bill.grandTotal) || 0).toLocaleString("en-IN");
+
+      const tbody = document.getElementById("inv-items-body");
+      tbody.innerHTML = "";
+      bill.items.forEach((it, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-1.5 text-center text-slate-400 font-bold">${idx + 1}</td>
+            <td class="p-1.5 font-bold text-slate-900">${it.name}</td>
+            <td class="p-1.5 font-mono text-[10px] text-slate-600">${it.imei}</td>
+            <td class="p-1.5 text-center font-bold">${it.qty}</td>
+            <td class="p-1.5 text-right">Rs. ${(it.rate || 0).toLocaleString("en-IN")}</td>
+            <td class="p-1.5 text-right font-black">Rs. ${(it.amount || 0).toLocaleString("en-IN")}</td>
+          </tr>
+        `;
+      });
+
+      // INSTANT HIGH-SPEED QR (Guaranteed Camera Scanning)
+      const qrBox = document.getElementById("inv-qr");
+      qrBox.innerHTML = "";
+      new QRCode(qrBox, {
+        text: bill.publicUrl,
+        width: 60,
+        height: 60,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
+      });
+
+      showView("invoice");
+    }
+
+    function openSavedBill(token) {
+      const b = billsCache.find(x => x.token === token);
+      if (b) displayInvoice(b);
+    }
+
+    function shareWhatsApp() {
+      if (!activeBill) return;
+      const phone = "91" + (activeBill.customerMobile || "").replace(/\D/g, "");
+      const msg = `नमस्ते ${activeBill.customerName}, आपका SRI RAM ENTERPRISES का बिल तैयार है। यहाँ देखें: ${activeBill.publicUrl}`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    function saveSettings() {
+      gasUrl = document.getElementById("settings-url").value.trim();
+      localStorage.setItem("sre_gas_url", gasUrl);
+      showToast("Settings Saved!");
+      showView("dashboard");
+    }
+
+    // Direct initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      const token = new URLSearchParams(window.location.search).get("b");
+      if (token) {
+        document.getElementById("login-modal").classList.add("hidden");
+        const found = billsCache.find(x => x.token === token);
+        if (found) displayInvoice(found);
+      } else {
+        if (sessionStorage.getItem("SRE_LOGGED") === "true") {
+          document.getElementById("login-modal").classList.add("hidden");
+        }
+        renderDashboard();
+      }
+    });
   </script>
 </body>
 </html>
