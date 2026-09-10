@@ -31,7 +31,7 @@
     .totals-box { width: 225px; min-width: 225px; } 
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
 
   <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
@@ -58,59 +58,30 @@
   <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4">
 
     <div id="view-dashboard" class="space-y-3">
+      <!-- FIXED: NEW DASHBOARD STATS (SALE, PURCHASE, PROFIT, LOSS) -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S BILLS</span><p id="dash-count" class="text-2xl font-black mt-0.5">0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S SALES</span><p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">COLLECTION</span><p id="dash-paid" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TOTAL DUE</span><p id="dash-due" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S SALE</span><p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S PURCHASE</span><p id="dash-purchase" class="text-2xl font-black text-indigo-600 mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">PROFIT</span><p id="dash-profit" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">LOSS</span><p id="dash-loss" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
       </div>
       
-      <!-- FIXED: NEW DASHBOARD BUTTONS (SALE, PURCHASE, PAYMENT, RECEIPT) -->
-      <div class="space-y-2.5">
-        
-        <!-- SALE ENTRY -->
-        <div>
-          <button onclick="toggleMenu('menu-sale')" class="w-full p-3 bg-[#004aad] text-white rounded-xl shadow font-black text-sm flex justify-between items-center border border-blue-800">
-            <span class="flex items-center space-x-2.5"><span class="text-lg">🛒</span><span>SALE ENTRY</span></span>
-            <span id="arrow-menu-sale">▼</span>
-          </button>
-          <div id="menu-sale" class="hidden grid grid-cols-3 gap-2 mt-2">
-            <button onclick="startNewBill('MOBILE', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">📱 Mobile</button>
-            <button onclick="startNewBill('ACCESSORIES', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">🎧 Accessories</button>
-            <button onclick="startNewBill('REPAIRING', 'SALE')" class="p-2.5 bg-blue-50 text-[#004aad] rounded-lg shadow-sm font-bold text-xs border border-blue-200">🔧 Repairing</button>
-          </div>
-        </div>
-
-        <!-- PURCHASE ENTRY -->
-        <div>
-          <button onclick="toggleMenu('menu-purchase')" class="w-full p-3 bg-indigo-800 text-white rounded-xl shadow font-black text-sm flex justify-between items-center border border-indigo-900">
-            <span class="flex items-center space-x-2.5"><span class="text-lg">📦</span><span>PURCHASE ENTRY</span></span>
-            <span id="arrow-menu-purchase">▼</span>
-          </button>
-          <div id="menu-purchase" class="hidden grid grid-cols-3 gap-2 mt-2">
-            <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">📱 Mobile</button>
-            <button onclick="startNewBill('ACCESSORIES', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">🎧 Accessories</button>
-            <button onclick="startNewBill('REPAIRING', 'PURCHASE')" class="p-2.5 bg-indigo-50 text-indigo-800 rounded-lg shadow-sm font-bold text-xs border border-indigo-200">🔧 Repairing</button>
-          </div>
-        </div>
-
-        <!-- PAYMENT & RECEIPT -->
-        <div class="grid grid-cols-2 gap-2.5 pt-1">
-          <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="p-3 bg-rose-600 text-white rounded-xl shadow font-black text-sm border border-rose-800 flex items-center justify-center space-x-1.5"><span class="text-lg">💸</span><span>PAYMENT</span></button>
-          <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="p-3 bg-emerald-600 text-white rounded-xl shadow font-black text-sm border border-emerald-800 flex items-center justify-center space-x-1.5"><span class="text-lg">🧾</span><span>RECEIPT</span></button>
-        </div>
-
-      </div>
-
+      <!-- FIXED: RECENT BILLS MOVED UP SINCE BUTTONS ARE NOW AT THE BOTTOM -->
       <div class="bg-white rounded-xl shadow-sm border overflow-hidden mt-3">
-        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs">Current Session Invoices</div>
+        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs flex justify-between">
+          <span>Current Session Invoices</span>
+        </div>
         <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto"></div>
       </div>
     </div>
 
     <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 space-y-3.5 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
-        <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-001</h2>
+        <!-- FIXED: ADDED ENTRY TYPE LABEL (SALE/PURCHASE) NEXT TO BILL NO -->
+        <div class="flex items-center">
+          <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-001</h2>
+          <span id="form-entry-type" class="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-[#004aad] ml-2">SALE</span>
+        </div>
         <div class="flex bg-slate-100 p-0.5 rounded-lg border">
           <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white">MOBILE</button>
           <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-3 py-1 rounded text-xs font-bold text-slate-600">ACCESSORIES</button>
@@ -344,6 +315,22 @@
 
   </main>
 
+  <!-- FIXED: 4 BOTTOM APP BUTTONS -->
+  <nav class="fixed bottom-0 w-full bg-white shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-200">
+     <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-2 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50">
+       <span class="text-xl">🛒</span><span class="text-[10px] font-black mt-0.5">SALE</span>
+     </button>
+     <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="flex-1 py-2 text-center text-indigo-700 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
+       <span class="text-xl">📦</span><span class="text-[10px] font-black mt-0.5">PURCHASE</span>
+     </button>
+     <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="flex-1 py-2 text-center text-rose-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
+       <span class="text-xl">💸</span><span class="text-[10px] font-black mt-0.5">PAYMENT</span>
+     </button>
+     <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="flex-1 py-2 text-center text-emerald-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
+       <span class="text-xl">🧾</span><span class="text-[10px] font-black mt-0.5">RECEIPT</span>
+     </button>
+  </nav>
+
   <script>
     let currentEntryType = "SALE";
     let currentBillType = "MOBILE";
@@ -351,20 +338,6 @@
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
-
-    function toggleMenu(id) {
-       ['menu-sale', 'menu-purchase'].forEach(m => {
-          const el = document.getElementById(m);
-          const arrow = document.getElementById('arrow-' + m);
-          if (m === id) {
-             el.classList.toggle('hidden');
-             arrow.innerText = el.classList.contains('hidden') ? '▼' : '▲';
-          } else {
-             el.classList.add('hidden');
-             document.getElementById('arrow-' + m).innerText = '▼';
-          }
-       });
-    }
 
     function showPopup(title, msg, isError = false, billToDisplay = null) {
       document.getElementById("popup-title").innerText = title;
@@ -411,7 +384,7 @@
             [b.paymentBreakdown.cash, b.paymentBreakdown.qr, b.paymentBreakdown.card], 
             b.finance ? b.finance.company : "", 
             b.paymentRate,
-            b.billType // FIXED: Store full bill type to remember if it was SALE or PURCHASE
+            b.billType 
         ];
         const jsonStr = JSON.stringify(min);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
@@ -481,25 +454,41 @@
       return d.getDate() + " " + months[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
     }
 
+    // FIXED: CALCULATE SALE, PURCHASE, PROFIT, AND LOSS
     function renderDashboard() {
       const today = getFormattedDate();
-      
       const todayBills = billsCache.filter(b => b.billDate === today);
-      let sales = 0, paid = 0, due = 0;
-      todayBills.forEach(b => { sales += Number(b.grandTotal) || 0; paid += Number(b.paid) || 0; due += Number(b.due) || 0; });
-      document.getElementById("dash-count").innerText = todayBills.length;
+      
+      let sales = 0, purchases = 0;
+      todayBills.forEach(b => { 
+          if(b.billType && b.billType.includes("SALE")) sales += Number(b.grandTotal) || 0; 
+          if(b.billType && b.billType.includes("PURCHASE")) purchases += Number(b.grandTotal) || 0; 
+      });
+      
+      let profit = sales > purchases ? sales - purchases : 0;
+      let loss = purchases > sales ? purchases - sales : 0;
+
       document.getElementById("dash-sales").innerText = "Rs. " + sales.toLocaleString("en-IN");
-      document.getElementById("dash-paid").innerText = "Rs. " + paid.toLocaleString("en-IN");
-      document.getElementById("dash-due").innerText = "Rs. " + due.toLocaleString("en-IN");
+      document.getElementById("dash-purchase").innerText = "Rs. " + purchases.toLocaleString("en-IN");
+      document.getElementById("dash-profit").innerText = "Rs. " + profit.toLocaleString("en-IN");
+      document.getElementById("dash-loss").innerText = "Rs. " + loss.toLocaleString("en-IN");
+
       const list = document.getElementById("recent-bills-list");
       list.innerHTML = billsCache.length === 0 ? '<p class="p-4 text-center text-xs text-slate-400">No bills in current session.</p>' :
-        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-xs">${b.customerName}</p></div><div class="font-black text-xs">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}</div></div>`).join("");
+        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
     function startNewBill(type, entryType = currentEntryType) {
       currentBillType = type;
       currentEntryType = entryType;
       
+      // FIXED: UPDATE THE FORM HEADER BADGE
+      const badge = document.getElementById("form-entry-type");
+      badge.innerText = entryType;
+      badge.className = entryType === 'SALE' 
+        ? "text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-[#004aad] ml-2" 
+        : "text-[10px] font-bold px-2 py-1 rounded bg-indigo-100 text-indigo-800 ml-2";
+
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
       document.getElementById("cust-box").classList.toggle("hidden", type === "REPAIRING");
       document.getElementById("items-box").classList.toggle("hidden", type === "REPAIRING");
@@ -532,7 +521,6 @@
 
       if(type !== "REPAIRING") addNewItemRow(true);
       
-      // FIXED: GENERATE PROPER INVOICE PREFIX BASED ON SALE OR PURCHASE
       const prefix = entryType === "PURCHASE" ? "PUR" : "SRE";
       const year = new Date().getFullYear();
       document.getElementById("form-invoice-no").innerText = `${prefix}-${year}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
@@ -849,7 +837,7 @@
       const billData = {
         invoiceNo: document.getElementById("form-invoice-no").innerText,
         billDate: formattedDate,
-        billType: `${currentEntryType} - ${currentBillType}`, // FIXED: SALE or PURCHASE
+        billType: `${currentEntryType} - ${currentBillType}`,
         customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
         paymentMode: s_val || p_val, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
@@ -889,7 +877,6 @@
       document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
       document.getElementById("inv-cust-gstin").innerText = bill.customerGstin || "-";
 
-      // FIXED: HEADER TEXT CHANGES IF IT IS A PURCHASE VOUCHER
       const isPur = bill.billType && bill.billType.includes("PURCHASE");
       document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : "TAX INVOICE";
 
@@ -963,7 +950,6 @@
       doc.setFillColor(...blue); doc.rect(15, 45, 180, 6.5, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); 
       
-      // FIXED: PDF TITLE CHANGES IF IT IS A PURCHASE VOUCHER
       const isPur = b.billType && b.billType.includes("PURCHASE");
       doc.text(isPur ? "PURCHASE VOUCHER" : "TAX INVOICE", 105, 49.5, { align: "center" });
 
