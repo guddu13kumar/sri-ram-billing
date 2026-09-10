@@ -4,27 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>SRI RAM ENTERPRISES - POS & Billing</title>
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#004aad" />
 
-  <!-- Tailwind CSS & Fast QR -->
+  <!-- Tailwind CSS, Crisp Canvas PDF Engine & Fast QR -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;600;700;800;900&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .thank-you-text { font-family: 'Caveat', cursive; }
 
-    /* Print Setup */
+    /* Fixed Canvas for Crisp HD PDF */
+    #invoice-capture {
+      width: 700px !important;
+      min-width: 700px !important;
+      max-width: 700px !important;
+      background-color: #ffffff !important;
+    }
+
     @media print {
-      @page { size: portrait; margin: 5mm; }
-      body { background: #ffffff !important; margin: 0 !important; }
-      header, #view-dashboard, #view-new-bill, #view-settings, #top-invoice-bar { display: none !important; }
-      #view-invoice { display: block !important; padding: 0 !important; }
+      body * { visibility: hidden; }
+      #invoice-capture, #invoice-capture * { visibility: visible; }
       #invoice-capture { 
-        box-shadow: none !important; 
-        border: 2px solid #0f172a !important; 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
         width: 100% !important; 
-        max-width: 100% !important;
+        box-shadow: none !important; 
+        border: 2px solid #004aad !important; 
+        margin: 0 !important;
       }
     }
   </style>
@@ -32,19 +43,19 @@
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <!-- TOP HEADER -->
-  <header id="main-header" class="bg-slate-900 text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex items-center justify-between">
+  <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex items-center justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
-      <div class="bg-amber-400 text-slate-950 font-black px-2 py-1 rounded text-xs">SRE</div>
+      <div class="border-2 border-white rounded-full w-8 h-8 flex items-center justify-center font-black text-xs">SRE</div>
       <div>
         <h1 class="font-black text-xs sm:text-sm tracking-wide leading-none">SRI RAM ENTERPRISES</h1>
-        <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium mt-0.5">Mobile • Accessories • Repairing</p>
+        <p class="text-[9px] sm:text-[10px] text-blue-100 font-medium mt-0.5">Mobile • Accessories • Repairing</p>
       </div>
     </div>
     <div class="flex items-center space-x-2">
-      <button onclick="showView('settings')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs font-bold border border-slate-700">
+      <button onclick="showView('settings')" class="px-2.5 py-1 bg-blue-900 hover:bg-blue-800 text-white rounded text-xs font-bold border border-blue-400">
         ⚙️ Settings
       </button>
-      <button onclick="logout()" class="px-2 py-1 bg-rose-900 text-white rounded text-xs font-bold">
+      <button onclick="logout()" class="px-2 py-1 bg-rose-800 text-white rounded text-xs font-bold">
         Exit
       </button>
     </div>
@@ -54,7 +65,9 @@
   <div id="login-modal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
     <div class="bg-white max-w-sm w-full rounded-2xl shadow-2xl p-6 space-y-4 border border-slate-200">
       <div class="text-center">
-        <span class="inline-block bg-amber-400 text-slate-950 font-black px-2.5 py-1 rounded text-xs mb-1">SRE POS</span>
+        <div class="w-12 h-12 border-2 border-[#004aad] rounded-full flex flex-col items-center justify-center text-center mx-auto mb-2">
+          <span class="text-xs font-black text-[#004aad]">SRE</span>
+        </div>
         <h2 class="text-lg font-black text-slate-900">SRI RAM ENTERPRISES</h2>
         <p class="text-xs text-slate-500">Bokaro Sector-4 Billing Terminal</p>
       </div>
@@ -62,60 +75,57 @@
       <div class="space-y-3 pt-2">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
-          <input type="text" id="login-username" value="admin" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-slate-900" />
+          <input type="text" id="login-username" value="admin" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-[#004aad]" />
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
-          <input type="password" id="login-password" value="admin123" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-slate-900" />
+          <input type="password" id="login-password" value="admin123" class="w-full p-2.5 border rounded-lg text-sm font-semibold outline-none focus:border-[#004aad]" />
         </div>
-        <button onclick="handleLogin()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-lg text-sm transition">
-          Sign In to Register
+        <button onclick="handleLogin()" class="w-full py-2.5 bg-[#004aad] hover:bg-blue-800 text-white font-black rounded-lg text-sm transition">
+          Sign In
         </button>
       </div>
-
-      <div class="pt-2 border-t text-center">
-        <p class="text-[11px] text-slate-400">Default: <b>admin</b> / <b>admin123</b></p>
-      </div>
+      <p class="text-[11px] text-center text-slate-400">Default: <b>admin</b> / <b>admin123</b></p>
     </div>
   </div>
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-xl hidden"></div>
 
-  <!-- MAIN WRAPPER -->
-  <main class="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-5">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4">
 
     <!-- VIEW 1: DASHBOARD -->
-    <div id="view-dashboard" class="space-y-4">
+    <div id="view-dashboard" class="space-y-3">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+        <div class="bg-white p-3 rounded-xl shadow-sm border">
           <span class="text-[10px] font-bold text-slate-400 uppercase">Today's Bills</span>
           <p id="dash-count" class="text-2xl font-black text-slate-900 mt-0.5">0</p>
         </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+        <div class="bg-white p-3 rounded-xl shadow-sm border">
           <span class="text-[10px] font-bold text-slate-400 uppercase">Today's Sales</span>
-          <p id="dash-sales" class="text-2xl font-black text-blue-900 mt-0.5">Rs. 0</p>
+          <p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p>
         </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+        <div class="bg-white p-3 rounded-xl shadow-sm border">
           <span class="text-[10px] font-bold text-slate-400 uppercase">Collection</span>
           <p id="dash-paid" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p>
         </div>
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border">
+        <div class="bg-white p-3 rounded-xl shadow-sm border">
           <span class="text-[10px] font-bold text-slate-400 uppercase">Total Due</span>
           <p id="dash-due" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p>
         </div>
       </div>
 
       <div class="grid grid-cols-3 gap-2.5">
-        <button onclick="startNewBill('MOBILE')" class="p-3 bg-slate-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+        <button onclick="startNewBill('MOBILE')" class="p-3 bg-[#004aad] text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
           <span class="text-xl mb-0.5">📱</span>
           <span>Mobile Sale</span>
         </button>
-        <button onclick="startNewBill('ACCESSORIES')" class="p-3 bg-blue-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+        <button onclick="startNewBill('ACCESSORIES')" class="p-3 bg-indigo-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
           <span class="text-xl mb-0.5">🎧</span>
           <span>Accessories</span>
         </button>
-        <button onclick="startNewBill('REPAIRING')" class="p-3 bg-indigo-900 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
+        <button onclick="startNewBill('REPAIRING')" class="p-3 bg-slate-800 text-white rounded-xl shadow font-bold text-xs flex flex-col items-center">
           <span class="text-xl mb-0.5">🔧</span>
           <span>Repairing</span>
         </button>
@@ -131,14 +141,14 @@
     </div>
 
     <!-- VIEW 2: BILLING FORM -->
-    <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 sm:p-6 space-y-4 border hidden">
-      <div class="flex justify-between items-center border-b pb-3">
+    <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 sm:p-5 space-y-3.5 border hidden">
+      <div class="flex justify-between items-center border-b pb-2.5">
         <div>
-          <span class="text-[9px] font-black text-blue-900 uppercase">INVOICE</span>
+          <span class="text-[9px] font-black text-[#004aad] uppercase block">NEW INVOICE</span>
           <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-00001</h2>
         </div>
-        <div class="flex bg-slate-100 p-0.5 rounded-lg border" id="pills-container">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-slate-900 text-white">MOBILE</button>
+        <div class="flex bg-slate-100 p-0.5 rounded-lg border">
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white">MOBILE</button>
           <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-3 py-1 rounded text-xs font-bold text-slate-600">ACCESSORIES</button>
           <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-3 py-1 rounded text-xs font-bold text-slate-600">REPAIRING</button>
         </div>
@@ -174,12 +184,12 @@
       <div id="items-box" class="space-y-2.5">
         <div class="flex justify-between items-center">
           <h3 id="items-title" class="font-bold text-xs text-slate-800 uppercase">Products / Handsets</h3>
-          <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-blue-900 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">+ Add Item</button>
+          <button type="button" onclick="addNewItemRow()" class="text-xs font-bold text-[#004aad] bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">+ Add Item</button>
         </div>
         <div id="items-container" class="space-y-2.5"></div>
       </div>
 
-      <!-- PAYMENT MODULE -->
+      <!-- PAYMENT MODULE (PRIMARY, SECONDARY, SPLIT) -->
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
@@ -208,7 +218,7 @@
             <input type="text" id="fin-company" placeholder="Finance Co. (Bajaj, TVS, HDB)" class="p-1.5 bg-white border rounded text-xs font-bold" />
             <input type="number" id="fin-dp" placeholder="Down Payment (Rs.)" oninput="handleFinanceChange()" class="p-1.5 bg-white border rounded text-xs font-bold" />
           </div>
-          <div class="text-[11px] text-blue-900 font-bold flex justify-between">
+          <div class="text-[11px] text-[#004aad] font-bold flex justify-between">
             <span>Loan Amount:</span>
             <span id="fin-loan-display">Rs. 0</span>
           </div>
@@ -232,107 +242,175 @@
       </div>
 
       <!-- TOTAL BANNER -->
-      <div class="bg-slate-900 text-white p-3.5 rounded-xl flex justify-between items-center shadow">
+      <div class="bg-[#004aad] text-white p-3.5 rounded-xl flex justify-between items-center shadow">
         <div>
-          <span class="text-[10px] text-slate-400 uppercase">Total Bill Amount</span>
-          <p id="total-grand" class="text-2xl font-black text-amber-400 leading-none mt-0.5">Rs. 0</p>
+          <span class="text-[10px] text-blue-200 uppercase">Total Bill Amount</span>
+          <p id="total-grand" class="text-2xl font-black text-amber-300 leading-none mt-0.5">Rs. 0</p>
         </div>
         <div class="text-right">
-          <span class="text-[10px] text-slate-400 uppercase">Balance Due</span>
-          <p id="total-due" class="text-lg font-bold text-rose-400 leading-none mt-0.5">Rs. 0</p>
+          <span class="text-[10px] text-blue-200 uppercase">Balance Due</span>
+          <p id="total-due" class="text-lg font-bold text-rose-300 leading-none mt-0.5">Rs. 0</p>
         </div>
       </div>
 
       <div class="flex space-x-2 pt-1">
         <button type="button" onclick="showView('dashboard')" class="flex-1 py-2.5 bg-slate-200 font-bold rounded-xl text-xs">Cancel</button>
-        <button type="button" onclick="saveBill()" class="flex-[2] py-2.5 bg-slate-900 text-white font-black rounded-xl text-xs shadow">SAVE & GENERATE BILL</button>
+        <button type="button" onclick="saveBill()" class="flex-[2] py-2.5 bg-[#004aad] hover:bg-blue-800 text-white font-black rounded-xl text-xs shadow transition">SAVE & GENERATE BILL</button>
       </div>
     </div>
 
-    <!-- VIEW 3: INVOICE VIEW -->
-    <div id="view-invoice" class="space-y-4 hidden">
-      <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-3 rounded-xl border shadow-sm">
+    <!-- VIEW 3: INVOICE VIEW (ORIGINAL BLUE TEMPLATE REPLICA) -->
+    <div id="view-invoice" class="space-y-3.5 hidden">
+      <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
-          <button onclick="window.print()" class="px-4 py-2 bg-slate-900 text-white font-bold text-xs rounded-lg shadow">🖨️ PRINT / SAVE PDF</button>
-          <button onclick="shareWhatsApp()" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow">💬 WHATSAPP</button>
+          <button onclick="downloadHDInvoice()" class="px-4 py-2 bg-[#004aad] hover:bg-blue-800 text-white font-bold text-xs rounded-lg shadow">📥 DOWNLOAD HD PDF</button>
+          <button onclick="shareWhatsApp()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow">💬 WHATSAPP</button>
         </div>
-        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600">← Back to Dashboard</button>
+        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600">← Back</button>
       </div>
 
+      <!-- EXACT PHOTO REPLICA TEMPLATE (BLUE GRID) -->
       <div class="w-full flex justify-center overflow-x-auto pb-6">
-        <div id="invoice-capture" class="bg-white p-6 border-2 border-slate-900 shadow-xl text-xs text-slate-900 w-[640px] max-w-[640px] rounded-lg">
+        <div id="invoice-capture" class="bg-white p-6 border-2 border-[#004aad] shadow-xl text-xs text-slate-900 box-border leading-tight">
           
-          <!-- HEADER -->
-          <div class="border-b-2 border-slate-900 pb-3 flex justify-between items-start">
-            <div>
-              <h1 class="text-2xl font-black text-slate-900 tracking-tight leading-none">SRI RAM ENTERPRISES</h1>
-              <p class="text-xs font-semibold text-slate-700 mt-1">Mobile • Accessories • Repairing</p>
-              <p class="text-[10px] text-slate-600 mt-0.5">GB-15, City Centre, Sector-4, Bokaro Steel City (Near Indian Bank)</p>
-              <p class="text-[10px] text-slate-800 font-bold mt-0.5">GSTIN: 20APOPK6864K1ZH • Mob: 9334765000, 9334237111</p>
+          <!-- STORE HEADER -->
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div class="w-14 h-14 border-2 border-[#004aad] rounded-full flex flex-col items-center justify-center text-center shrink-0">
+              <span class="text-[6px] font-bold text-[#004aad] leading-none">ENTERPRISES</span>
+              <span class="text-sm font-black text-[#004aad] leading-none my-0.5">SRE</span>
+              <span class="text-[6px] font-bold text-[#004aad] leading-none">SINCE 2004</span>
             </div>
-            <div class="text-right">
-              <span class="bg-slate-900 text-white font-black px-2 py-0.5 text-[10px] tracking-widest uppercase rounded">TAX INVOICE</span>
-              <p id="inv-no" class="font-black text-sm text-slate-900 mt-2">SRE-2026-00001</p>
-              <p id="inv-date" class="text-slate-500 text-[10px] font-semibold mt-0.5"></p>
+
+            <div class="text-center flex-1 px-2">
+              <h1 class="text-2xl font-black text-[#004aad] tracking-tight leading-tight">SRI RAM ENTERPRISES</h1>
+              <p class="text-xs font-bold text-[#004aad] my-0.5">Mobile • Accessories • Repairing</p>
+              <p class="text-[9.5px] font-semibold text-slate-700">GB-15, CITY CENTRE, SECTOR-4, B.S. CITY (NEAR INDIAN BANK)</p>
+              <p class="text-[10px] font-bold text-slate-800">Contact : 9334765000, 9334237111, 9335136000</p>
+              <p class="text-[10px] font-black text-slate-900">GSTIN : 20APOPK6864K1ZH</p>
             </div>
+            <div class="w-10 shrink-0"></div>
+          </div>
+
+          <!-- BLUE TAX INVOICE STRIP -->
+          <div class="bg-[#004aad] text-white font-black text-center py-1 text-xs tracking-widest uppercase my-2">
+            TAX INVOICE
           </div>
 
           <!-- CUSTOMER DETAILS -->
-          <div class="grid grid-cols-2 gap-3 py-3 border-b border-slate-200">
-            <div>
-              <span class="text-[9px] font-black text-slate-400 uppercase">Customer Details:</span>
-              <p id="inv-cust-name" class="font-extrabold text-sm text-slate-900"></p>
-              <p id="inv-cust-phone" class="text-slate-600 font-mono text-[11px]"></p>
-              <p id="inv-cust-address" class="text-slate-600 text-[10px]"></p>
-            </div>
-            <div class="text-right flex flex-col justify-end">
-              <p id="inv-pay-mode" class="font-bold text-xs text-slate-800"></p>
-              <div id="inv-fin-details" class="text-[10px] text-blue-900 font-bold mt-0.5 hidden"></div>
-            </div>
-          </div>
-
-          <!-- ITEMS TABLE -->
-          <div class="my-3 overflow-hidden rounded border border-slate-200">
-            <table class="w-full border-collapse text-left text-[11px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
-                  <th class="p-1.5 w-8 text-center">#</th>
-                  <th class="p-1.5">Product Description</th>
-                  <th class="p-1.5">IMEI / Remarks</th>
-                  <th class="p-1.5 text-center w-12">Qty</th>
-                  <th class="p-1.5 text-right w-20">Rate</th>
-                  <th class="p-1.5 text-right w-24">Amount</th>
-                </tr>
-              </thead>
-              <tbody id="inv-items-body" class="divide-y divide-slate-200 font-medium"></tbody>
-            </table>
-          </div>
-
-          <!-- FOOTER: QR CODE & GRAND TOTAL -->
-          <div class="flex justify-between items-end pt-3 border-t-2 border-slate-900 mt-3">
-            <div class="flex items-center space-x-3">
-              <div id="inv-qr" class="w-16 h-16 bg-white border border-slate-300 p-0.5 flex items-center justify-center rounded"></div>
-              <div class="text-[9px] text-slate-500 leading-tight">
-                <span class="font-black text-slate-900 block text-[10px]">SCAN TO VERIFY</span>
-                Scan with any Camera<br />to open bill online.
+          <div class="space-y-1.5 py-0.5 text-[11px] font-semibold text-slate-800">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center flex-1 mr-3">
+                <span class="font-bold whitespace-nowrap">Invoice No. :&nbsp;</span>
+                <span id="inv-no" class="font-black border-b border-dotted border-slate-500 flex-1 px-1">SRE-2026-00001</span>
+              </div>
+              <div class="flex items-center w-36">
+                <span class="font-bold whitespace-nowrap">Date :&nbsp;</span>
+                <span id="inv-date" class="font-bold border-b border-dotted border-slate-500 flex-1 px-1 text-center"></span>
               </div>
             </div>
 
-            <div class="text-right">
-              <span class="text-[10px] font-bold text-slate-500 uppercase block">Grand Total</span>
-              <p id="inv-grand-total" class="text-2xl font-black text-slate-900 leading-none mt-0.5">Rs. 0</p>
+            <div class="flex items-center">
+              <span class="font-bold whitespace-nowrap">Name :&nbsp;</span>
+              <span id="inv-cust-name" class="font-black border-b border-dotted border-slate-500 flex-1 px-1"></span>
+            </div>
+
+            <div class="flex items-center">
+              <span class="font-bold whitespace-nowrap">Address :&nbsp;</span>
+              <span id="inv-cust-address" class="font-medium border-b border-dotted border-slate-500 flex-1 px-1"></span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <div class="flex items-center flex-1 mr-3">
+                <span class="font-bold whitespace-nowrap">GSTIN :&nbsp;</span>
+                <span class="border-b border-dotted border-slate-500 flex-1 px-1 text-slate-600 font-mono text-[10px]">-</span>
+              </div>
+              <div class="flex items-center w-44">
+                <span class="font-bold whitespace-nowrap">Ph. :&nbsp;</span>
+                <span id="inv-cust-phone" class="font-bold border-b border-dotted border-slate-500 flex-1 px-1 font-mono text-[11px]"></span>
+              </div>
             </div>
           </div>
 
-          <!-- SIGNATURES -->
-          <div class="mt-8 pt-2 border-t border-slate-200 flex justify-between items-end text-[9px] text-slate-500">
-            <div>
-              <p class="font-bold text-slate-700">Terms & Conditions:</p>
-              <p>• Goods once sold will not be returned without warranty terms.</p>
+          <!-- BLUE BORDERED ITEMS GRID TABLE (6 BALANCED ROWS) -->
+          <div class="mt-2">
+            <table class="w-full border-collapse border-2 border-[#004aad] text-left text-[10.5px]">
+              <thead>
+                <tr class="bg-[#004aad] text-white text-center font-black">
+                  <th class="border border-[#004aad] p-1.5 w-10">S.No</th>
+                  <th class="border border-[#004aad] p-1.5 w-48">Brand / Product</th>
+                  <th class="border border-[#004aad] p-1.5">Model / IMEI</th>
+                  <th class="border border-[#004aad] p-1.5 w-12">Qty.</th>
+                  <th class="border border-[#004aad] p-1.5 w-18">Rate</th>
+                  <th class="border border-[#004aad] p-1.5 w-22">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="inv-items-body" class="divide-y divide-[#004aad] font-medium text-slate-900"></tbody>
+            </table>
+          </div>
+
+          <!-- BOTTOM SECTION: EXACT GRID ALIGNED (CLOSED BOX) -->
+          <div class="flex items-stretch justify-between border-x-2 border-b-2 border-[#004aad]">
+            
+            <!-- LEFT: THANK YOU & LOW-DENSITY FAST SCANNER QR -->
+            <div class="flex-1 flex flex-col justify-between p-3">
+              <div>
+                <p class="thank-you-text text-4xl text-[#004aad] -rotate-6 leading-tight">
+                  Thank You<br />for your Business!
+                </p>
+              </div>
+              
+              <div class="flex items-center space-x-2.5 pt-2">
+                <div id="inv-qr" class="w-[72px] h-[72px] border border-[#004aad] p-1 bg-white shrink-0 flex items-center justify-center"></div>
+                <div class="text-[9px] text-slate-600 leading-tight">
+                  <span class="font-black text-[#004aad] block text-[10px]">SCAN TO VERIFY</span>
+                  Scan with Camera<br />to open bill online.
+                </div>
+              </div>
             </div>
-            <div class="text-center">
+
+            <!-- RIGHT: EXACT BLUE TOTAL BOX -->
+            <div class="w-60 border-l-2 border-[#004aad] text-[11px] font-bold bg-white flex flex-col justify-between">
+              <div class="divide-y divide-[#004aad]">
+                <div class="flex justify-between p-1.5">
+                  <span class="pl-1">Subtotal</span>
+                  <span id="inv-calc-subtotal" class="font-black pr-1">Rs. 0</span>
+                </div>
+                <div class="flex justify-between p-1.5">
+                  <span class="pl-1">Discount</span>
+                  <span id="inv-calc-discount" class="pr-1">0</span>
+                </div>
+                <div class="flex justify-between p-1.5">
+                  <span class="pl-1">CGST 9%</span>
+                  <span id="inv-cgst-val" class="pr-1">0.00</span>
+                </div>
+                <div class="flex justify-between p-1.5">
+                  <span class="pl-1">SGST 9%</span>
+                  <span id="inv-sgst-val" class="pr-1">0.00</span>
+                </div>
+                <div class="flex justify-between p-1.5 text-slate-400">
+                  <span class="pl-1">IGST ___%</span>
+                  <span class="pr-1">-</span>
+                </div>
+              </div>
+              
+              <!-- SOLID BLUE GRAND TOTAL (ONLY TOTAL AMOUNT, NO PAID/DUE) -->
+              <div class="bg-[#004aad] text-white flex justify-between items-center p-2 font-black text-xs">
+                <span class="uppercase">Grand Total</span>
+                <span id="inv-grand-total" class="text-sm font-black pr-1">Rs. 0</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SIGNATURES -->
+          <div class="flex justify-between items-end mt-7 pt-1 text-[10px] font-bold text-slate-800">
+            <div class="border-t border-slate-500 pt-0.5 w-36 text-center">
+              Customer's Signature
+            </div>
+            <div class="text-right">
+              <span class="text-[#004aad] font-black block text-[11px]">For SRI RAM ENTERPRISES</span>
               <div class="h-6"></div>
-              <span class="border-t border-slate-400 pt-0.5 inline-block w-36 font-bold text-slate-800">Authorized Signatory</span>
+              <span class="border-t border-slate-500 pt-0.5 inline-block w-40 text-center">Authorized Signatory</span>
             </div>
           </div>
 
@@ -346,7 +424,7 @@
       <input type="text" id="settings-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full p-2 border rounded text-xs font-mono" />
       <div class="flex space-x-2 pt-1">
         <button onclick="showView('dashboard')" class="flex-1 py-1.5 bg-slate-200 font-bold rounded text-xs">Back</button>
-        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-slate-900 text-white font-bold rounded text-xs">SAVE SETTINGS</button>
+        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-[#004aad] text-white font-bold rounded text-xs">SAVE SETTINGS</button>
       </div>
     </div>
 
@@ -365,7 +443,6 @@
       setTimeout(() => t.classList.add("hidden"), 3000);
     }
 
-    // LOGIN LOGIC - ZERO BLOCKING FALLBACK
     function handleLogin() {
       const u = document.getElementById("login-username").value.trim();
       const p = document.getElementById("login-password").value.trim();
@@ -429,7 +506,7 @@
       list.innerHTML = billsCache.slice(0, 15).map(b => `
         <div onclick='openSavedBill("${b.token}")' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center">
           <div>
-            <p class="font-bold text-slate-900 text-xs">${b.invoiceNo}</p>
+            <p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p>
             <p class="text-xs text-slate-600">${b.customerName}</p>
             <span class="text-[9px] text-slate-400">${b.billDate}</span>
           </div>
@@ -459,7 +536,6 @@
       document.getElementById("items-container").innerHTML = "";
       addNewItemRow();
 
-      // Sequential Safe Invoice Number
       const year = new Date().getFullYear();
       const seq = (billsCache.length + 1).toString().padStart(5, "0");
       document.getElementById("form-invoice-no").innerText = `SRE-${year}-${seq}`;
@@ -472,7 +548,7 @@
       currentBillType = type;
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
         const btn = document.getElementById(`pill-${t}`);
-        btn.className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-slate-900 text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600";
+        btn.className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600";
       });
 
       const custBox = document.getElementById("cust-box");
@@ -558,14 +634,25 @@
 
     function recalcTotals() {
       let grand = 0;
+      let totalTaxable = 0;
+      let totalGst = 0;
+      let totalDiscount = 0;
+
       if (currentBillType === "REPAIRING") {
         grand = Number(document.getElementById("rep-charge").value) || 0;
+        totalTaxable = grand;
       } else {
         document.querySelectorAll(".item-row").forEach(r => {
           const q = Number(r.querySelector(".item-qty").value) || 1;
           const rate = Number(r.querySelector(".item-rate").value) || 0;
           const disc = Number(r.querySelector(".item-disc").value) || 0;
-          grand += Math.max(0, (q * rate) - disc);
+          const lineTotal = Math.max(0, (q * rate) - disc);
+          grand += lineTotal;
+          totalDiscount += disc;
+          
+          const taxable = lineTotal / 1.18;
+          totalTaxable += taxable;
+          totalGst += (lineTotal - taxable);
         });
       }
 
@@ -577,7 +664,7 @@
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
       document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
 
-      return { grand, paid, due };
+      return { grand, paid, due, totalTaxable, totalGst, totalDiscount };
     }
 
     function saveBill() {
@@ -651,6 +738,9 @@
         grandTotal: totals.grand,
         paid: totals.paid,
         due: totals.due,
+        totalTaxable: totals.totalTaxable,
+        totalGst: totals.totalGst,
+        totalDiscount: totals.totalDiscount,
         token,
         publicUrl: `${window.location.origin}${window.location.pathname}?b=${token}`
       };
@@ -658,7 +748,7 @@
       billsCache = [billData, ...billsCache];
       localStorage.setItem("sre_bills_cache", JSON.stringify(billsCache));
 
-      // Background safe Google Sheets Sync (Never blocks)
+      // Background safe Google Sheets Sync
       if (gasUrl) {
         fetch(gasUrl, {
           method: "POST",
@@ -679,32 +769,59 @@
       document.getElementById("inv-cust-name").innerText = bill.customerName;
       document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
       document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-";
-      document.getElementById("inv-pay-mode").innerText = "Payment: " + bill.paymentMode;
-      document.getElementById("inv-grand-total").innerText = "Rs. " + (Number(bill.grandTotal) || 0).toLocaleString("en-IN");
 
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
-      bill.items.forEach((it, idx) => {
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-1.5 text-center text-slate-400 font-bold">${idx + 1}</td>
-            <td class="p-1.5 font-bold text-slate-900">${it.name}</td>
-            <td class="p-1.5 font-mono text-[10px] text-slate-600">${it.imei}</td>
-            <td class="p-1.5 text-center font-bold">${it.qty}</td>
-            <td class="p-1.5 text-right">Rs. ${(it.rate || 0).toLocaleString("en-IN")}</td>
-            <td class="p-1.5 text-right font-black">Rs. ${(it.amount || 0).toLocaleString("en-IN")}</td>
-          </tr>
-        `;
-      });
 
-      // INSTANT HIGH-SPEED QR (Guaranteed Camera Scanning)
+      const rawItems = bill.items || [];
+      for (let i = 0; i < 6; i++) {
+        const it = rawItems[i];
+        if (it) {
+          tbody.innerHTML += `
+            <tr style="height: 24px;">
+              <td class="border border-[#004aad] px-1 text-center font-bold text-slate-800">${i + 1}</td>
+              <td class="border border-[#004aad] px-1.5 font-bold text-slate-950">${it.name}</td>
+              <td class="border border-[#004aad] px-1.5 font-mono text-[9.5px] text-slate-700">${it.imei}</td>
+              <td class="border border-[#004aad] px-1 text-center font-bold">${it.qty}</td>
+              <td class="border border-[#004aad] px-1.5 text-right font-semibold">${(it.rate || 0).toLocaleString("en-IN")}</td>
+              <td class="border border-[#004aad] px-1.5 text-right font-black text-slate-950">${(it.amount || 0).toLocaleString("en-IN")}</td>
+            </tr>
+          `;
+        } else {
+          tbody.innerHTML += `
+            <tr style="height: 24px;">
+              <td class="border border-[#004aad] px-1 text-center text-slate-300">${i + 1}</td>
+              <td class="border border-[#004aad] px-1.5">&nbsp;</td>
+              <td class="border border-[#004aad] px-1.5">&nbsp;</td>
+              <td class="border border-[#004aad] px-1">&nbsp;</td>
+              <td class="border border-[#004aad] px-1.5">&nbsp;</td>
+              <td class="border border-[#004aad] px-1.5">&nbsp;</td>
+            </tr>
+          `;
+        }
+      }
+
+      const grand = Number(bill.grandTotal) || 0;
+      const discount = Number(bill.totalDiscount) || 0;
+      const totalGst = Number(bill.totalGst) || 0;
+      const subtotal = grand + discount - totalGst;
+
+      document.getElementById("inv-calc-subtotal").innerText = "Rs. " + subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById("inv-calc-discount").innerText = discount > 0 ? discount.toLocaleString("en-IN") : "0";
+      
+      const halfGst = totalGst / 2;
+      document.getElementById("inv-cgst-val").innerText = halfGst > 0 ? halfGst.toFixed(2) : "0.00";
+      document.getElementById("inv-sgst-val").innerText = halfGst > 0 ? halfGst.toFixed(2) : "0.00";
+      document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN");
+
+      // CLEAN LOW DENSITY QR CODE (Instantly Scanned by Google Lens / Any Camera)
       const qrBox = document.getElementById("inv-qr");
       qrBox.innerHTML = "";
       new QRCode(qrBox, {
         text: bill.publicUrl,
-        width: 60,
-        height: 60,
-        colorDark: "#0f172a",
+        width: 68,
+        height: 68,
+        colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.L
       });
@@ -715,6 +832,34 @@
     function openSavedBill(token) {
       const b = billsCache.find(x => x.token === token);
       if (b) displayInvoice(b);
+    }
+
+    // ULTRA CRISP HD PDF DOWNLOAD (LOCKED 700px CANVAS)
+    async function downloadHDInvoice() {
+      const elem = document.getElementById("invoice-capture");
+      try {
+        const canvas = await html2canvas(elem, {
+          scale: 3,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+          width: 700,
+          windowWidth: 700
+        });
+
+        const imgData = canvas.toDataURL("image/png", 1.0);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const pdfWidth = 190;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const marginX = (210 - pdfWidth) / 2;
+
+        pdf.addImage(imgData, "PNG", marginX, 10, pdfWidth, pdfHeight);
+        pdf.save(`SRE_Invoice_${activeBill?.invoiceNo || "Bill"}.pdf`);
+      } catch (err) {
+        alert("PDF Download Error: " + err.message);
+      }
     }
 
     function shareWhatsApp() {
@@ -731,7 +876,6 @@
       showView("dashboard");
     }
 
-    // Direct initialization
     window.addEventListener("DOMContentLoaded", () => {
       const token = new URLSearchParams(window.location.search).get("b");
       if (token) {
