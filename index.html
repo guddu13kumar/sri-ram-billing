@@ -30,7 +30,7 @@
     .totals-box { width: 225px; min-width: 225px; } 
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="flex space-x-2">
-      <button onclick="showView('settings')" class="px-2.5 py-1 bg-blue-900 text-white rounded text-xs font-bold border border-blue-400">⚙️ Settings</button>
+      <button onclick="showView('settings')" class="px-2.5 py-1 bg-blue-900 text-white rounded text-xs font-bold border border-blue-400 hover:bg-blue-800 transition">⚙️ Settings</button>
     </div>
   </header>
 
@@ -50,26 +50,59 @@
       <div id="popup-icon" class="text-6xl mb-3">✅</div>
       <h3 id="popup-title" class="text-xl font-black text-slate-900 uppercase tracking-wide">Success</h3>
       <p id="popup-message" class="text-sm font-bold text-slate-600 mt-2 mb-6">Data saved successfully!</p>
-      <button onclick="closePopup()" class="w-full py-3 bg-[#004aad] text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-md">OK</button>
+      <button onclick="closePopup()" class="w-full py-3 bg-[#004aad] text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-md hover:bg-blue-800 transition">OK</button>
     </div>
   </div>
 
   <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4">
 
-    <!-- VIEW 1: DASHBOARD -->
-    <div id="view-dashboard" class="space-y-3">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S SALE</span><p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S PURCHASE</span><p id="dash-purchase" class="text-2xl font-black text-indigo-600 mt-0.5">Rs. 0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">PROFIT</span><p id="dash-profit" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p></div>
-        <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">LOSS</span><p id="dash-loss" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
+    <!-- VIEW 1: NEW PREMIUM DASHBOARD -->
+    <div id="view-dashboard" class="space-y-4">
+      
+      <!-- Top Stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Today's Sale</span><p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Today's Purchase</span><p id="dash-purchase" class="text-2xl font-black text-indigo-600 mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gross Profit</span><p id="dash-profit" class="text-2xl font-black text-emerald-600 mt-0.5">Rs. 0</p></div>
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Loss</span><p id="dash-loss" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
       </div>
       
-      <div class="bg-white rounded-xl shadow-sm border overflow-hidden mt-3">
-        <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs flex justify-between">
-          <span>Current Session Invoices</span>
+      <!-- Main Action Buttons (Premium UI Grid) -->
+      <div class="grid grid-cols-2 gap-3 mt-2">
+        <button onclick="startNewBill('MOBILE', 'SALE')" class="p-6 bg-gradient-to-br from-blue-500 to-[#004aad] text-white rounded-2xl shadow-md flex flex-col items-center justify-center transform transition active:scale-95 hover:shadow-lg border border-blue-600">
+          <span class="text-5xl mb-2 drop-shadow-md">🛒</span>
+          <span class="text-xs font-black uppercase tracking-widest drop-shadow-md">Sale Entry</span>
+        </button>
+        
+        <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="p-6 bg-gradient-to-br from-indigo-500 to-indigo-800 text-white rounded-2xl shadow-md flex flex-col items-center justify-center transform transition active:scale-95 hover:shadow-lg border border-indigo-600">
+          <span class="text-5xl mb-2 drop-shadow-md">📦</span>
+          <span class="text-xs font-black uppercase tracking-widest drop-shadow-md">Purchase</span>
+        </button>
+
+        <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="p-4 bg-white border border-rose-200 text-rose-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-rose-50">
+          <span class="text-3xl mb-1">💸</span>
+          <span class="text-[10px] font-black uppercase tracking-wider">Payment Out</span>
+        </button>
+        
+        <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="p-4 bg-white border border-emerald-200 text-emerald-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-emerald-50">
+          <span class="text-3xl mb-1">🧾</span>
+          <span class="text-[10px] font-black uppercase tracking-wider">Receipt In</span>
+        </button>
+      </div>
+
+      <div class="mt-2">
+        <button onclick="showView('ledger')" class="w-full p-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl shadow-md flex items-center justify-center space-x-3 transform transition active:scale-95 hover:shadow-lg border border-orange-600">
+          <span class="text-3xl drop-shadow-md">📒</span>
+          <span class="text-sm font-black uppercase tracking-widest drop-shadow-md">Party Ledger (Khata)</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-3">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 font-bold text-xs uppercase tracking-wider text-slate-600 flex justify-between items-center">
+          <span>Recent Invoices</span>
+          <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded-full text-slate-500">Current Session</span>
         </div>
-        <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-96 overflow-y-auto"></div>
+        <div id="recent-bills-list" class="divide-y divide-slate-100 max-h-72 overflow-y-auto"></div>
       </div>
     </div>
 
@@ -81,7 +114,7 @@
           <span id="form-entry-type" class="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-[#004aad] ml-2">SALE</span>
         </div>
         <div class="flex bg-slate-100 p-0.5 rounded-lg border">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white">MOBILE</button>
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white shadow-sm">MOBILE</button>
           <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-3 py-1 rounded text-xs font-bold text-slate-600">ACCESSORIES</button>
           <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-3 py-1 rounded text-xs font-bold text-slate-600">REPAIRING</button>
         </div>
@@ -105,7 +138,7 @@
       <div id="items-box" class="space-y-2.5">
         <div class="flex justify-between items-end">
           <h3 class="font-bold text-xs uppercase text-slate-800">Products</h3>
-          <button onclick="addNewItemRow(false)" class="text-xs font-bold text-[#004aad] bg-blue-50 px-3 py-1 rounded border border-blue-200">+ Add Item</button>
+          <button onclick="addNewItemRow(false)" class="text-xs font-bold text-[#004aad] bg-blue-50 px-3 py-1 rounded border border-blue-200 hover:bg-blue-100 transition">+ Add Item</button>
         </div>
         <div id="items-container" class="space-y-2.5"></div>
       </div>
@@ -209,8 +242,8 @@
         <div class="text-right"><span class="text-[10px] text-blue-200">BALANCE DUE</span><p id="total-due" class="text-lg font-bold text-rose-300 mt-0.5">Rs. 0</p></div>
       </div>
       <div class="flex space-x-2 pt-1">
-        <button type="button" onclick="showView('dashboard')" class="flex-1 py-2.5 bg-slate-200 font-bold rounded-xl text-xs">Cancel</button>
-        <button type="button" onclick="saveBill()" class="flex-[2] py-2.5 bg-[#004aad] text-white font-black rounded-xl text-xs shadow">SAVE & GENERATE</button>
+        <button type="button" onclick="showView('dashboard')" class="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-xs hover:bg-slate-300 transition">Cancel</button>
+        <button type="button" onclick="saveBill()" class="flex-[2] py-3 bg-[#004aad] text-white font-black rounded-xl text-xs shadow hover:bg-blue-800 transition">SAVE & GENERATE</button>
       </div>
     </div>
 
@@ -218,10 +251,10 @@
     <div id="view-invoice" class="space-y-3.5 hidden">
       <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-2.5 rounded-xl border shadow-sm">
         <div class="flex space-x-2">
-          <button onclick="downloadVectorPDF()" class="px-4 py-2 bg-[#004aad] text-white font-bold text-xs rounded shadow">📥 DOWNLOAD PDF</button>
-          <button onclick="shareWhatsApp()" id="btn-whatsapp" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded shadow">💬 WHATSAPP</button>
+          <button onclick="downloadVectorPDF()" class="px-4 py-2 bg-[#004aad] text-white font-bold text-xs rounded shadow hover:bg-blue-800 transition">📥 DOWNLOAD PDF</button>
+          <button onclick="shareWhatsApp()" id="btn-whatsapp" class="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded shadow hover:bg-emerald-700 transition">💬 WHATSAPP</button>
         </div>
-        <button onclick="showView('dashboard')" id="btn-back" class="text-xs font-bold text-slate-600">← Back</button>
+        <button onclick="showView('dashboard')" id="btn-back" class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition">← Back</button>
       </div>
 
       <div class="w-full flex justify-center overflow-x-auto pb-6">
@@ -301,68 +334,73 @@
       </div>
     </div>
 
-    <!-- VIEW 4: LEDGER -->
+    <!-- VIEW 4: LEDGER WITH NEW DESIGN -->
     <div id="view-ledger" class="bg-white rounded-2xl shadow p-4 space-y-4 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
-        <h2 class="text-lg font-black text-slate-900">LEDGER (खाता)</h2>
-        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 px-3 py-1 bg-slate-100 rounded-lg">← Back</button>
+        <h2 class="text-xl font-black text-slate-900 tracking-wider">LEDGER (खाता)</h2>
+        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition">← Back to Dash</button>
       </div>
       
       <!-- Ledger Tabs -->
-      <div class="flex bg-slate-100 p-1 rounded-lg border">
-        <button type="button" onclick="switchLedgerTab('CUSTOMER')" id="tab-CUSTOMER" class="flex-1 py-2.5 rounded-md text-xs font-bold bg-[#004aad] text-white shadow-sm">CUSTOMER</button>
-        <button type="button" onclick="switchLedgerTab('SUPPLIER')" id="tab-SUPPLIER" class="flex-1 py-2.5 rounded-md text-xs font-bold text-slate-600">SUPPLIER</button>
+      <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <button type="button" onclick="switchLedgerTab('CUSTOMER')" id="tab-CUSTOMER" class="flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-wider">CUSTOMER</button>
+        <button type="button" onclick="switchLedgerTab('SUPPLIER')" id="tab-SUPPLIER" class="flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider">SUPPLIER</button>
+      </div>
+
+      <!-- NEW: Shared Ledger Layout (Search + Stats + Opening Balance) -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+         <input type="text" placeholder="🔍 Search Party Name or Mobile Number..." class="w-full p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50 focus:border-[#004aad] transition" />
+         
+         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
+               <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Opening Balance</p>
+               <p class="text-sm font-black text-slate-700 mt-0.5">Rs. 0</p>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 text-center">
+               <p class="text-[9px] text-[#004aad] font-bold uppercase tracking-wider">Total Billed</p>
+               <p class="text-sm font-black text-[#004aad] mt-0.5">Rs. 0</p>
+            </div>
+            <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-center">
+               <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider">Total Paid</p>
+               <p class="text-sm font-black text-emerald-600 mt-0.5">Rs. 0</p>
+            </div>
+            <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-200 text-center">
+               <p class="text-[9px] text-rose-600 font-bold uppercase tracking-wider">Net Balance</p>
+               <p class="text-sm font-black text-rose-600 mt-0.5">Rs. 0</p>
+            </div>
+         </div>
       </div>
 
       <!-- Customer Ledger Placeholder -->
       <div id="ledger-customer-content" class="space-y-3">
-         <div class="p-6 bg-blue-50 border border-blue-200 rounded-xl text-center">
-            <span class="text-4xl mb-2 block">👥</span>
-            <p class="text-sm font-black text-[#004aad] uppercase tracking-wide">Customer Ledger</p>
-            <p class="text-xs font-bold text-slate-500 mt-1">Pending Development. Will show customer dues and payments here.</p>
+         <div class="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+            <span class="text-5xl mb-3 block">👥</span>
+            <p class="text-sm font-black text-[#004aad] uppercase tracking-wide">Customer Ledger History</p>
+            <p class="text-xs font-bold text-slate-400 mt-2 max-w-xs mx-auto">Pending Development. Will show date-wise customer bills and payments.</p>
          </div>
       </div>
 
       <!-- Supplier Ledger Placeholder -->
       <div id="ledger-supplier-content" class="space-y-3 hidden">
-         <div class="p-6 bg-indigo-50 border border-indigo-200 rounded-xl text-center">
-            <span class="text-4xl mb-2 block">🏢</span>
-            <p class="text-sm font-black text-indigo-800 uppercase tracking-wide">Supplier Ledger</p>
-            <p class="text-xs font-bold text-slate-500 mt-1">Pending Development. Will show supplier dues and payments here.</p>
+         <div class="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+            <span class="text-5xl mb-3 block">🏢</span>
+            <p class="text-sm font-black text-indigo-700 uppercase tracking-wide">Supplier Ledger History</p>
+            <p class="text-xs font-bold text-slate-400 mt-2 max-w-xs mx-auto">Pending Development. Will show date-wise supplier bills and payments.</p>
          </div>
       </div>
     </div>
 
     <!-- SETTINGS -->
-    <div id="view-settings" class="space-y-3 bg-white p-5 rounded-xl border max-w-md mx-auto hidden">
-      <h2 class="font-bold text-sm text-slate-900">Backend Cloud URL (Google Sheet)</h2>
-      <input type="text" id="settings-url" class="w-full p-2 border rounded outline-none" placeholder="Paste Google Apps Script URL here" />
-      <div class="flex space-x-2 pt-1">
-        <button onclick="showView('dashboard')" class="flex-1 py-1.5 bg-slate-200 font-bold rounded">Back</button>
-        <button onclick="saveSettings()" class="flex-[2] py-1.5 bg-[#004aad] text-white font-bold rounded">SAVE SETTINGS</button>
+    <div id="view-settings" class="space-y-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto hidden">
+      <h2 class="font-black text-sm text-slate-900 tracking-wider">BACKEND CLOUD URL</h2>
+      <input type="text" id="settings-url" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-[#004aad]" placeholder="Paste Google Apps Script URL here" />
+      <div class="flex space-x-2 pt-2">
+        <button onclick="showView('dashboard')" class="flex-1 py-3 bg-slate-200 font-bold rounded-xl text-xs hover:bg-slate-300 transition">Back</button>
+        <button onclick="saveSettings()" class="flex-[2] py-3 bg-[#004aad] text-white font-black rounded-xl text-xs hover:bg-blue-800 transition shadow-md">SAVE SETTINGS</button>
       </div>
     </div>
 
   </main>
-
-  <!-- FIXED: ADDED 5TH BUTTON FOR LEDGER -->
-  <nav class="fixed bottom-0 w-full bg-white shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-200">
-     <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-2 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50">
-       <span class="text-xl">🛒</span><span class="text-[10px] font-black mt-0.5">SALE</span>
-     </button>
-     <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="flex-1 py-2 text-center text-indigo-700 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
-       <span class="text-xl">📦</span><span class="text-[10px] font-black mt-0.5">PURCHASE</span>
-     </button>
-     <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="flex-1 py-2 text-center text-rose-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
-       <span class="text-xl">💸</span><span class="text-[10px] font-black mt-0.5">PAYMENT</span>
-     </button>
-     <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="flex-1 py-2 text-center text-emerald-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
-       <span class="text-xl">🧾</span><span class="text-[10px] font-black mt-0.5">RECEIPT</span>
-     </button>
-     <button onclick="showView('ledger')" class="flex-1 py-2 text-center text-amber-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
-       <span class="text-xl">📒</span><span class="text-[10px] font-black mt-0.5">LEDGER</span>
-     </button>
-  </nav>
 
   <script>
     let currentEntryType = "SALE";
@@ -372,7 +410,6 @@
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
 
-    // FIXED: LEDGER TAB SWITCHER LOGIC
     function switchLedgerTab(type) {
       const btnCust = document.getElementById("tab-CUSTOMER");
       const btnSupp = document.getElementById("tab-SUPPLIER");
@@ -380,13 +417,13 @@
       const contSupp = document.getElementById("ledger-supplier-content");
 
       if (type === 'CUSTOMER') {
-          btnCust.className = "flex-1 py-2.5 rounded-md text-xs font-bold bg-[#004aad] text-white shadow-sm";
-          btnSupp.className = "flex-1 py-2.5 rounded-md text-xs font-bold text-slate-600";
+          btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-wider";
+          btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider";
           contCust.classList.remove("hidden");
           contSupp.classList.add("hidden");
       } else {
-          btnSupp.className = "flex-1 py-2.5 rounded-md text-xs font-bold bg-indigo-700 text-white shadow-sm";
-          btnCust.className = "flex-1 py-2.5 rounded-md text-xs font-bold text-slate-600";
+          btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-md tracking-wider";
+          btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider";
           contSupp.classList.remove("hidden");
           contCust.classList.add("hidden");
       }
@@ -489,7 +526,6 @@
         }
     }
 
-    // FIXED: ADDED LEDGER VIEW HANDLING
     function showView(view) {
       document.getElementById("view-dashboard").classList.add("hidden");
       document.getElementById("view-new-bill").classList.add("hidden");
@@ -543,7 +579,7 @@
         ? "text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-[#004aad] ml-2" 
         : "text-[10px] font-bold px-2 py-1 rounded bg-indigo-100 text-indigo-800 ml-2";
 
-      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
+      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white shadow-sm" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
       
       const isPurchase = (entryType === "PURCHASE");
       const isRepairSale = (type === "REPAIRING" && !isPurchase); 
