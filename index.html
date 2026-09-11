@@ -174,7 +174,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
+        <!-- FIXED: GLOBAL DISCOUNT AND GST HIDDEN DURING PURCHASE -->
+        <div id="global-tax-discount-box" class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200">
           <div>
             <label class="text-[10px] font-bold text-slate-600 block mb-1">Global Discount (Rs.)</label>
             <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none" placeholder="Discount Amount" />
@@ -299,7 +300,6 @@
       </div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="view-settings" class="space-y-3 bg-white p-5 rounded-xl border max-w-md mx-auto hidden">
       <h2 class="font-bold text-sm text-slate-900">Backend Cloud URL (Google Sheet)</h2>
       <input type="text" id="settings-url" class="w-full p-2 border rounded outline-none" placeholder="Paste Google Apps Script URL here" />
@@ -472,7 +472,6 @@
         billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
-    // FIXED: HANDLING REPAIRING LOGIC DIFFERENTLY FOR SALE vs PURCHASE
     function startNewBill(type, entryType = currentEntryType) {
       currentBillType = type;
       currentEntryType = entryType;
@@ -486,7 +485,10 @@
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
       
       const isPurchase = (entryType === "PURCHASE");
-      const isRepairSale = (type === "REPAIRING" && !isPurchase); // Custom box ONLY for Repairing Sale
+      const isRepairSale = (type === "REPAIRING" && !isPurchase); 
+
+      // FIXED: HIDING GLOBAL TAX/DISCOUNT BOX ONLY FOR PURCHASE
+      document.getElementById("global-tax-discount-box").classList.toggle("hidden", isPurchase);
 
       document.getElementById("cust-box").classList.toggle("hidden", isRepairSale);
       document.getElementById("items-box").classList.toggle("hidden", isRepairSale);
@@ -523,6 +525,10 @@
       document.getElementById("pay-primary").value = "Cash";
       document.getElementById("pay-secondary").value = "";
       document.getElementById("global-gst").value = "0"; 
+      
+      if(document.getElementById("fin-rate")) document.getElementById("fin-rate").readOnly = false;
+      if(document.getElementById("dues-rate")) document.getElementById("dues-rate").readOnly = false;
+
       onPaymentModeChange();
 
       if(!isRepairSale) addNewItemRow(true);
@@ -565,6 +571,7 @@
       imeiBox.innerHTML = html;
     }
 
+    // FIXED: ADDED RATE, GST, AND DISCOUNT IN ITEM ROW SPECIFICALLY FOR PURCHASE
     function addNewItemRow(isFirst = false) {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
@@ -574,6 +581,29 @@
       if (!isFirst) {
         removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-2 right-3 text-rose-600 font-bold text-xs">X Remove</button>`;
       }
+
+      const purchaseFieldsHtml = currentEntryType === "PURCHASE" ? `
+        <div class="purchase-fields grid grid-cols-3 gap-2 mt-2">
+           <div class="w-full">
+             <label class="text-[10px] font-bold text-slate-600 block mb-1">Rate (Rs.) *</label>
+             <input type="number" oninput="recalcTotals()" class="item-rate w-full p-1.5 border rounded text-xs font-bold outline-none" placeholder="0" />
+           </div>
+           <div class="w-full">
+             <label class="text-[10px] font-bold text-slate-600 block mb-1">GST Slab</label>
+             <select onchange="recalcTotals()" class="item-gst w-full p-1.5 border rounded text-xs font-bold outline-none">
+               <option value="0" selected>0%</option>
+               <option value="5">5%</option>
+               <option value="12">12%</option>
+               <option value="18">18%</option>
+               <option value="28">28%</option>
+             </select>
+           </div>
+           <div class="w-full">
+             <label class="text-[10px] font-bold text-slate-600 block mb-1">Discount (Rs.)</label>
+             <input type="number" oninput="recalcTotals()" class="item-discount w-full p-1.5 border rounded text-xs font-bold outline-none" placeholder="0" />
+           </div>
+        </div>
+      ` : '';
 
       div.innerHTML = `
         ${removeBtn}
@@ -587,6 +617,7 @@
              <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border rounded text-xs font-bold outline-none" />
            </div>
         </div>
+        ${purchaseFieldsHtml}
         <div class="item-imeis-box"></div>
       `;
       container.appendChild(div);
@@ -657,6 +688,7 @@
       recalcTotals();
     }
 
+    // FIXED: FORWARD CALCULATION FOR PURCHASE, REVERSE CALCULATION FOR SALE
     function recalcTotals() {
       let rawPaid = 0;
       const s = document.getElementById("pay-secondary").value;
@@ -687,28 +719,66 @@
       }
 
       let grand = 0;
+      let totalTaxable = 0;
+      let totalGst = 0;
+      let totalDiscount = 0;
+      let globalGstRate = 0;
+
       const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
 
-      if (isRepairSale) {
-        grand = Number(document.getElementById("rep-charge").value) || 0;
-      } else {
-        if (s === "Finance") {
-            grand = Number(document.getElementById("fin-rate").value) || 0;
-        } else if (s === "Dues") {
-            grand = Number(document.getElementById("dues-rate").value) || 0;
-        } else {
-            grand = rawPaid;
+      if (currentEntryType === "PURCHASE") {
+        document.querySelectorAll(".item-row").forEach(r => {
+          const q = Number(r.querySelector(".item-qty").value) || 1;
+          const rate = Number(r.querySelector(".item-rate")?.value) || 0;
+          const gstSlab = Number(r.querySelector(".item-gst")?.value) || 0;
+          const disc = Number(r.querySelector(".item-discount")?.value) || 0;
+
+          const basic = rate * q;
+          const taxValue = Math.max(0, basic - disc);
+          const gstVal = taxValue * (gstSlab / 100);
+          
+          totalTaxable += taxValue;
+          totalGst += gstVal;
+          totalDiscount += disc;
+          grand += (taxValue + gstVal);
+        });
+        
+        grand = Math.round(grand);
+        
+        const firstGst = document.querySelector(".item-gst");
+        if(firstGst) globalGstRate = Number(firstGst.value) || 0;
+
+        if(document.getElementById("fin-rate")) {
+           document.getElementById("fin-rate").value = grand;
+           document.getElementById("fin-rate").readOnly = true;
         }
+        if(document.getElementById("dues-rate")) {
+           document.getElementById("dues-rate").value = grand;
+           document.getElementById("dues-rate").readOnly = true;
+        }
+
+      } else {
+        if (isRepairSale) {
+          grand = Number(document.getElementById("rep-charge").value) || 0;
+        } else {
+          if (s === "Finance") {
+              grand = Number(document.getElementById("fin-rate").value) || 0;
+          } else if (s === "Dues") {
+              grand = Number(document.getElementById("dues-rate").value) || 0;
+          } else {
+              grand = rawPaid;
+          }
+        }
+
+        const globalDisc = Number(document.getElementById("global-discount").value) || 0;
+        globalGstRate = Number(document.getElementById("global-gst").value) || 0;
+        
+        totalDiscount = globalDisc;
+        totalTaxable = grand / (1 + (globalGstRate/100));
+        totalGst = grand - totalTaxable;
+        grand = Math.round(grand);
       }
 
-      const globalDisc = Number(document.getElementById("global-discount").value) || 0;
-      const globalGstRate = Number(document.getElementById("global-gst").value) || 0;
-      
-      const totalDiscount = globalDisc;
-      const totalTaxable = grand / (1 + (globalGstRate/100));
-      const totalGst = grand - totalTaxable;
-
-      grand = Math.round(grand);
       const paid = rawPaid;
       const due = Math.max(0, grand - paid);
       
@@ -733,7 +803,7 @@
         gstin = document.getElementById("cust-gstin").value.trim().toUpperCase() || "-";
         
         if(currentEntryType === "PURCHASE" && !name) return showPopup("Validation Error", "Supplier / Party Name डालना अनिवार्य है!", true);
-        if(!name) name = "Customer"; // Fallback for sale
+        if(!name) name = "Customer"; 
 
         if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       }
@@ -747,11 +817,11 @@
 
       if (s_val === "Finance") {
           if (!document.getElementById("fin-company").value) return showPopup("Validation Error", "Finance Company चुनना अनिवार्य है!", true);
-          if (!document.getElementById("fin-rate").value || Number(document.getElementById("fin-rate").value) <= 0) return showPopup("Validation Error", "Finance में Rate डालना अनिवार्य है!", true);
+          if (currentEntryType === "SALE" && (!document.getElementById("fin-rate").value || Number(document.getElementById("fin-rate").value) <= 0)) return showPopup("Validation Error", "Finance में Rate डालना अनिवार्य है!", true);
       } else if (s_val === "Dues") {
-          if (!document.getElementById("dues-rate").value || Number(document.getElementById("dues-rate").value) <= 0) return showPopup("Validation Error", "Dues (उधार) में Rate डालना अनिवार्य है!", true);
+          if (currentEntryType === "SALE" && (!document.getElementById("dues-rate").value || Number(document.getElementById("dues-rate").value) <= 0)) return showPopup("Validation Error", "Dues (उधार) में Rate डालना अनिवार्य है!", true);
       } else {
-          if (!checkSplit && !document.getElementById("pay-paid").value) {
+          if (!checkSplit && document.getElementById("pay-paid").value === "") {
               return showPopup("Validation Error", "Total Amount Paid डालना अनिवार्य है!", true);
           }
       }
@@ -781,7 +851,7 @@
       if (isRepairSale) {
         items = [{ name: document.getElementById("rep-device").value.trim().toUpperCase(), imei: document.getElementById("rep-issue").value.trim().toUpperCase(), qty: 1, rate: totals.totalTaxable + totals.totalDiscount, amount: totals.totalTaxable + totals.totalDiscount }];
       } else {
-        let err = false; let imeiErr = false;
+        let err = false; let imeiErr = false; let rateErr = false;
         let totalQty = 0;
         
         document.querySelectorAll(".item-row").forEach(r => {
@@ -809,14 +879,33 @@
           }
           
           const q = Number(r.querySelector(".item-qty").value)||1;
-          const amt = q * unitBasicRate;
+          let uRate = 0;
+          let amt = 0;
+
+          if (currentEntryType === "PURCHASE") {
+              const rate = Number(r.querySelector(".item-rate")?.value) || 0;
+              const disc = Number(r.querySelector(".item-discount")?.value) || 0;
+              const gst = Number(r.querySelector(".item-gst")?.value) || 0;
+              
+              if(rate <= 0) rateErr = true;
+              
+              uRate = rate;
+              const taxVal = Math.max(0, (rate * q) - disc);
+              amt = taxVal + (taxVal * (gst / 100));
+          } else {
+              uRate = unitBasicRate;
+              amt = q * unitBasicRate;
+          }
 
           items.push({ 
             name: pName, imei: validImeis.length > 0 ? validImeis.join(", ") : "-", 
-            qty: q, rate: unitBasicRate, amount: amt 
+            qty: q, rate: uRate, amount: amt 
           });
         });
-        if(err) return showPopup("Validation Error", "प्रोडक्ट नाम भरना अनिवार्य है!", true);
+        
+        if (err || rateErr) {
+            return showPopup("Validation Error", currentEntryType === "PURCHASE" ? "प्रोडक्ट नाम और Rate (Rs.) भरना अनिवार्य है!" : "प्रोडक्ट नाम भरना अनिवार्य है!", true);
+        }
         if(imeiErr) return showPopup("Validation Error", "IMEI नंबर पूरे 15 अंकों का होना चाहिए!", true);
       }
 
