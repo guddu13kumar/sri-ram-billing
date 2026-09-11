@@ -24,7 +24,6 @@
       }
     }
     
-    /* Strict Table Alignment Rules */
     .table-col-qty { width: 55px; text-align: center; }
     .table-col-rate { width: 75px; text-align: right; }
     .table-col-amt { width: 95px; text-align: right; }
@@ -58,7 +57,6 @@
   <main class="flex-1 w-full max-w-5xl mx-auto p-2.5 sm:p-4">
 
     <div id="view-dashboard" class="space-y-3">
-      <!-- FIXED: NEW DASHBOARD STATS (SALE, PURCHASE, PROFIT, LOSS) -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S SALE</span><p id="dash-sales" class="text-2xl font-black text-[#004aad] mt-0.5">Rs. 0</p></div>
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">TODAY'S PURCHASE</span><p id="dash-purchase" class="text-2xl font-black text-indigo-600 mt-0.5">Rs. 0</p></div>
@@ -66,7 +64,6 @@
         <div class="bg-white p-3 rounded-xl shadow-sm border"><span class="text-[10px] font-bold text-slate-400">LOSS</span><p id="dash-loss" class="text-2xl font-black text-rose-600 mt-0.5">Rs. 0</p></div>
       </div>
       
-      <!-- FIXED: RECENT BILLS MOVED UP SINCE BUTTONS ARE NOW AT THE BOTTOM -->
       <div class="bg-white rounded-xl shadow-sm border overflow-hidden mt-3">
         <div class="px-4 py-2.5 bg-slate-50 border-b font-bold text-xs flex justify-between">
           <span>Current Session Invoices</span>
@@ -77,7 +74,6 @@
 
     <div id="view-new-bill" class="bg-white rounded-2xl shadow p-4 space-y-3.5 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
-        <!-- FIXED: ADDED ENTRY TYPE LABEL (SALE/PURCHASE) NEXT TO BILL NO -->
         <div class="flex items-center">
           <h2 id="form-invoice-no" class="text-lg font-black text-slate-900">SRE-2026-001</h2>
           <span id="form-entry-type" class="text-[10px] font-bold px-2 py-1 rounded bg-blue-100 text-[#004aad] ml-2">SALE</span>
@@ -315,7 +311,6 @@
 
   </main>
 
-  <!-- FIXED: 4 BOTTOM APP BUTTONS -->
   <nav class="fixed bottom-0 w-full bg-white shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-200">
      <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-2 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50">
        <span class="text-xl">🛒</span><span class="text-[10px] font-black mt-0.5">SALE</span>
@@ -454,7 +449,6 @@
       return d.getDate() + " " + months[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
     }
 
-    // FIXED: CALCULATE SALE, PURCHASE, PROFIT, AND LOSS
     function renderDashboard() {
       const today = getFormattedDate();
       const todayBills = billsCache.filter(b => b.billDate === today);
@@ -478,11 +472,11 @@
         billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
+    // FIXED: HANDLING REPAIRING LOGIC DIFFERENTLY FOR SALE vs PURCHASE
     function startNewBill(type, entryType = currentEntryType) {
       currentBillType = type;
       currentEntryType = entryType;
       
-      // FIXED: UPDATE THE FORM HEADER BADGE
       const badge = document.getElementById("form-entry-type");
       badge.innerText = entryType;
       badge.className = entryType === 'SALE' 
@@ -490,19 +484,31 @@
         : "text-[10px] font-bold px-2 py-1 rounded bg-indigo-100 text-indigo-800 ml-2";
 
       ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-3 py-1 rounded text-xs font-bold bg-[#004aad] text-white" : "px-3 py-1 rounded text-xs font-bold text-slate-600");
-      document.getElementById("cust-box").classList.toggle("hidden", type === "REPAIRING");
-      document.getElementById("items-box").classList.toggle("hidden", type === "REPAIRING");
-      document.getElementById("repair-box").classList.toggle("hidden", type !== "REPAIRING");
+      
+      const isPurchase = (entryType === "PURCHASE");
+      const isRepairSale = (type === "REPAIRING" && !isPurchase); // Custom box ONLY for Repairing Sale
+
+      document.getElementById("cust-box").classList.toggle("hidden", isRepairSale);
+      document.getElementById("items-box").classList.toggle("hidden", isRepairSale);
+      document.getElementById("repair-box").classList.toggle("hidden", !isRepairSale);
       document.getElementById("items-container").innerHTML = "";
       
-      if (type === "ACCESSORIES") {
-        document.getElementById("lbl-cust-name").innerText = "Customer Name";
-        document.getElementById("lbl-cust-phone").innerText = "Mobile";
-        document.getElementById("lbl-cust-address").innerText = "Address";
+      const lblName = document.getElementById("lbl-cust-name");
+      const lblPhone = document.getElementById("lbl-cust-phone");
+      const lblAddress = document.getElementById("lbl-cust-address");
+
+      if (isPurchase) {
+        lblName.innerText = "Supplier / Party Name *";
       } else {
-        document.getElementById("lbl-cust-name").innerText = "Customer Name *";
-        document.getElementById("lbl-cust-phone").innerText = "Mobile *";
-        document.getElementById("lbl-cust-address").innerText = "Address *";
+        lblName.innerText = "Customer Name *";
+      }
+
+      if (type === "ACCESSORIES" || (type === "REPAIRING" && isPurchase)) {
+        lblPhone.innerText = "Mobile";
+        lblAddress.innerText = "Address";
+      } else {
+        lblPhone.innerText = "Mobile *";
+        lblAddress.innerText = "Address *";
       }
 
       document.getElementById("cust-name").value = "";
@@ -519,7 +525,7 @@
       document.getElementById("global-gst").value = "0"; 
       onPaymentModeChange();
 
-      if(type !== "REPAIRING") addNewItemRow(true);
+      if(!isRepairSale) addNewItemRow(true);
       
       const prefix = entryType === "PURCHASE" ? "PUR" : "SRE";
       const year = new Date().getFullYear();
@@ -532,7 +538,8 @@
 
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
-      if (currentBillType === "REPAIRING") { imeiBox.innerHTML = ""; return; }
+      const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
+      if (isRepairSale) { imeiBox.innerHTML = ""; return; }
       
       const isMobile = currentBillType === "MOBILE";
       const existingImeis = Array.from(imeiBox.querySelectorAll(".item-imei")).map(inp => inp.value);
@@ -680,12 +687,18 @@
       }
 
       let grand = 0;
-      if (s === "Finance") {
-          grand = Number(document.getElementById("fin-rate").value) || 0;
-      } else if (s === "Dues") {
-          grand = Number(document.getElementById("dues-rate").value) || 0;
+      const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
+
+      if (isRepairSale) {
+        grand = Number(document.getElementById("rep-charge").value) || 0;
       } else {
-          grand = rawPaid;
+        if (s === "Finance") {
+            grand = Number(document.getElementById("fin-rate").value) || 0;
+        } else if (s === "Dues") {
+            grand = Number(document.getElementById("dues-rate").value) || 0;
+        } else {
+            grand = rawPaid;
+        }
       }
 
       const globalDisc = Number(document.getElementById("global-discount").value) || 0;
@@ -708,14 +721,20 @@
 
     function saveBill() {
       let name = "", phone = "", address = "", gstin = "";
-      if (currentBillType === "REPAIRING") {
+      const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
+
+      if (isRepairSale) {
         phone = document.getElementById("rep-phone").value.trim(); name = "Repair Customer";
         if(phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       } else {
-        name = document.getElementById("cust-name").value.trim().toUpperCase() || "Customer";
+        name = document.getElementById("cust-name").value.trim().toUpperCase();
         phone = document.getElementById("cust-phone").value.trim();
         address = document.getElementById("cust-address").value.trim().toUpperCase() || "-";
         gstin = document.getElementById("cust-gstin").value.trim().toUpperCase() || "-";
+        
+        if(currentEntryType === "PURCHASE" && !name) return showPopup("Validation Error", "Supplier / Party Name डालना अनिवार्य है!", true);
+        if(!name) name = "Customer"; // Fallback for sale
+
         if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       }
 
@@ -759,7 +778,7 @@
       if (totals.grand <= 0) return showPopup("Validation Error", "अमाउंट 0 से अधिक होना चाहिए!", true);
 
       let items = [];
-      if (currentBillType === "REPAIRING") {
+      if (isRepairSale) {
         items = [{ name: document.getElementById("rep-device").value.trim().toUpperCase(), imei: document.getElementById("rep-issue").value.trim().toUpperCase(), qty: 1, rate: totals.totalTaxable + totals.totalDiscount, amount: totals.totalTaxable + totals.totalDiscount }];
       } else {
         let err = false; let imeiErr = false;
@@ -777,7 +796,7 @@
           if(!pName) err = true;
           
           let validImeis = [];
-          if(currentBillType === "MOBILE" || currentBillType === "ACCESSORIES"){
+          if(currentBillType === "MOBILE" || currentBillType === "ACCESSORIES" || (currentBillType === "REPAIRING" && currentEntryType === "PURCHASE")){
             Array.from(r.querySelectorAll(".item-imei")).forEach(inp => {
                const val = inp.value.trim().toUpperCase();
                if(currentBillType === "MOBILE") {
