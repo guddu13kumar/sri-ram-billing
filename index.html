@@ -45,7 +45,6 @@
     </div>
   </header>
 
-  <!-- FIXED: ADDED NEW PARTY CREATION MODAL -->
   <div id="party-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-5 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 transform scale-100 mx-4">
       <h3 class="text-lg font-black text-slate-900 uppercase tracking-wide border-b pb-2 mb-3">Create New Party</h3>
@@ -163,7 +162,6 @@
 
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
         <div>
-          <!-- FIXED: ADDED [+] NEW BUTTON FOR PARTY CREATION IN FORM -->
           <div class="flex justify-between items-center mb-1">
             <label id="lbl-cust-name" class="text-[10px] font-bold text-slate-600">Customer Name *</label>
             <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-100 text-[#004aad] border border-blue-200 px-1.5 py-0.5 rounded text-[8px] font-black shadow-sm hover:bg-blue-200 transition">➕ NEW</button>
@@ -382,60 +380,64 @@
       </div>
     </div>
 
-    <!-- VIEW 4: LEDGER -->
+    <!-- VIEW 4: LEDGER WITH PROPER DEBIT/CREDIT ACCOUNTING LOGIC -->
     <div id="view-ledger" class="bg-white rounded-2xl shadow p-4 space-y-4 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
         <h2 class="text-xl font-black text-slate-900 tracking-wider">LEDGER (खाता)</h2>
         <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition">← Back to Dash</button>
       </div>
       
+      <!-- Ledger Tabs -->
       <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
         <button type="button" onclick="switchLedgerTab('CUSTOMER')" id="tab-CUSTOMER" class="flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-wider">CUSTOMER</button>
         <button type="button" onclick="switchLedgerTab('SUPPLIER')" id="tab-SUPPLIER" class="flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider">SUPPLIER</button>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-         <!-- FIXED: ADDED [+] BUTTON TO LEDGER SEARCH AREA -->
+         <!-- Search and Auto-filter Bar -->
          <div class="flex space-x-2">
-           <input type="text" placeholder="🔍 Search Party Name or Mobile Number..." class="flex-1 p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50 focus:border-[#004aad] transition" />
+           <input type="text" id="ledger-search" oninput="updateLedgerView()" placeholder="🔍 Search Party Name or Mobile Number..." class="flex-1 p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50 focus:border-[#004aad] transition" />
            <button onclick="openPartyModal(document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]') ? 'CUSTOMER' : 'SUPPLIER')" class="w-12 bg-[#004aad] text-white rounded-xl font-black text-2xl flex items-center justify-center shadow-md hover:bg-blue-800 transition pb-1" title="Add New Party">+</button>
          </div>
          
          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-center">
-               <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Opening Balance</p>
-               <p class="text-sm font-black text-slate-700 mt-0.5">Rs. 0</p>
+               <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Opening Bal</p>
+               <p id="ledger-ob" class="text-sm font-black text-slate-700 mt-0.5">Rs. 0</p>
             </div>
             <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 text-center">
                <p class="text-[9px] text-[#004aad] font-bold uppercase tracking-wider">Total Billed</p>
-               <p class="text-sm font-black text-[#004aad] mt-0.5">Rs. 0</p>
+               <p id="ledger-billed" class="text-sm font-black text-[#004aad] mt-0.5">Rs. 0</p>
             </div>
             <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-center">
                <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider">Total Paid</p>
-               <p class="text-sm font-black text-emerald-600 mt-0.5">Rs. 0</p>
+               <p id="ledger-paid" class="text-sm font-black text-emerald-600 mt-0.5">Rs. 0</p>
             </div>
             <div class="bg-rose-50 p-2.5 rounded-xl border border-rose-200 text-center">
-               <p class="text-[9px] text-rose-600 font-bold uppercase tracking-wider">Net Balance</p>
-               <p class="text-sm font-black text-rose-600 mt-0.5">Rs. 0</p>
+               <p class="text-[9px] text-rose-600 font-bold uppercase tracking-wider">Net Dues</p>
+               <p id="ledger-bal" class="text-sm font-black text-rose-600 mt-0.5">Rs. 0</p>
             </div>
          </div>
       </div>
 
-      <div id="ledger-customer-content" class="space-y-3">
-         <div class="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-            <span class="text-5xl mb-3 block">👥</span>
-            <p class="text-sm font-black text-[#004aad] uppercase tracking-wide">Customer Ledger History</p>
-            <p class="text-xs font-bold text-slate-400 mt-2 max-w-xs mx-auto">Pending Development. Will show date-wise customer bills and payments.</p>
-         </div>
+      <!-- SINGLE DYNAMIC LEDGER TABLE -->
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mt-3">
+        <table class="w-full text-left text-[10px] sm:text-xs">
+          <thead class="bg-slate-100 text-slate-600 uppercase tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="p-2 border-r border-slate-200">Date</th>
+              <th class="p-2 border-r border-slate-200">Particulars</th>
+              <th id="th-dr" class="p-2 border-r border-slate-200 text-right text-rose-600">Debit (Dr)<br><span class="text-[8px] font-normal text-slate-500 normal-case">Sale Amt</span></th>
+              <th id="th-cr" class="p-2 border-r border-slate-200 text-right text-emerald-600">Credit (Cr)<br><span class="text-[8px] font-normal text-slate-500 normal-case">Receipt</span></th>
+              <th class="p-2 text-right">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-tbody" class="divide-y divide-slate-100">
+            <tr><td colspan="5" class="text-center p-6 text-slate-400 font-bold">🔍 Search a party to view ledger history...</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <div id="ledger-supplier-content" class="space-y-3 hidden">
-         <div class="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-            <span class="text-5xl mb-3 block">🏢</span>
-            <p class="text-sm font-black text-indigo-700 uppercase tracking-wide">Supplier Ledger History</p>
-            <p class="text-xs font-bold text-slate-400 mt-2 max-w-xs mx-auto">Pending Development. Will show date-wise supplier bills and payments.</p>
-         </div>
-      </div>
     </div>
 
     <!-- SETTINGS -->
@@ -476,7 +478,6 @@
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
 
-    // FIXED: PARTY MODAL LOGIC & ALT+C SHORTCUT
     function openPartyModal(type) {
         document.getElementById('new-party-type').value = type || 'CUSTOMER';
         document.getElementById('new-party-name').value = '';
@@ -502,7 +503,6 @@
             return showPopup("Validation Error", "Please enter valid Party Name and 10-digit Mobile Number!", true);
         }
         
-        // Auto-fill active form if open
         if (!document.getElementById('view-new-bill').classList.contains('hidden')) {
             document.getElementById('cust-name').value = name;
             document.getElementById('cust-phone').value = phone;
@@ -515,7 +515,6 @@
     }
 
     document.addEventListener('keydown', function(e) {
-        // Alt + C Shortcut
         if (e.altKey && (e.key === 'c' || e.key === 'C')) {
             if (!document.getElementById('view-new-bill').classList.contains('hidden') && currentEntryType === 'PURCHASE') {
                 e.preventDefault();
@@ -524,23 +523,91 @@
         }
     });
 
+    // FIXED: SWITCH TABS & CHANGE TABLE DR/CR HEADERS ACCORDING TO ACCOUNTING RULES
     function switchLedgerTab(type) {
       const btnCust = document.getElementById("tab-CUSTOMER");
       const btnSupp = document.getElementById("tab-SUPPLIER");
-      const contCust = document.getElementById("ledger-customer-content");
-      const contSupp = document.getElementById("ledger-supplier-content");
+      const thDr = document.getElementById("th-dr");
+      const thCr = document.getElementById("th-cr");
 
       if (type === 'CUSTOMER') {
           btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-wider";
           btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider";
-          contCust.classList.remove("hidden");
-          contSupp.classList.add("hidden");
+          thDr.innerHTML = "Debit (Dr)<br><span class='text-[8px] font-normal text-slate-500 normal-case'>Sale Amt</span>";
+          thCr.innerHTML = "Credit (Cr)<br><span class='text-[8px] font-normal text-slate-500 normal-case'>Receipt</span>";
       } else {
           btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black bg-indigo-600 text-white shadow-md tracking-wider";
           btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider";
-          contSupp.classList.remove("hidden");
-          contCust.classList.add("hidden");
+          thDr.innerHTML = "Debit (Dr)<br><span class='text-[8px] font-normal text-slate-500 normal-case'>Payment</span>";
+          thCr.innerHTML = "Credit (Cr)<br><span class='text-[8px] font-normal text-slate-500 normal-case'>Purchase Amt</span>";
       }
+      
+      document.getElementById("ledger-search").value = "";
+      updateLedgerView();
+    }
+
+    // FIXED: LEDGER CALCULATION & DATA INJECTION
+    function updateLedgerView() {
+        const searchText = document.getElementById("ledger-search").value.trim().toUpperCase();
+        const isCust = document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]');
+        
+        let totalBilled = 0;
+        let totalPaid = 0;
+        let html = '';
+
+        if (!searchText) {
+            document.getElementById("ledger-tbody").innerHTML = '<tr><td colspan="5" class="text-center p-6 text-slate-400 font-bold">🔍 Search a party to view ledger history...</td></tr>';
+            document.getElementById("ledger-ob").innerText = "Rs. 0";
+            document.getElementById("ledger-billed").innerText = "Rs. 0";
+            document.getElementById("ledger-paid").innerText = "Rs. 0";
+            document.getElementById("ledger-bal").innerText = "Rs. 0";
+            return;
+        }
+
+        const partyBills = billsCache.filter(b => 
+            (b.customerName.toUpperCase().includes(searchText) || (b.customerMobile && b.customerMobile.includes(searchText))) &&
+            (isCust ? b.billType.includes("SALE") : b.billType.includes("PURCHASE"))
+        ).reverse(); 
+
+        let runBal = 0; 
+
+        partyBills.forEach(b => {
+            const billed = Number(b.grandTotal) || 0;
+            const paid = Number(b.paid) || 0;
+            const due = Number(b.due) || 0;
+
+            totalBilled += billed;
+            totalPaid += paid;
+            runBal += due; 
+
+            let drStr = "-";
+            let crStr = "-";
+
+            if (isCust) {
+                if (billed > 0) drStr = billed.toLocaleString("en-IN");
+                if (paid > 0) crStr = paid.toLocaleString("en-IN");
+            } else {
+                if (paid > 0) drStr = paid.toLocaleString("en-IN");
+                if (billed > 0) crStr = billed.toLocaleString("en-IN");
+            }
+
+            html += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                <td class="p-2 whitespace-nowrap text-slate-600">${b.billDate}</td>
+                <td class="p-2 font-bold ${isCust ? 'text-[#004aad]' : 'text-indigo-700'} whitespace-nowrap">${b.invoiceNo}</td>
+                <td class="p-2 text-right text-rose-600 font-medium">${drStr}</td>
+                <td class="p-2 text-right text-emerald-600 font-medium">${crStr}</td>
+                <td class="p-2 text-right font-black">${runBal.toLocaleString("en-IN")} <span class="text-[8px] text-slate-400">${isCust ? 'Dr' : 'Cr'}</span></td>
+            </tr>`;
+        });
+
+        if(html === '') {
+            html = '<tr><td colspan="5" class="text-center p-6 text-slate-400 font-bold">No records found for this party in current session.</td></tr>';
+        }
+
+        document.getElementById("ledger-tbody").innerHTML = html;
+        document.getElementById("ledger-billed").innerText = "Rs. " + totalBilled.toLocaleString("en-IN");
+        document.getElementById("ledger-paid").innerText = "Rs. " + totalPaid.toLocaleString("en-IN");
+        document.getElementById("ledger-bal").innerText = "Rs. " + runBal.toLocaleString("en-IN");
     }
 
     function showPopup(title, msg, isError = false, billToDisplay = null) {
@@ -650,7 +717,10 @@
       if (view === "dashboard") { renderDashboard(); document.getElementById("view-dashboard").classList.remove("hidden"); }
       else if (view === "new-bill") document.getElementById("view-new-bill").classList.remove("hidden");
       else if (view === "invoice") document.getElementById("view-invoice").classList.remove("hidden");
-      else if (view === "ledger") document.getElementById("view-ledger").classList.remove("hidden");
+      else if (view === "ledger") { 
+          document.getElementById("view-ledger").classList.remove("hidden"); 
+          updateLedgerView(); 
+      }
       else if (view === "settings") { document.getElementById("settings-url").value = gasUrl; document.getElementById("view-settings").classList.remove("hidden"); }
     }
 
@@ -680,7 +750,7 @@
 
       const list = document.getElementById("recent-bills-list");
       list.innerHTML = billsCache.length === 0 ? '<p class="p-4 text-center text-xs text-slate-400">No bills in current session.</p>' :
-        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between"><div><p class="font-bold text-[#004aad] text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
+        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between border-b border-slate-100 last:border-0"><div><p class="font-bold ${b.billType.includes('SALE') ? 'text-[#004aad]' : 'text-indigo-700'} text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
     function startNewBill(type, entryType = currentEntryType) {
@@ -705,7 +775,6 @@
       document.getElementById("repair-box").classList.toggle("hidden", !isRepairSale);
       document.getElementById("items-container").innerHTML = "";
       
-      // FIXED: LABEL AND [+] BUTTON FOR PARTY
       const lblName = document.getElementById("lbl-cust-name");
       const btnParty = document.getElementById("btn-add-party");
 
