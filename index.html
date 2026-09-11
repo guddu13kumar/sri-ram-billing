@@ -32,7 +32,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
 
-  <!-- DATALIST FOR AUTO-COMPLETE PARTIES -->
   <datalist id="party-list"></datalist>
 
   <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
@@ -163,6 +162,7 @@
         </div>
       </div>
 
+      <!-- FIXED: Added Wrappers to hide Mobile, Address, GSTIN on Purchase -->
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 bg-slate-50 p-3 rounded-xl border">
         <div>
           <div class="flex justify-between items-center mb-1">
@@ -171,9 +171,9 @@
           </div>
           <input type="text" id="cust-name" list="party-list" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" />
         </div>
-        <div><label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
-        <div><label id="lbl-cust-address" class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
-        <div><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
+        <div id="box-cust-phone"><label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
+        <div id="box-cust-address"><label id="lbl-cust-address" class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
+        <div id="box-cust-gstin"><label class="text-[10px] font-bold text-slate-600 block mb-1">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" maxlength="15" /></div>
       </div>
 
       <div id="repair-box" class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2.5 hidden">
@@ -193,68 +193,88 @@
       </div>
 
       <div class="p-3.5 bg-slate-50 rounded-xl border space-y-3">
-        <div class="grid grid-cols-2 gap-2.5">
-          <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Primary Mode</label>
-            <select id="pay-primary" onchange="onPrimaryModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
-              <option value="Cash">💵 Cash</option>
-              <option value="QR">📲 QR (Paytm/PhonePe)</option>
-              <option value="Card Swipe">💳 Card Swipe</option>
-              <option value="Cash + QR">💵 Cash + 📲 QR</option>
-              <option value="Cash + Card">💵 Cash + 💳 Card</option>
-              <option value="QR + Card">📲 QR + 💳 Card</option>
-              <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
-            </select>
+        
+        <!-- FIXED: SEPARATED SALE PAYMENT UI -->
+        <div id="sale-payment-section">
+          <div class="grid grid-cols-2 gap-2.5">
+            <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Primary Mode</label>
+              <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2 border rounded text-xs font-bold outline-none">
+                <option value="Cash">💵 Cash</option>
+                <option value="QR">📲 QR (Paytm/PhonePe)</option>
+                <option value="Card Swipe">💳 Card Swipe</option>
+                <option value="Cash + QR">💵 Cash + 📲 QR</option>
+                <option value="Cash + Card">💵 Cash + 💳 Card</option>
+                <option value="QR + Card">📲 QR + 💳 Card</option>
+                <option value="Cash + QR + Card">💵 Cash + 📲 QR + 💳 Card</option>
+              </select>
+            </div>
+            <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Secondary Mode</label>
+              <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2 border border-rose-200 rounded text-xs font-bold outline-none">
+                <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Udhar</option>
+              </select>
+            </div>
           </div>
-          <div><label class="text-[10px] font-bold text-slate-600 block mb-1">Secondary Mode</label>
-            <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2 border border-rose-200 rounded text-xs font-bold outline-none">
-              <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Udhar</option>
-            </select>
+
+          <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden mt-3">
+            <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
+            <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
+          </div>
+
+          <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden mt-3">
+            <div class="grid grid-cols-3 gap-2 mb-2">
+              <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Company *</label><select id="fin-company" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
+                <option value="">-- Fin. Company --</option>
+                <option value="Kisto Pe">Kisto Pe</option>
+                <option value="Bajaj Finserv">Bajaj Finserv</option>
+                <option value="HDB Finance">HDB Finance</option>
+                <option value="TVS Credit">TVS Credit</option>
+                <option value="IDFC First Bank">IDFC First Bank</option>
+              </select></div>
+              <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
+              <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
+                <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
+                <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
+                <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
+              </select></div>
+            </div>
+            <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden">
+              <div id="wrap-fin-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
+              <div id="wrap-fin-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
+              <div id="wrap-fin-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
+            </div>
+          </div>
+
+          <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden mt-3">
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
+                <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
+                <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
+                <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
+              </select></div>
+              <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
+            </div>
+            <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
+              <div id="wrap-dues-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+              <div id="wrap-dues-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+              <div id="wrap-dues-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+            </div>
           </div>
         </div>
 
-        <div id="split-box" class="pt-2 border-t grid grid-cols-3 gap-2 hidden">
-          <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
-          <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
-          <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none" /></div>
-        </div>
-
-        <div id="fin-box" class="pt-2 border-t bg-blue-50 p-2.5 rounded hidden">
-          <div class="grid grid-cols-3 gap-2 mb-2">
-            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Company *</label><select id="fin-company" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
-              <option value="">-- Fin. Company --</option>
-              <option value="Kisto Pe">Kisto Pe</option>
-              <option value="Bajaj Finserv">Bajaj Finserv</option>
-              <option value="HDB Finance">HDB Finance</option>
-              <option value="TVS Credit">TVS Credit</option>
-              <option value="IDFC First Bank">IDFC First Bank</option>
-            </select></div>
-            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
-            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-blue-200 rounded text-xs font-bold outline-none">
-              <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option>
-              <option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
-            </select></div>
+        <!-- FIXED: NEW PURCHASE PAYMENT UI (RADIO BUTTONS) -->
+        <div id="purchase-payment-section" class="hidden">
+          <label class="text-[10px] font-bold text-slate-600 block mb-1">Payment Mode *</label>
+          <div class="flex flex-wrap gap-3 text-xs font-bold text-slate-700 bg-white p-2.5 border border-slate-300 rounded-lg">
+            <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="pur_pay_mode" value="Cash" onchange="onPurPaymentModeChange()" checked> <span>Cash</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="pur_pay_mode" value="QR" onchange="onPurPaymentModeChange()"> <span>QR</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer"><input type="radio" name="pur_pay_mode" value="Cash + QR" onchange="onPurPaymentModeChange()"> <span>Cash + QR</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer text-rose-600"><input type="radio" name="pur_pay_mode" value="Credit" onchange="onPurPaymentModeChange()"> <span>Credit (Udhar)</span></label>
           </div>
-          <div id="fin-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <div id="wrap-fin-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
-            <div id="wrap-fin-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
-            <div id="wrap-fin-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-blue-300 rounded text-xs font-bold outline-none" /></div>
-          </div>
-        </div>
-
-        <div id="dues-box" class="pt-2 border-t bg-rose-50 p-2.5 rounded hidden">
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none">
-              <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
-              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
-              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-            </select></div>
-            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" oninput="recalcTotals()" /></div>
-          </div>
-          <div id="dues-split-container" class="grid grid-cols-3 gap-2 hidden">
-            <div id="wrap-dues-split-cash" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Cash Amt</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
-            <div id="wrap-dues-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP QR Amt</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
-            <div id="wrap-dues-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-1">DP Card Amt</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-rose-300 rounded text-xs font-bold outline-none" /></div>
+          
+          <div id="pur-split-box" class="pt-3 grid grid-cols-2 gap-2 hidden">
+            <div id="wrap-pur-cash"><label class="text-[10px] font-bold text-slate-600 block mb-1">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none focus:border-[#004aad]" /></div>
+            <div id="wrap-pur-qr"><label class="text-[10px] font-bold text-slate-600 block mb-1">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold outline-none focus:border-[#004aad]" /></div>
           </div>
         </div>
 
@@ -383,14 +403,13 @@
       </div>
     </div>
 
-    <!-- VIEW 4: LEDGER WITH PROPER DEBIT/CREDIT ACCOUNTING LOGIC -->
+    <!-- VIEW 4: LEDGER -->
     <div id="view-ledger" class="bg-white rounded-2xl shadow p-4 space-y-4 border hidden">
       <div class="flex justify-between items-center border-b pb-2.5">
         <h2 class="text-xl font-black text-slate-900 tracking-wider">LEDGER (खाता)</h2>
         <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition">← Back to Dash</button>
       </div>
       
-      <!-- Ledger Tabs -->
       <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
         <button type="button" onclick="switchLedgerTab('CUSTOMER')" id="tab-CUSTOMER" class="flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-wider">CUSTOMER</button>
         <button type="button" onclick="switchLedgerTab('SUPPLIER')" id="tab-SUPPLIER" class="flex-1 py-3 rounded-lg text-xs font-black text-slate-500 tracking-wider">SUPPLIER</button>
@@ -438,7 +457,6 @@
           </tbody>
         </table>
       </div>
-
     </div>
 
     <!-- VIEW 5: PAYMENT OUT / RECEIPT IN MODULE -->
@@ -512,7 +530,6 @@
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
 
-    // LOCAL STORAGE FOR PARTIES (AUTO-COMPLETE)
     let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || [];
 
     function refreshPartyList() {
@@ -520,7 +537,6 @@
         if(dl) dl.innerHTML = partiesCache.map(p => `<option value="${p.name}"></option>`).join("");
     }
     
-    // Call on load
     refreshPartyList();
 
     function openPartyModal(type) {
@@ -548,7 +564,6 @@
             return showPopup("Validation Error", "Please enter valid Party Name and 10-digit Mobile Number!", true);
         }
         
-        // Save to cache
         if (!partiesCache.find(p => p.name === name)) {
             partiesCache.push({name: name, phone: phone, type: type});
             localStorage.setItem("sre_parties", JSON.stringify(partiesCache));
@@ -575,7 +590,6 @@
         }
     });
 
-    // PAYMENT OUT / RECEIPT IN MODULE LOGIC
     function startPayment(type) {
         currentPaymentType = type;
         const title = type === 'OUT' ? 'PAYMENT OUT (To Supplier)' : 'RECEIPT IN (From Customer)';
@@ -682,7 +696,6 @@
             totalBilled += billed;
             totalPaid += paid;
             
-            // PERFECT ACCOUNTING RUNNING BALANCE FIX
             runBal += (billed - paid); 
 
             let drStr = "-";
@@ -879,7 +892,16 @@
       const isPurchase = (entryType === "PURCHASE");
       const isRepairSale = (type === "REPAIRING" && !isPurchase); 
 
+      // FIXED: HIDE MOBILE, ADDRESS, GSTIN FOR PURCHASE ALWAYS
+      document.getElementById("box-cust-phone").classList.toggle("hidden", isPurchase);
+      document.getElementById("box-cust-address").classList.toggle("hidden", isPurchase);
+      document.getElementById("box-cust-gstin").classList.toggle("hidden", isPurchase);
+
       document.getElementById("global-tax-discount-box").classList.toggle("hidden", isPurchase);
+      
+      // FIXED: HIDE SECONDARY MODE (Old Payment Section) FOR PURCHASE ALWAYS
+      document.getElementById("sale-payment-section").classList.toggle("hidden", isPurchase);
+      document.getElementById("purchase-payment-section").classList.toggle("hidden", !isPurchase);
 
       document.getElementById("cust-box").classList.toggle("hidden", isRepairSale);
       document.getElementById("items-box").classList.toggle("hidden", isRepairSale);
@@ -894,6 +916,9 @@
         btnParty.setAttribute("onclick", "openPartyModal('SUPPLIER')");
         btnParty.innerHTML = "➕ NEW (Alt+C)";
         btnParty.className = "bg-indigo-100 text-indigo-800 border border-indigo-200 px-1.5 py-0.5 rounded text-[8px] font-black shadow-sm hover:bg-indigo-200 transition";
+        
+        document.querySelector('input[name="pur_pay_mode"][value="Cash"]').checked = true;
+        onPurPaymentModeChange();
       } else {
         lblName.innerText = "Customer Name *";
         btnParty.setAttribute("onclick", "openPartyModal('CUSTOMER')");
@@ -917,7 +942,7 @@
       document.getElementById("cust-address").value = "";
       document.getElementById("cust-gstin").value = "";
 
-      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount", "rep-phone", "rep-device", "rep-issue"].forEach(id => {
+      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount", "rep-phone", "rep-device", "rep-issue", "pur-split-cash", "pur-split-qr"].forEach(id => {
           const el = document.getElementById(id);
           if(el) el.value = "";
       });
@@ -928,7 +953,7 @@
       if(document.getElementById("fin-rate")) document.getElementById("fin-rate").readOnly = false;
       if(document.getElementById("dues-rate")) document.getElementById("dues-rate").readOnly = false;
 
-      onPaymentModeChange();
+      if(!isPurchase) onPaymentModeChange();
 
       if(!isRepairSale) addNewItemRow(true);
       
@@ -1086,33 +1111,70 @@
       recalcTotals();
     }
 
+    // FIXED: RADIO BUTTON CHANGE LOGIC FOR PURCHASE
+    function onPurPaymentModeChange() {
+        const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+        const isSplit = mode === "Cash + QR";
+        const isCredit = mode === "Credit";
+
+        document.getElementById("pur-split-box").classList.toggle("hidden", !isSplit);
+        
+        const payPaidInput = document.getElementById("pay-paid");
+        if (isSplit || isCredit) {
+            payPaidInput.readOnly = true;
+            payPaidInput.classList.add("bg-slate-200", "cursor-not-allowed", "text-slate-500");
+            payPaidInput.classList.remove("bg-white", "text-emerald-700");
+            payPaidInput.placeholder = isCredit ? "Credit (Rs. 0 Paid)" : "Auto Calculated...";
+            if (isCredit) payPaidInput.value = "";
+        } else {
+            payPaidInput.readOnly = false;
+            payPaidInput.classList.remove("bg-slate-200", "cursor-not-allowed", "text-slate-500");
+            payPaidInput.classList.add("bg-white", "text-emerald-700");
+            payPaidInput.placeholder = "Enter Amount...";
+        }
+        recalcTotals();
+    }
+
     function recalcTotals() {
       let rawPaid = 0;
-      const s = document.getElementById("pay-secondary").value;
-      const p = document.getElementById("pay-primary").value;
-      let activeMode = p;
-      if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
-      if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
-
-      const isSplit = activeMode.includes("+");
-
-      if (isSplit) {
-        if (s === "Finance") {
-          if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("fin-split-cash").value) || 0;
-          if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("fin-split-qr").value) || 0;
-          if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("fin-split-card").value) || 0;
-        } else if (s === "Dues") {
-          if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("dues-split-cash").value) || 0;
-          if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("dues-split-qr").value) || 0;
-          if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("dues-split-card").value) || 0;
-        } else {
-          if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("split-cash").value) || 0;
-          if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("split-qr").value) || 0;
-          if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("split-card").value) || 0;
-        }
-        document.getElementById("pay-paid").value = rawPaid || "";
+      
+      if (currentEntryType === "PURCHASE") {
+          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+          if (mode === "Cash + QR") {
+              rawPaid = (Number(document.getElementById("pur-split-cash").value) || 0) + (Number(document.getElementById("pur-split-qr").value) || 0);
+              document.getElementById("pay-paid").value = rawPaid || "";
+          } else if (mode === "Credit") {
+              rawPaid = 0;
+          } else {
+              rawPaid = Number(document.getElementById("pay-paid").value) || 0;
+          }
       } else {
-        rawPaid = Number(document.getElementById("pay-paid").value) || 0;
+          const s = document.getElementById("pay-secondary").value;
+          const p = document.getElementById("pay-primary").value;
+          let activeMode = p;
+          if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
+          if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
+
+          const isSplit = activeMode.includes("+");
+
+          if (isSplit) {
+            if (s === "Finance") {
+              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("fin-split-cash").value) || 0;
+              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("fin-split-qr").value) || 0;
+              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("fin-split-card").value) || 0;
+            } else if (s === "Dues") {
+              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("dues-split-cash").value) || 0;
+              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("dues-split-qr").value) || 0;
+              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("dues-split-card").value) || 0;
+            } else {
+              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("split-cash").value) || 0;
+              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("split-qr").value) || 0;
+              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("split-card").value) || 0;
+            }
+            document.getElementById("pay-paid").value = rawPaid || "";
+          } else {
+            rawPaid = Number(document.getElementById("pay-paid").value) || 0;
+          }
       }
 
       let grand = 0;
@@ -1141,23 +1203,12 @@
         });
         
         grand = Math.round(grand);
-        
-        const firstGst = document.querySelector(".item-gst");
-        if(firstGst) globalGstRate = Number(firstGst.value) || 0;
-
-        if(document.getElementById("fin-rate")) {
-           document.getElementById("fin-rate").value = grand;
-           document.getElementById("fin-rate").readOnly = true;
-        }
-        if(document.getElementById("dues-rate")) {
-           document.getElementById("dues-rate").value = grand;
-           document.getElementById("dues-rate").readOnly = true;
-        }
 
       } else {
         if (isRepairSale) {
           grand = Number(document.getElementById("rep-charge").value) || 0;
         } else {
+          const s = document.getElementById("pay-secondary").value;
           if (s === "Finance") {
               grand = Number(document.getElementById("fin-rate").value) || 0;
           } else if (s === "Dues") {
@@ -1202,43 +1253,59 @@
         if(currentEntryType === "PURCHASE" && !name) return showPopup("Validation Error", "Supplier / Party Name डालना अनिवार्य है!", true);
         if(!name) name = "Customer"; 
 
-        if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
+        if(currentEntryType === "SALE" && currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "10 अंकों का मोबाइल नंबर डालें!", true);
       }
 
-      const s_val = document.getElementById("pay-secondary").value;
-      const p_val = document.getElementById("pay-primary").value;
-      let aMode = p_val;
-      if (s_val === "Finance") aMode = document.getElementById("fin-dp-mode").value;
-      if (s_val === "Dues") aMode = document.getElementById("dues-mode").value;
-      const checkSplit = aMode.includes("+");
+      // FIXED: COMPLETELY SEPARATED VALIDATION LOGIC FOR SALE AND PURCHASE
+      let s_val = "", p_val = "", aMode = "";
+      let checkSplit = false;
 
-      if (s_val === "Finance") {
-          if (!document.getElementById("fin-company").value) return showPopup("Validation Error", "Finance Company चुनना अनिवार्य है!", true);
-          if (currentEntryType === "SALE" && (!document.getElementById("fin-rate").value || Number(document.getElementById("fin-rate").value) <= 0)) return showPopup("Validation Error", "Finance में Rate डालना अनिवार्य है!", true);
-      } else if (s_val === "Dues") {
-          if (currentEntryType === "SALE" && (!document.getElementById("dues-rate").value || Number(document.getElementById("dues-rate").value) <= 0)) return showPopup("Validation Error", "Dues (उधार) में Rate डालना अनिवार्य है!", true);
-      } else {
-          if (!checkSplit && document.getElementById("pay-paid").value === "") {
-              return showPopup("Validation Error", "Total Amount Paid डालना अनिवार्य है!", true);
-          }
-      }
+      if (currentEntryType === "SALE") {
+          s_val = document.getElementById("pay-secondary").value;
+          p_val = document.getElementById("pay-primary").value;
+          aMode = p_val;
+          if (s_val === "Finance") aMode = document.getElementById("fin-dp-mode").value;
+          if (s_val === "Dues") aMode = document.getElementById("dues-mode").value;
+          checkSplit = aMode.includes("+");
 
-      if (checkSplit) {
-          let splitErr = false;
           if (s_val === "Finance") {
-              if(aMode.includes("Cash") && !document.getElementById("fin-split-cash").value) splitErr = true;
-              if(aMode.includes("QR") && !document.getElementById("fin-split-qr").value) splitErr = true;
-              if(aMode.includes("Card") && !document.getElementById("fin-split-card").value) splitErr = true;
+              if (!document.getElementById("fin-company").value) return showPopup("Validation Error", "Finance Company चुनना अनिवार्य है!", true);
+              if (!document.getElementById("fin-rate").value || Number(document.getElementById("fin-rate").value) <= 0) return showPopup("Validation Error", "Finance में Rate डालना अनिवार्य है!", true);
           } else if (s_val === "Dues") {
-              if(aMode.includes("Cash") && !document.getElementById("dues-split-cash").value) splitErr = true;
-              if(aMode.includes("QR") && !document.getElementById("dues-split-qr").value) splitErr = true;
-              if(aMode.includes("Card") && !document.getElementById("dues-split-card").value) splitErr = true;
+              if (!document.getElementById("dues-rate").value || Number(document.getElementById("dues-rate").value) <= 0) return showPopup("Validation Error", "Dues (उधार) में Rate डालना अनिवार्य है!", true);
           } else {
-              if(aMode.includes("Cash") && !document.getElementById("split-cash").value) splitErr = true;
-              if(aMode.includes("QR") && !document.getElementById("split-qr").value) splitErr = true;
-              if(aMode.includes("Card") && !document.getElementById("split-card").value) splitErr = true;
+              if (!checkSplit && document.getElementById("pay-paid").value === "") {
+                  return showPopup("Validation Error", "Total Amount Paid डालना अनिवार्य है!", true);
+              }
           }
-          if (splitErr) return showPopup("Validation Error", "Split Payment के सभी चुने गए बॉक्स में अमाउंट भरना अनिवार्य है!", true);
+
+          if (checkSplit) {
+              let splitErr = false;
+              if (s_val === "Finance") {
+                  if(aMode.includes("Cash") && !document.getElementById("fin-split-cash").value) splitErr = true;
+                  if(aMode.includes("QR") && !document.getElementById("fin-split-qr").value) splitErr = true;
+                  if(aMode.includes("Card") && !document.getElementById("fin-split-card").value) splitErr = true;
+              } else if (s_val === "Dues") {
+                  if(aMode.includes("Cash") && !document.getElementById("dues-split-cash").value) splitErr = true;
+                  if(aMode.includes("QR") && !document.getElementById("dues-split-qr").value) splitErr = true;
+                  if(aMode.includes("Card") && !document.getElementById("dues-split-card").value) splitErr = true;
+              } else {
+                  if(aMode.includes("Cash") && !document.getElementById("split-cash").value) splitErr = true;
+                  if(aMode.includes("QR") && !document.getElementById("split-qr").value) splitErr = true;
+                  if(aMode.includes("Card") && !document.getElementById("split-card").value) splitErr = true;
+              }
+              if (splitErr) return showPopup("Validation Error", "Split Payment के सभी चुने गए बॉक्स में अमाउंट भरना अनिवार्य है!", true);
+          }
+      } else {
+          // PURCHASE VALIDATION
+          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+          if (mode === "Cash + QR") {
+              const c = document.getElementById("pur-split-cash").value;
+              const q = document.getElementById("pur-split-qr").value;
+              if (c === "" || q === "") return showPopup("Validation Error", "Cash and QR amount must be filled for split payment!", true);
+          } else if (mode !== "Credit") {
+              if (document.getElementById("pay-paid").value === "") return showPopup("Validation Error", "Total Amount Paid डालना अनिवार्य है!", true);
+          }
       }
 
       const totals = recalcTotals();
@@ -1313,24 +1380,38 @@
 
       let cashAmt = 0, qrAmt = 0, cardAmt = 0;
 
-      if (!checkSplit) {
-        if (aMode.includes("Cash")) cashAmt = totals.paid;
-        if (aMode.includes("QR")) qrAmt = totals.paid;
-        if (aMode.includes("Card")) cardAmt = totals.paid;
+      // FIXED: PROPER PAYMENT BREAKDOWN EXTRACTION
+      if (currentEntryType === "SALE") {
+          if (!checkSplit) {
+            if (aMode.includes("Cash")) cashAmt = totals.paid;
+            if (aMode.includes("QR")) qrAmt = totals.paid;
+            if (aMode.includes("Card")) cardAmt = totals.paid;
+          } else {
+            if (s_val === "Finance") {
+              if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || 0;
+              if(aMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || 0;
+              if(aMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || 0;
+            } else if (s_val === "Dues") {
+              if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || 0;
+              if(aMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || 0;
+              if(aMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || 0;
+            } else {
+              if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("split-cash").value) || 0;
+              if(aMode.includes("QR")) qrAmt = Number(document.getElementById("split-qr").value) || 0;
+              if(aMode.includes("Card")) cardAmt = Number(document.getElementById("split-card").value) || 0;
+            }
+          }
       } else {
-        if (s_val === "Finance") {
-          if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("fin-split-cash").value) || 0;
-          if(aMode.includes("QR")) qrAmt = Number(document.getElementById("fin-split-qr").value) || 0;
-          if(aMode.includes("Card")) cardAmt = Number(document.getElementById("fin-split-card").value) || 0;
-        } else if (s_val === "Dues") {
-          if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("dues-split-cash").value) || 0;
-          if(aMode.includes("QR")) qrAmt = Number(document.getElementById("dues-split-qr").value) || 0;
-          if(aMode.includes("Card")) cardAmt = Number(document.getElementById("dues-split-card").value) || 0;
-        } else {
-          if(aMode.includes("Cash")) cashAmt = Number(document.getElementById("split-cash").value) || 0;
-          if(aMode.includes("QR")) qrAmt = Number(document.getElementById("split-qr").value) || 0;
-          if(aMode.includes("Card")) cardAmt = Number(document.getElementById("split-card").value) || 0;
-        }
+          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+          p_val = mode;
+          if (mode === "Cash") cashAmt = totals.paid;
+          else if (mode === "QR") qrAmt = totals.paid;
+          else if (mode === "Cash + QR") {
+              cashAmt = Number(document.getElementById("pur-split-cash").value) || 0;
+              qrAmt = Number(document.getElementById("pur-split-qr").value) || 0;
+          } else if (mode === "Credit") {
+              s_val = "Dues"; // Forces ledger to register it as outstanding
+          }
       }
 
       const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
@@ -1390,7 +1471,6 @@
       const isPur = bill.billType && bill.billType.includes("PURCHASE");
       document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
       
-      // FIXED: PDF LABELS FOR PURCHASE
       document.getElementById("inv-name-label").innerText = isPur || bill.billType.includes("PAYMENT") ? "Supplier" : "Name";
 
       const tbody = document.getElementById("inv-items-body");
@@ -1398,7 +1478,6 @@
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
-          // FIXED: PRINT GST AND DISCOUNT ON PURCHASE INVOICES
           let dispName = it.name;
           if (isPur && (it.disc > 0 || it.gst > 0)) {
               dispName += ` <span class="text-[9px] text-[#004aad] block mt-0.5">[G:${it.gst}% D:Rs.${it.disc}]</span>`;
@@ -1437,7 +1516,6 @@
       }
       bd.innerHTML = bdHtml;
       
-      // Print Amount properly for Payment Receipts too
       const showGrand = (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT")) ? bill.paid : grand;
       document.getElementById("inv-grand-total").innerText = "Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
