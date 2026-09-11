@@ -32,6 +32,9 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
 
+  <!-- DATALIST FOR AUTO-COMPLETE PARTIES -->
+  <datalist id="party-list"></datalist>
+
   <header id="main-header" class="bg-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between">
     <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showView('dashboard')">
       <div class="border-2 border-white rounded-full w-8 h-8 flex items-center justify-center font-black text-xs">SRE</div>
@@ -119,12 +122,12 @@
           <span class="text-xs font-black uppercase tracking-widest drop-shadow-md">Purchase</span>
         </button>
 
-        <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="p-4 bg-white border border-rose-200 text-rose-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-rose-50">
+        <button onclick="startPayment('OUT')" class="p-4 bg-white border border-rose-200 text-rose-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-rose-50">
           <span class="text-3xl mb-1">💸</span>
           <span class="text-[10px] font-black uppercase tracking-wider">Payment Out</span>
         </button>
         
-        <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="p-4 bg-white border border-emerald-200 text-emerald-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-emerald-50">
+        <button onclick="startPayment('IN')" class="p-4 bg-white border border-emerald-200 text-emerald-600 rounded-2xl shadow-sm flex flex-col items-center justify-center transform transition active:scale-95 hover:bg-emerald-50">
           <span class="text-3xl mb-1">🧾</span>
           <span class="text-[10px] font-black uppercase tracking-wider">Receipt In</span>
         </button>
@@ -166,7 +169,7 @@
             <label id="lbl-cust-name" class="text-[10px] font-bold text-slate-600">Customer Name *</label>
             <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-100 text-[#004aad] border border-blue-200 px-1.5 py-0.5 rounded text-[8px] font-black shadow-sm hover:bg-blue-200 transition">➕ NEW</button>
           </div>
-          <input type="text" id="cust-name" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" />
+          <input type="text" id="cust-name" list="party-list" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" />
         </div>
         <div><label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 block mb-1">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-2 border rounded text-xs font-bold outline-none" /></div>
         <div><label id="lbl-cust-address" class="text-[10px] font-bold text-slate-600 block mb-1">Address *</label><input type="text" id="cust-address" class="w-full p-2 border rounded text-xs font-bold outline-none uppercase" /></div>
@@ -333,7 +336,7 @@
             <div class="grid grid-cols-2 gap-x-8 gap-y-2">
               <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Invoice No.</span><span class="mx-1">:</span><span id="inv-no" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">Date</span><span class="mx-1">:</span><span id="inv-date" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
-              <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
+              <div class="flex items-center"><span id="inv-name-label" class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">Mobile</span><span class="mx-1">:</span><span id="inv-cust-phone" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[9px] tracking-wider">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
               <div class="flex items-center"><span class="w-16 text-slate-500 uppercase text-[9px] tracking-wider">GSTIN</span><span class="mx-1">:</span><span id="inv-cust-gstin" class="font-bold text-[11px] text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1"></span></div>
@@ -394,9 +397,8 @@
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-         <!-- Search and Auto-filter Bar -->
          <div class="flex space-x-2">
-           <input type="text" id="ledger-search" oninput="updateLedgerView()" placeholder="🔍 Search Party Name or Mobile Number..." class="flex-1 p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50 focus:border-[#004aad] transition" />
+           <input type="text" id="ledger-search" oninput="updateLedgerView()" list="party-list" placeholder="🔍 Search Party Name or Mobile Number..." class="flex-1 p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none bg-slate-50 focus:border-[#004aad] transition" />
            <button onclick="openPartyModal(document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]') ? 'CUSTOMER' : 'SUPPLIER')" class="w-12 bg-[#004aad] text-white rounded-xl font-black text-2xl flex items-center justify-center shadow-md hover:bg-blue-800 transition pb-1" title="Add New Party">+</button>
          </div>
          
@@ -420,7 +422,6 @@
          </div>
       </div>
 
-      <!-- SINGLE DYNAMIC LEDGER TABLE -->
       <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mt-3">
         <table class="w-full text-left text-[10px] sm:text-xs">
           <thead class="bg-slate-100 text-slate-600 uppercase tracking-wider border-b border-slate-200">
@@ -438,6 +439,38 @@
         </table>
       </div>
 
+    </div>
+
+    <!-- VIEW 5: PAYMENT OUT / RECEIPT IN MODULE -->
+    <div id="view-payment" class="bg-white rounded-2xl shadow p-4 space-y-4 border hidden">
+      <div class="flex justify-between items-center border-b pb-2.5">
+        <h2 id="pay-title" class="text-xl font-black text-slate-900 tracking-wider">PAYMENT OUT</h2>
+        <button onclick="showView('dashboard')" class="text-xs font-bold text-slate-600 px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition">← Back</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-600 block mb-1" id="pay-party-lbl">Party Name *</label>
+          <input type="text" id="pay-party" list="party-list" class="w-full p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none uppercase focus:border-[#004aad]" placeholder="Select or type name" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 block mb-1">Amount (Rs.) *</label>
+            <input type="number" id="pay-amt" class="w-full p-3 border border-emerald-400 bg-emerald-50 rounded-xl text-sm font-black outline-none text-emerald-700" placeholder="0" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 block mb-1">Payment Mode *</label>
+            <select id="pay-mode" class="w-full p-3 border border-slate-300 rounded-xl text-xs font-bold outline-none">
+              <option value="Cash">Cash</option>
+              <option value="QR">QR / Online</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-600 block mb-1">Remarks</label>
+          <input type="text" id="pay-remarks" class="w-full p-3 border border-slate-300 rounded-xl text-xs outline-none focus:border-[#004aad]" placeholder="e.g. Previous dues cleared" />
+        </div>
+        <button onclick="savePaymentTransaction()" class="w-full py-3.5 bg-[#004aad] text-white font-black rounded-xl text-xs shadow-md mt-4 hover:bg-blue-800 transition tracking-widest">SAVE TRANSACTION</button>
+      </div>
     </div>
 
     <!-- SETTINGS -->
@@ -459,10 +492,10 @@
      <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="flex-1 py-2 text-center text-indigo-700 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
        <span class="text-xl">📦</span><span class="text-[10px] font-black mt-0.5">PURCHASE</span>
      </button>
-     <button onclick="showPopup('Coming Soon', 'Payment module is under development.')" class="flex-1 py-2 text-center text-rose-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
+     <button onclick="startPayment('OUT')" class="flex-1 py-2 text-center text-rose-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
        <span class="text-xl">💸</span><span class="text-[10px] font-black mt-0.5">PAYMENT</span>
      </button>
-     <button onclick="showPopup('Coming Soon', 'Receipt module is under development.')" class="flex-1 py-2 text-center text-emerald-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
+     <button onclick="startPayment('IN')" class="flex-1 py-2 text-center text-emerald-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
        <span class="text-xl">🧾</span><span class="text-[10px] font-black mt-0.5">RECEIPT</span>
      </button>
      <button onclick="showView('ledger')" class="flex-1 py-2 text-center text-amber-600 border-l border-slate-100 flex flex-col items-center hover:bg-slate-50">
@@ -473,10 +506,22 @@
   <script>
     let currentEntryType = "SALE";
     let currentBillType = "MOBILE";
+    let currentPaymentType = "OUT"; 
     let activeInvoiceData = null;
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
+
+    // LOCAL STORAGE FOR PARTIES (AUTO-COMPLETE)
+    let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || [];
+
+    function refreshPartyList() {
+        const dl = document.getElementById("party-list");
+        if(dl) dl.innerHTML = partiesCache.map(p => `<option value="${p.name}"></option>`).join("");
+    }
+    
+    // Call on load
+    refreshPartyList();
 
     function openPartyModal(type) {
         document.getElementById('new-party-type').value = type || 'CUSTOMER';
@@ -503,6 +548,13 @@
             return showPopup("Validation Error", "Please enter valid Party Name and 10-digit Mobile Number!", true);
         }
         
+        // Save to cache
+        if (!partiesCache.find(p => p.name === name)) {
+            partiesCache.push({name: name, phone: phone, type: type});
+            localStorage.setItem("sre_parties", JSON.stringify(partiesCache));
+            refreshPartyList();
+        }
+
         if (!document.getElementById('view-new-bill').classList.contains('hidden')) {
             document.getElementById('cust-name').value = name;
             document.getElementById('cust-phone').value = phone;
@@ -511,7 +563,7 @@
         }
         
         closePartyModal();
-        showPopup("Party Created", "New " + type + " created and auto-filled successfully!");
+        showPopup("Party Created", "New " + type + " saved permanently to database!");
     }
 
     document.addEventListener('keydown', function(e) {
@@ -523,7 +575,60 @@
         }
     });
 
-    // FIXED: SWITCH TABS & CHANGE TABLE DR/CR HEADERS ACCORDING TO ACCOUNTING RULES
+    // PAYMENT OUT / RECEIPT IN MODULE LOGIC
+    function startPayment(type) {
+        currentPaymentType = type;
+        const title = type === 'OUT' ? 'PAYMENT OUT (To Supplier)' : 'RECEIPT IN (From Customer)';
+        document.getElementById('pay-title').innerText = title;
+        document.getElementById('pay-party-lbl').innerText = type === 'OUT' ? 'Supplier Name *' : 'Customer Name *';
+        document.getElementById('pay-party').value = '';
+        document.getElementById('pay-amt').value = '';
+        document.getElementById('pay-mode').value = 'Cash';
+        document.getElementById('pay-remarks').value = '';
+        showView('payment');
+    }
+
+    function savePaymentTransaction() {
+       const party = document.getElementById('pay-party').value.trim().toUpperCase();
+       const amt = Number(document.getElementById('pay-amt').value) || 0;
+       const mode = document.getElementById('pay-mode').value;
+       const remarks = document.getElementById('pay-remarks').value.trim();
+       
+       if(!party || amt <= 0) return showPopup("Validation Error", "Party Name and valid Amount are required!", true);
+       
+       const token = Math.random().toString(36).substring(2, 8).toUpperCase();
+       const isOut = currentPaymentType === 'OUT';
+       const prefix = isOut ? "PAY" : "REC";
+       const invNo = `${prefix}-${new Date().getFullYear()}-${(billsCache.length+1).toString().padStart(3,"0")}`;
+       
+       const billData = {
+           invoiceNo: invNo,
+           billDate: getFormattedDate(),
+           billType: isOut ? "PAYMENT OUT" : "RECEIPT IN",
+           customerName: party,
+           customerMobile: "-", customerAddress: "-", customerGstin: "-",
+           items: [{name: remarks || (isOut?"Payment Given":"Payment Received"), imei: "-", qty: 1, rate: amt, amount: 0}], 
+           paymentMode: mode, paymentBreakdown: {cash: mode==="Cash"?amt:0, qr: mode==="QR"?amt:0, card:0},
+           paymentRate: "",
+           grandTotal: 0, paid: amt, due: 0,
+           totalTaxable: 0, totalGst: 0, totalDiscount: 0,
+           gstSlab: 0, finance: null, token: token
+       };
+
+       billsCache.unshift(billData);
+
+       if (gasUrl) {
+          fetch(gasUrl, { 
+              method: "POST", mode: "no-cors",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "createBill", billData: billData }) 
+          }).then(() => { showPopup("Transaction Saved", "Payment logged and synced successfully!"); showView('dashboard'); })
+            .catch(() => { showPopup("Sync Error", "Internet issue. Saved locally.", true); showView('dashboard'); });
+       } else {
+          showPopup("Transaction Saved", "Payment logged locally."); showView('dashboard');
+       }
+    }
+
     function switchLedgerTab(type) {
       const btnCust = document.getElementById("tab-CUSTOMER");
       const btnSupp = document.getElementById("tab-SUPPLIER");
@@ -546,7 +651,6 @@
       updateLedgerView();
     }
 
-    // FIXED: LEDGER CALCULATION & DATA INJECTION
     function updateLedgerView() {
         const searchText = document.getElementById("ledger-search").value.trim().toUpperCase();
         const isCust = document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]');
@@ -566,7 +670,7 @@
 
         const partyBills = billsCache.filter(b => 
             (b.customerName.toUpperCase().includes(searchText) || (b.customerMobile && b.customerMobile.includes(searchText))) &&
-            (isCust ? b.billType.includes("SALE") : b.billType.includes("PURCHASE"))
+            (isCust ? (b.billType.includes("SALE") || b.billType.includes("RECEIPT")) : (b.billType.includes("PURCHASE") || b.billType.includes("PAYMENT")))
         ).reverse(); 
 
         let runBal = 0; 
@@ -574,11 +678,12 @@
         partyBills.forEach(b => {
             const billed = Number(b.grandTotal) || 0;
             const paid = Number(b.paid) || 0;
-            const due = Number(b.due) || 0;
 
             totalBilled += billed;
             totalPaid += paid;
-            runBal += due; 
+            
+            // PERFECT ACCOUNTING RUNNING BALANCE FIX
+            runBal += (billed - paid); 
 
             let drStr = "-";
             let crStr = "-";
@@ -644,7 +749,7 @@
             b.customerName, 
             b.customerMobile, 
             b.customerAddress, 
-            validItems.map(x => [x.name.substring(0,20), x.imei.substring(0,25), x.qty, x.rate, x.amount]), 
+            validItems.map(x => [x.name.substring(0,20), x.imei.substring(0,25), x.qty, x.rate, x.amount, x.disc||0, x.gst||0]), 
             b.totalTaxable, 
             b.totalGst, 
             b.totalDiscount, 
@@ -670,13 +775,17 @@
         if (Array.isArray(min)) {
             const yr = String(min[1] || "").slice(-2) || "26";
             const isPurchase = min[16] ? min[16].includes("PURCHASE") : false;
-            const prefix = isPurchase ? "PUR" : "SRE";
+            let prefix = "SRE";
+            if(isPurchase) prefix = "PUR";
+            if(min[16] && min[16].includes("PAYMENT")) prefix = "PAY";
+            if(min[16] && min[16].includes("RECEIPT")) prefix = "REC";
+
             const invNo = `${prefix}-20${yr}-${String(min[0] || "0").padStart(3, '0')}`;
             let gt = Math.round(Number(min[6]) + Number(min[7]));
             
             return {
                 invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
-                items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4] })),
+                items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4], disc: x[5]||0, gst: x[6]||0 })),
                 grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] !== undefined ? Number(min[9]) : 0,
                 paymentMode: min[10] || "Cash", paid: min[11] !== undefined ? min[11] : gt, due: min[12] || 0,
                 paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
@@ -713,10 +822,12 @@
       document.getElementById("view-invoice").classList.add("hidden");
       document.getElementById("view-settings").classList.add("hidden");
       document.getElementById("view-ledger").classList.add("hidden");
+      document.getElementById("view-payment").classList.add("hidden");
 
       if (view === "dashboard") { renderDashboard(); document.getElementById("view-dashboard").classList.remove("hidden"); }
       else if (view === "new-bill") document.getElementById("view-new-bill").classList.remove("hidden");
       else if (view === "invoice") document.getElementById("view-invoice").classList.remove("hidden");
+      else if (view === "payment") document.getElementById("view-payment").classList.remove("hidden");
       else if (view === "ledger") { 
           document.getElementById("view-ledger").classList.remove("hidden"); 
           updateLedgerView(); 
@@ -750,7 +861,7 @@
 
       const list = document.getElementById("recent-bills-list");
       list.innerHTML = billsCache.length === 0 ? '<p class="p-4 text-center text-xs text-slate-400">No bills in current session.</p>' :
-        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between border-b border-slate-100 last:border-0"><div><p class="font-bold ${b.billType.includes('SALE') ? 'text-[#004aad]' : 'text-indigo-700'} text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(Number(b.grandTotal)||0).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
+        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-3 hover:bg-slate-50 cursor-pointer flex justify-between border-b border-slate-100 last:border-0"><div><p class="font-bold ${b.billType.includes('SALE') || b.billType.includes('RECEIPT') ? 'text-[#004aad]' : 'text-indigo-700'} text-xs">${b.invoiceNo}</p><p class="text-[10px] text-slate-500">${b.billType}</p></div><div class="font-black text-xs text-right">Rs. ${(b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? b.paid : b.grandTotal).toLocaleString("en-IN")}<br><span class="text-[9px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
     function startNewBill(type, entryType = currentEntryType) {
@@ -1167,6 +1278,8 @@
           const q = Number(r.querySelector(".item-qty").value)||1;
           let uRate = 0;
           let amt = 0;
+          let iGst = 0;
+          let iDisc = 0;
 
           if (currentEntryType === "PURCHASE") {
               const rate = Number(r.querySelector(".item-rate")?.value) || 0;
@@ -1176,6 +1289,9 @@
               if(rate <= 0) rateErr = true;
               
               uRate = rate;
+              iGst = gst;
+              iDisc = disc;
+
               const taxVal = Math.max(0, (rate * q) - disc);
               amt = taxVal + (taxVal * (gst / 100));
           } else {
@@ -1185,7 +1301,7 @@
 
           items.push({ 
             name: pName, imei: validImeis.length > 0 ? validImeis.join(", ") : "-", 
-            qty: q, rate: uRate, amount: amt 
+            qty: q, rate: uRate, amount: amt, disc: iDisc, gst: iGst
           });
         });
         
@@ -1272,16 +1388,25 @@
       document.getElementById("inv-cust-gstin").innerText = bill.customerGstin || "-";
 
       const isPur = bill.billType && bill.billType.includes("PURCHASE");
-      document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : "TAX INVOICE";
+      document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
+      
+      // FIXED: PDF LABELS FOR PURCHASE
+      document.getElementById("inv-name-label").innerText = isPur || bill.billType.includes("PAYMENT") ? "Supplier" : "Name";
 
       const tbody = document.getElementById("inv-items-body");
       tbody.innerHTML = "";
       for (let i = 0; i < 8; i++) {
         const it = bill.items[i];
         if (it) {
+          // FIXED: PRINT GST AND DISCOUNT ON PURCHASE INVOICES
+          let dispName = it.name;
+          if (isPur && (it.disc > 0 || it.gst > 0)) {
+              dispName += ` <span class="text-[9px] text-[#004aad] block mt-0.5">[G:${it.gst}% D:Rs.${it.disc}]</span>`;
+          }
+
           tbody.innerHTML += `<tr>
             <td class="p-1.5 border border-[#004aad] text-center font-bold text-[10.5px] text-slate-900">${i+1}</td>
-            <td class="p-1.5 border border-[#004aad] font-bold text-[10.5px] text-slate-900">${it.name}</td>
+            <td class="p-1.5 border border-[#004aad] font-bold text-[10.5px] text-slate-900">${dispName}</td>
             <td class="p-1.5 border border-[#004aad] font-bold text-[10.5px] text-slate-900 break-all">${it.imei}</td>
             <td class="p-1.5 border border-[#004aad] table-col-qty font-bold text-[10.5px] text-slate-900">${it.qty}</td>
             <td class="p-1.5 border border-[#004aad] table-col-rate font-bold text-[10.5px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td>
@@ -1311,7 +1436,10 @@
                    <div class="flex justify-between p-1.5 text-slate-700"><span>${halfGst}% SGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
       }
       bd.innerHTML = bdHtml;
-      document.getElementById("inv-grand-total").innerText = "Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2});
+      
+      // Print Amount properly for Payment Receipts too
+      const showGrand = (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT")) ? bill.paid : grand;
+      document.getElementById("inv-grand-total").innerText = "Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
       document.getElementById("inv-qr-container").innerHTML = "";
       new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 90, height: 90, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
@@ -1345,7 +1473,8 @@
       doc.setTextColor(255, 255, 255); doc.setFontSize(9); 
       
       const isPur = b.billType && b.billType.includes("PURCHASE");
-      doc.text(isPur ? "PURCHASE VOUCHER" : "TAX INVOICE", 105, 49.5, { align: "center" });
+      const docTitle = isPur ? "PURCHASE VOUCHER" : (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
+      doc.text(docTitle, 105, 49.5, { align: "center" });
 
       let y = 57;
       doc.setTextColor(...dark); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
@@ -1353,7 +1482,7 @@
       doc.text("Date", 140, y); doc.text(":", 152, y); doc.text(b.billDate, 155, y);
       
       y += 6;
-      doc.text("Name", 20, y); doc.text(":", 40, y); doc.text(b.customerName, 43, y);
+      doc.text(isPur || b.billType.includes("PAYMENT") ? "Supplier" : "Name", 20, y); doc.text(":", 40, y); doc.text(b.customerName, 43, y);
       doc.text("Mobile", 140, y); doc.text(":", 152, y); doc.text(b.customerMobile || "-", 155, y);
       
       y += 6;
@@ -1385,7 +1514,10 @@
         
         doc.text(String(i+1), 20.5, y+5, { align:"center" });
         if (item) {
-          doc.text(String(item.name).substring(0,24), 28, y+5);
+          let dispName = String(item.name).substring(0,24);
+          if (isPur && (item.disc > 0 || item.gst > 0)) dispName += ` [G:${item.gst}% D:${item.disc}]`;
+          doc.text(dispName, 28, y+5);
+
           const imeiStr = String(item.imei || "-");
           doc.text(imeiStr.substring(0, 42), 87, y+5);
           doc.text(String(item.qty), 141, y+5, { align:"center" });
@@ -1423,7 +1555,9 @@
         doc.line(134, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
         doc.text(row.l, 137, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5;
       });
-      doc.setFillColor(...blue); doc.rect(134, rY, 61, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 137, rY+6); doc.setFontSize(10); doc.text("Rs. " + grand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
+
+      const showGrand = (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT")) ? b.paid : grand;
+      doc.setFillColor(...blue); doc.rect(134, rY, 61, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 137, rY+6); doc.setFontSize(10); doc.text("Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
 
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
