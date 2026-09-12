@@ -34,6 +34,7 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #004aad; }
 
+    /* Premium Input Autofill Fix */
     input:-webkit-autofill {
         -webkit-box-shadow: 0 0 0 30px white inset !important;
         -webkit-text-fill-color: #004aad !important;
@@ -170,43 +171,49 @@
     <!-- VIEW 2: NEW BILL FORM (PREMIUM & WIDE) -->
     <div id="view-new-bill" class="bg-white rounded-2xl shadow-xl p-4 sm:p-6 space-y-4 border border-slate-100 hidden">
       
-      <!-- PREMIUM PURCHASE HEADER -->
-      <div id="pur-header-title" class="hidden w-full text-center py-3.5 mb-4 bg-[#004aad] rounded-xl shadow-sm">
+      <div id="pur-header-title" class="hidden w-full text-center py-3.5 mb-4 bg-gradient-to-r from-[#004aad] to-blue-800 rounded-xl shadow-sm">
          <h2 class="text-lg font-black text-white tracking-[0.3em]">PURCHASE ENTRY</h2>
       </div>
 
-      <div class="flex flex-wrap sm:flex-nowrap justify-between items-end border-b border-slate-100 pb-4 mb-4 gap-4">
-        <div class="flex items-center space-x-3">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-100 pb-4 mb-4 gap-4">
+        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
           <h2 id="form-invoice-no" class="text-xl font-black text-[#004aad] tracking-wide">SRE-2026-001</h2>
           <span id="form-entry-type" class="text-[10px] font-black px-2.5 py-1 rounded-md bg-blue-50 text-[#004aad] border border-blue-100 uppercase tracking-widest">SALE</span>
         </div>
         
-        <div id="pur-top-bar" class="hidden flex-1 flex justify-end gap-3 w-full">
-           <div class="w-48">
-             <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Supplier Inv No *</label>
-             <input type="text" id="pur-invoice-no" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" placeholder="Enter Inv No" />
+        <div id="pur-top-bar" class="hidden w-full sm:flex-1 grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+           <div class="sm:col-span-5 relative">
+             <div class="flex justify-between items-center mb-1.5">
+               <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Supplier Name *</label>
+               <button type="button" tabindex="-1" onclick="openPartyModal('SUPPLIER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2.5 py-1 rounded-md text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ NEW</button>
+             </div>
+             <input type="text" id="pur-supplier-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Search or Enter Name" />
            </div>
-           <div class="w-48">
-             <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Date *</label>
-             <input type="date" id="pur-invoice-date" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" />
+           <div class="sm:col-span-4">
+             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Supplier Inv No *</label>
+             <input type="text" id="pur-invoice-no" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Enter Inv No" />
+           </div>
+           <div class="sm:col-span-3">
+             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Date *</label>
+             <input type="date" id="pur-invoice-date" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" />
            </div>
         </div>
 
-        <div class="flex bg-slate-50 p-1 rounded-xl border border-slate-200 self-end shadow-sm">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-4 py-2 rounded-lg text-[10px] font-black tracking-widest bg-[#004aad] text-white shadow-sm transition-all">MOBILE</button>
-          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="px-4 py-2 rounded-lg text-[10px] font-black tracking-widest text-slate-500 hover:text-[#004aad] transition-all">ACCESSORIES</button>
-          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="px-4 py-2 rounded-lg text-[10px] font-black tracking-widest text-slate-500 hover:text-[#004aad] transition-all">REPAIRING</button>
+        <div class="flex bg-slate-100/70 p-1.5 rounded-xl border border-slate-200 self-end shadow-inner gap-1 w-full sm:w-auto overflow-x-auto">
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md transition-all">MOBILE</button>
+          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">ACCESSORIES</button>
+          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">REPAIRING</button>
         </div>
       </div>
 
-      <!-- CUSTOMER / SUPPLIER BOX -->
+      <!-- CUSTOMER BOX (For Sale Only) -->
       <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div>
           <div class="flex justify-between items-center mb-1.5">
             <label id="lbl-cust-name" class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Customer Name *</label>
             <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2 py-1 rounded text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest">➕ NEW</button>
           </div>
-          <input type="text" id="cust-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C') && currentEntryType==='PURCHASE') { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" />
+          <input type="text" id="cust-name" list="party-list" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" />
         </div>
         <div id="box-cust-phone"><label id="lbl-cust-phone" class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
         <div id="box-cust-address"><label id="lbl-cust-address" class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Address *</label><input type="text" id="cust-address" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
@@ -223,13 +230,12 @@
 
       <!-- ITEMS GRID -->
       <div id="items-box" class="space-y-3 pt-3">
-        <div class="flex justify-between items-end pb-1 border-b border-slate-100">
+        <div class="flex justify-between items-end pb-2 border-b border-slate-100">
           <h3 class="font-black text-sm uppercase text-[#004aad] tracking-widest">Products Entry</h3>
           <button onclick="addNewItemRow(false)" class="text-[10px] font-black text-[#004aad] bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ Add Row</button>
         </div>
         
         <div id="items-wrapper" class="overflow-x-visible">
-           <!-- FIXED: CORRECTED ORDER: Product, Rate, GST, Qty, IMEI -->
            <div id="pur-grid-header" class="hidden flex items-center gap-3 px-3 pb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest min-w-[850px] sm:min-w-full">
                <div class="flex-[2] min-w-[180px]">Product Name</div>
                <div class="w-24 text-right">Rate (Rs)</div>
@@ -308,19 +314,18 @@
         <div id="purchase-payment-section" class="hidden">
           <div class="mb-4">
             <label class="text-[10px] font-black text-slate-400 block mb-2 text-center uppercase tracking-widest">Payment Mode *</label>
-            <div class="flex justify-between items-center text-xs font-black text-slate-500 bg-slate-50 border border-slate-200 rounded-xl h-[54px] px-1.5 overflow-hidden shadow-sm max-w-2xl mx-auto">
-              <!-- FIXED: NO RED COLOR, CREDIT FIRST -->
-              <label class="flex-1 flex justify-center items-center space-x-2 cursor-pointer text-[#004aad] border-r border-slate-200 last:border-0 hover:bg-white h-full transition-all">
-                <input type="radio" name="pur_pay_mode" value="Credit" class="w-4 h-4 accent-[#004aad]" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
+            <div class="flex justify-between items-center text-xs font-black bg-slate-100 border border-slate-200 rounded-xl h-[56px] p-1.5 shadow-inner max-w-2xl mx-auto gap-1">
+              <label id="lbl-pay-Credit" class="flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all">
+                <input type="radio" name="pur_pay_mode" value="Credit" class="hidden" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
               </label>
-              <label class="flex-1 flex justify-center items-center space-x-2 cursor-pointer text-[#004aad] border-r border-slate-200 last:border-0 hover:bg-white h-full transition-all">
-                <input type="radio" name="pur_pay_mode" value="Cash" class="w-4 h-4 accent-[#004aad]" onchange="onPurPaymentModeChange()"> <span>CASH</span>
+              <label id="lbl-pay-Cash" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                <input type="radio" name="pur_pay_mode" value="Cash" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH</span>
               </label>
-              <label class="flex-1 flex justify-center items-center space-x-2 cursor-pointer text-[#004aad] border-r border-slate-200 last:border-0 hover:bg-white h-full transition-all">
-                <input type="radio" name="pur_pay_mode" value="QR" class="w-4 h-4 accent-[#004aad]" onchange="onPurPaymentModeChange()"> <span>QR</span>
+              <label id="lbl-pay-QR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                <input type="radio" name="pur_pay_mode" value="QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>QR</span>
               </label>
-              <label class="flex-1 flex justify-center items-center space-x-2 cursor-pointer text-[#004aad] hover:bg-white h-full transition-all">
-                <input type="radio" name="pur_pay_mode" value="Cash + QR" class="w-4 h-4 accent-[#004aad]" onchange="onPurPaymentModeChange()"> <span>CASH+QR</span>
+              <label id="lbl-pay-CashQR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                <input type="radio" name="pur_pay_mode" value="Cash + QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH+QR</span>
               </label>
             </div>
           </div>
@@ -360,7 +365,6 @@
       </div>
 
       <div class="bg-[#004aad] text-white p-5 rounded-2xl shadow-xl mt-4 relative overflow-hidden">
-        <!-- Decoration -->
         <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-10 -mb-10 pointer-events-none"></div>
         
@@ -637,10 +641,14 @@
         }
 
         if (!document.getElementById('view-new-bill').classList.contains('hidden')) {
-            document.getElementById('cust-name').value = name;
-            document.getElementById('cust-phone').value = phone;
-            document.getElementById('cust-address').value = address;
-            document.getElementById('cust-gstin').value = gstin;
+            if (currentEntryType === 'PURCHASE') {
+                document.getElementById('pur-supplier-name').value = name;
+            } else {
+                document.getElementById('cust-name').value = name;
+                document.getElementById('cust-phone').value = phone;
+                document.getElementById('cust-address').value = address;
+                document.getElementById('cust-gstin').value = gstin;
+            }
         }
         closePartyModal();
     }
@@ -718,7 +726,6 @@
           }).catch(e => console.log("Sync background error", e)); 
        } 
        
-       // FIXED: INSTANT POPUP
        showPopup("Transaction Saved", "Payment logged successfully!");
        showView('dashboard');
     }
@@ -899,7 +906,16 @@
       currentEntryType = entryType;
       
       document.getElementById("form-entry-type").innerText = entryType;
-      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => document.getElementById(`pill-${t}`).className = (t === type) ? "px-4 py-2 rounded-lg text-[10px] font-black tracking-widest bg-[#004aad] text-white shadow-sm transition-all" : "px-4 py-2 rounded-lg text-[10px] font-black tracking-widest text-slate-500 hover:text-[#004aad] transition-all");
+      
+      // Update Premium Tabs
+      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
+          const el = document.getElementById(`pill-${t}`);
+          if (t === type) {
+              el.className = "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md transition-all";
+          } else {
+              el.className = "flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all";
+          }
+      });
       
       const isPurchase = (entryType === "PURCHASE");
       const isRepairSale = (type === "REPAIRING" && !isPurchase); 
@@ -910,6 +926,7 @@
       document.getElementById("pur-top-bar").classList.toggle("hidden", !isPurchase);
 
       if (isPurchase) {
+         document.getElementById("pur-supplier-name").value = "";
          document.getElementById("pur-invoice-no").value = "";
          const today = new Date();
          const yyyy = today.getFullYear();
@@ -918,17 +935,20 @@
          document.getElementById("pur-invoice-date").value = `${yyyy}-${mm}-${dd}`;
       }
 
-      document.getElementById("box-cust-phone").classList.toggle("hidden", isPurchase);
-      document.getElementById("box-cust-address").classList.toggle("hidden", isPurchase);
-      document.getElementById("box-cust-gstin").classList.toggle("hidden", isPurchase);
+      // Hide Cust Box entirely if Purchase or Repair Sale
+      if (isPurchase) {
+          document.getElementById("cust-box").classList.add("hidden");
+      } else if (isRepairSale) {
+          document.getElementById("cust-box").classList.add("hidden");
+      } else {
+          document.getElementById("cust-box").classList.remove("hidden");
+      }
+
       document.getElementById("global-tax-discount-box").classList.toggle("hidden", isPurchase);
-      
       document.getElementById("sale-payment-section").classList.toggle("hidden", isPurchase);
       document.getElementById("purchase-payment-section").classList.toggle("hidden", !isPurchase);
       document.getElementById("form-gst-breakdown").classList.toggle("hidden", !isPurchase);
 
-      document.getElementById("cust-box").classList.toggle("hidden", isRepairSale);
-      document.getElementById("items-box").classList.toggle("hidden", isRepairSale);
       document.getElementById("repair-box").classList.toggle("hidden", !isRepairSale);
       
       document.getElementById("pur-grid-header").classList.toggle("hidden", !isPurchase);
@@ -936,21 +956,10 @@
       document.getElementById("items-container").className = isPurchase ? "space-y-3 min-w-[850px] sm:min-w-full" : "space-y-3";
       document.getElementById("items-container").innerHTML = "";
       
-      const lblName = document.getElementById("lbl-cust-name");
       if (isPurchase) {
-        lblName.innerText = "Supplier / Party Name *";
         document.querySelector('input[name="pur_pay_mode"][value="Credit"]').checked = true;
+        updatePurPaymentUI("Credit");
         onPurPaymentModeChange();
-      } else {
-        lblName.innerText = "Customer Name *";
-      }
-
-      const lblPhone = document.getElementById("lbl-cust-phone");
-      const lblAddress = document.getElementById("lbl-cust-address");
-      if (type === "ACCESSORIES" || (type === "REPAIRING" && isPurchase)) {
-        lblPhone.innerText = "Mobile"; lblAddress.innerText = "Address";
-      } else {
-        lblPhone.innerText = "Mobile *"; lblAddress.innerText = "Address *";
       }
 
       document.getElementById("cust-name").value = "";
@@ -980,7 +989,6 @@
 
     function changeBillType(type) { startNewBill(type, currentEntryType); }
 
-    // FIXED: 15 NUMERIC LIMIT RESTORED FOR SALE PAGE
     function renderItemImeis(row) {
       const imeiBox = row.querySelector(".item-imeis-box");
       const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
@@ -1005,8 +1013,6 @@
       imeiBox.innerHTML = html;
     }
 
-    // FIXED: PURCHASE COLUMN ORDER -> Product | Rate | GST | Qty | IMEI | Amt | Act
-    // FIXED: NO RED DELETE BUTTON
     function addNewItemRow(isFirst = false) {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
@@ -1069,7 +1075,6 @@
 
     function handleQtyChange(input) { renderItemImeis(input.closest(".item-row")); recalcTotals(); }
 
-    // FIXED: AUTOMATICALLY OPEN AND REQUIRE 15 DIGITS FOR EXTRA IMEIs
     function handlePurQtyChange(input) {
        recalcTotals(); 
        const row = input.closest(".item-row");
@@ -1092,7 +1097,6 @@
                html += `<input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all shadow-sm" />`;
            }
            extraBox.innerHTML = html;
-           // Automatically show the box when QTY is increased
            extraBox.classList.remove("hidden");
            btn.innerText = "⬆️";
        } else {
@@ -1163,8 +1167,28 @@
       recalcTotals();
     }
 
+    // PREMIUM UI FOR PAYMENT MODES
+    function updatePurPaymentUI(mode) {
+        const labels = {
+            "Credit": "lbl-pay-Credit",
+            "Cash": "lbl-pay-Cash",
+            "QR": "lbl-pay-QR",
+            "Cash + QR": "lbl-pay-CashQR"
+        };
+        for (let key in labels) {
+            const lbl = document.getElementById(labels[key]);
+            if (!lbl) continue;
+            if (key === mode) {
+                lbl.className = "flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all";
+            } else {
+                lbl.className = "flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all";
+            }
+        }
+    }
+
     function onPurPaymentModeChange() {
         const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+        updatePurPaymentUI(mode);
         const isSplit = mode === "Cash + QR";
         const isCredit = mode === "Credit";
 
@@ -1287,15 +1311,18 @@
         phone = document.getElementById("rep-phone").value.trim(); name = "Repair Customer";
         if(phone.length !== 10) return showPopup("Validation Error", "Please enter 10-digit mobile number!", true);
       } else {
-        name = document.getElementById("cust-name").value.trim().toUpperCase();
-        phone = document.getElementById("cust-phone").value.trim();
-        address = document.getElementById("cust-address").value.trim().toUpperCase() || "-";
-        gstin = document.getElementById("cust-gstin").value.trim().toUpperCase() || "-";
-        
-        if(currentEntryType === "PURCHASE" && !name) return showPopup("Validation Error", "Supplier / Party Name is required!", true);
-        if(!name) name = "Customer"; 
-
-        if(currentEntryType === "SALE" && currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "Please enter 10-digit mobile number!", true);
+        if (currentEntryType === "PURCHASE") {
+            name = document.getElementById("pur-supplier-name").value.trim().toUpperCase();
+            phone = "-"; address = "-"; gstin = "-";
+            if(!name) return showPopup("Validation Error", "Supplier Name is required!", true);
+        } else {
+            name = document.getElementById("cust-name").value.trim().toUpperCase();
+            phone = document.getElementById("cust-phone").value.trim();
+            address = document.getElementById("cust-address").value.trim().toUpperCase() || "-";
+            gstin = document.getElementById("cust-gstin").value.trim().toUpperCase() || "-";
+            if(!name) name = "Customer"; 
+            if(currentBillType === "MOBILE" && phone.length !== 10) return showPopup("Validation Error", "Please enter 10-digit mobile number!", true);
+        }
       }
 
       let s_val = "", p_val = "", aMode = "";
@@ -1335,8 +1362,8 @@
                   if(aMode.includes("Card") && !document.getElementById("dues-split-card").value) splitErr = true;
               } else {
                   if(aMode.includes("Cash") && !document.getElementById("split-cash").value) splitErr = true;
-                  if(aMode.includes("QR") && !document.getElementById("split-qr").value) splitErr = true;
-                  if(aMode.includes("Card") && !document.getElementById("split-card").value) splitErr = true;
+                  if(aMode.includes("QR")) document.getElementById("split-qr").value ? null : splitErr = true;
+                  if(aMode.includes("Card")) document.getElementById("split-card").value ? null : splitErr = true;
               }
               if (splitErr) return showPopup("Validation Error", "All selected split payment amounts must be filled!", true);
           }
@@ -1501,7 +1528,6 @@
 
       billsCache.unshift(billData); 
 
-      // FIXED: INSTANT POPUP AND FIRE-AND-FORGET FETCH
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
