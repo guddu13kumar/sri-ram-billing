@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SRI RAM ENTERPRISES - POS</title>
+  <title>POS System</title>
   <meta name="theme-color" content="#004aad" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
     body { font-family: 'Inter', system-ui, sans-serif; }
 
     @media print {
@@ -40,7 +40,7 @@
         -webkit-text-fill-color: #004aad !important;
     }
 
-    /* STRICT FIX: Hide Number Input Arrows */
+    /* Hide Number Input Arrows */
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -51,17 +51,15 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col pb-20">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <datalist id="party-list"></datalist>
   <datalist id="item-list"></datalist>
 
-  <header id="main-header" class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white sticky top-0 z-30 px-4 py-2.5 shadow-md flex justify-between items-center">
+  <header id="main-header" class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white sticky top-0 z-30 px-4 py-3 shadow-md flex justify-between items-center">
     <div class="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition-opacity" onclick="showView('dashboard')">
-      <div class="border-2 border-white/80 rounded-full w-8 h-8 flex items-center justify-center font-black text-xs shadow-sm bg-white/10 backdrop-blur-sm">SRE</div>
       <div>
-        <h1 class="font-black text-sm sm:text-base leading-none tracking-wide">SRI RAM ENTERPRISES</h1>
-        <p class="text-[9px] sm:text-[10px] text-blue-100 font-bold mt-1 tracking-widest uppercase opacity-90">Mobile • Accessories • Repairing</p>
+        <h1 class="font-black text-sm sm:text-base leading-none tracking-widest uppercase">POS Dashboard</h1>
       </div>
     </div>
     <div class="flex space-x-3 items-center">
@@ -69,7 +67,7 @@
     </div>
   </header>
 
-  <!-- MODALS (Hidden by Default) -->
+  <!-- MODALS -->
   <div id="party-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-5 rounded-2xl shadow-2xl w-full max-w-md border border-slate-100 transform scale-100 mx-4">
       <h3 class="text-base font-black text-[#004aad] uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">Create New Party</h3>
@@ -138,8 +136,8 @@
     </div>
   </div>
 
-  <!-- MAIN CONTAINER (FULL WIDTH COMPATIBLE) -->
-  <main class="flex-1 w-full max-w-screen-2xl mx-auto p-3 sm:p-5">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 w-full max-w-screen-2xl mx-auto p-3 sm:p-5 pb-24">
 
     <!-- VIEW 1: DASHBOARD -->
     <div id="view-dashboard" class="space-y-4 max-w-5xl mx-auto">
@@ -180,12 +178,12 @@
       </div>
     </div>
 
-    <!-- VIEW 2: NEW BILL FORM (PREMIUM, COMPRESSED & WIDE) -->
+    <!-- VIEW 2: NEW BILL FORM -->
     <div id="view-new-bill" class="bg-white rounded-2xl shadow-xl p-3 sm:p-5 border border-slate-100 hidden">
       
-      <!-- COMPRESSED PURCHASE HEADER -->
-      <div id="pur-header-title" class="hidden w-full text-center py-2 mb-3 bg-gradient-to-r from-[#004aad] to-blue-700 rounded-lg shadow-sm">
-         <h2 class="text-sm font-black text-white tracking-[0.3em]">PURCHASE ENTRY</h2>
+      <!-- FIXED: CLEAN PREMIUM TITLE -->
+      <div id="pur-header-title" class="hidden w-full border-b-2 border-slate-100 pb-2 mb-3">
+         <h2 class="text-lg font-black text-[#004aad] tracking-[0.2em] uppercase">Purchase Entry</h2>
       </div>
 
       <div class="flex flex-wrap sm:flex-nowrap justify-between items-end border-b border-slate-100 pb-3 mb-3 gap-3">
@@ -194,6 +192,7 @@
           <span id="form-entry-type" class="text-[9px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-[#004aad] border border-blue-100 uppercase tracking-widest">SALE</span>
         </div>
         
+        <!-- FIXED: INVOICE NO LABEL -->
         <div id="pur-top-bar" class="hidden w-full sm:flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
            <div class="sm:col-span-6 relative">
              <div class="flex justify-between items-center mb-1">
@@ -203,8 +202,8 @@
              <input type="text" id="pur-supplier-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Search or Enter Name" />
            </div>
            <div class="sm:col-span-3">
-             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Supplier Inv No *</label>
-             <input type="text" id="pur-invoice-no" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Enter Inv No" />
+             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Invoice No *</label>
+             <input type="text" id="pur-invoice-no" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Invoice No" />
            </div>
            <div class="sm:col-span-3">
              <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Date *</label>
@@ -241,177 +240,176 @@
         <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Issue Description *</label><textarea id="rep-issue" rows="1" placeholder="Issue Details..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs outline-none uppercase focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all"></textarea></div>
       </div>
 
-      <!-- ITEMS GRID -->
-      <div id="items-box" class="space-y-2 pt-2">
+      <!-- FIXED: PRODUCT DETAILS HEADER -->
+      <div id="items-box" class="space-y-2 pt-1">
         <div class="flex justify-between items-end pb-1 border-b border-slate-100">
-          <h3 class="font-black text-[11px] uppercase text-[#004aad] tracking-widest">Products Entry</h3>
+          <h3 class="font-black text-[11px] uppercase text-[#004aad] tracking-widest">Product Details</h3>
           <button onclick="addNewItemRow(false)" class="text-[9px] font-black text-[#004aad] bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ Add Row</button>
         </div>
         
         <div id="items-wrapper" class="overflow-x-visible">
-           <div id="pur-grid-header" class="hidden flex items-center gap-3 px-3 pb-1 text-[9px] font-black text-slate-400 uppercase tracking-widest min-w-[850px] sm:min-w-full">
-               <div class="flex-[2] min-w-[180px]">Product Name</div>
-               <div class="w-24 text-right">Rate (Rs)</div>
-               <div class="w-20 text-center">GST</div>
-               <div class="w-20 text-center">Qty</div>
-               <div class="flex-[1.5] min-w-[140px]">IMEI-1 / Serial</div>
-               <div class="w-28 text-right">Amount</div>
-               <div class="w-12 text-center">Act</div>
+           <!-- FIXED: EXACT WIDTH ALIGNMENT -->
+           <div id="pur-grid-header" class="hidden flex items-center gap-2 px-2 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-widest min-w-[850px] sm:min-w-full border-b border-slate-200 mb-2">
+               <div class="flex-[2] min-w-[150px]">Product Name</div>
+               <div class="w-20 text-right">Rate</div>
+               <div class="w-16 text-center">GST</div>
+               <div class="w-16 text-center">Qty</div>
+               <div class="flex-[1.5] min-w-[120px]">IMEI-1 / Serial</div>
+               <div class="w-24 text-right">Amount</div>
+               <div class="w-10 text-center">Act</div>
            </div>
            <div id="items-container" class="space-y-2"></div>
         </div>
       </div>
 
-      <!-- BOTTOM PAYMENT SECTION (COMPRESSED & PREMIUM) -->
-      <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm mt-3">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mt-2 flex flex-col">
         
-        <!-- Global Discount Row -->
-        <div id="global-tax-discount-box" class="grid grid-cols-2 gap-4 mb-3 pb-3 border-b border-slate-100">
-          <div>
-            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Global Discount (Rs.)</label>
-            <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" placeholder="Discount Amount" />
-          </div>
-          <div>
-            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Bill GST Slab</label>
-            <select id="global-gst" onchange="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
-              <option value="0" selected>0% GST</option>
-              <option value="5">5% GST</option>
-              <option value="12">12% GST</option>
-              <option value="18">18% GST</option>
-              <option value="28">28% GST</option>
-            </select>
-          </div>
-        </div>
+        <div class="p-4 flex flex-col space-y-3">
+            <div id="global-tax-discount-box" class="grid grid-cols-2 gap-4 pb-3 border-b border-slate-100">
+              <div>
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Global Discount (Rs.)</label>
+                <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" placeholder="Discount Amount" />
+              </div>
+              <div>
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Bill GST Slab</label>
+                <select id="global-gst" onchange="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
+                  <option value="0" selected>0% GST</option>
+                  <option value="5">5% GST</option>
+                  <option value="12">12% GST</option>
+                  <option value="18">18% GST</option>
+                  <option value="28">28% GST</option>
+                </select>
+              </div>
+            </div>
 
-        <!-- PAYMENT MODE & AMOUNT PAID (SAME ROW) -->
-        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-end w-full">
+            <!-- PAYMENT MODE & AMOUNT PAID (COMPRESSED) -->
+            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-end w-full">
+                
+                <div class="flex-1 w-full">
+                   <div id="sale-payment-section" class="grid grid-cols-2 gap-3">
+                      <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Primary Mode</label>
+                        <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
+                          <option value="Cash">Cash</option><option value="QR">QR (Online)</option><option value="Card Swipe">Card Swipe</option>
+                          <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
+                          <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
+                        </select>
+                      </div>
+                      <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Secondary Mode</label>
+                        <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
+                          <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Credit</option>
+                        </select>
+                      </div>
+                   </div>
+
+                   <!-- FIXED: PURCHASE PAYMENT MODES (NO RED COLOR, CREDIT FIRST) -->
+                   <div id="purchase-payment-section" class="hidden w-full">
+                      <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Payment Mode *</label>
+                      <div class="flex justify-between items-center text-[11px] font-black bg-slate-50 border border-slate-200 rounded-xl h-[46px] p-1 shadow-inner gap-1">
+                        <label id="lbl-pay-Credit" class="flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all">
+                          <input type="radio" name="pur_pay_mode" value="Credit" class="hidden" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
+                        </label>
+                        <label id="lbl-pay-Cash" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                          <input type="radio" name="pur_pay_mode" value="Cash" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH</span>
+                        </label>
+                        <label id="lbl-pay-QR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                          <input type="radio" name="pur_pay_mode" value="QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>QR</span>
+                        </label>
+                        <label id="lbl-pay-CashQR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
+                          <input type="radio" name="pur_pay_mode" value="Cash + QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH+QR</span>
+                        </label>
+                      </div>
+                   </div>
+                </div>
+
+                <!-- FIXED: SHARED TOTAL AMOUNT PAID (IN SAME ROW) -->
+                <div class="w-full sm:w-64">
+                   <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Amount Paid *</label>
+                   <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2.5 border-2 border-blue-400 rounded-xl font-black text-[#004aad] text-lg outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200 h-[46px]" placeholder="0" />
+                </div>
+            </div>
+
+            <!-- DYNAMIC SPLIT/FINANCE BOXES -->
+            <div id="split-box" class="pt-3 border-t border-slate-100 grid grid-cols-3 gap-3 hidden mt-2">
+              <div id="wrap-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
+              <div id="wrap-split-qr" class="hidden"><label class="text-[9px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
+              <div id="wrap-split-card" class="hidden"><label class="text-[9px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
+            </div>
+
+            <div id="fin-box" class="pt-3 border-t border-blue-100 bg-blue-50 p-3 rounded-xl hidden mt-2">
+              <div class="grid grid-cols-3 gap-3 mb-2">
+                <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Company *</label><select id="fin-company" class="w-full p-2 border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
+                  <option value="">-- Fin. Company --</option><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option>
+                  <option value="HDB Finance">HDB Finance</option><option value="TVS Credit">TVS Credit</option><option value="IDFC First Bank">IDFC First Bank</option>
+                </select></div>
+                <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full p-2 border border-blue-200 rounded-lg text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad]" oninput="recalcTotals()" /></div>
+                <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full p-2 border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
+                  <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
+                  <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
+                </select></div>
+              </div>
+              <div id="fin-split-container" class="grid grid-cols-3 gap-3 hidden">
+                <div id="wrap-fin-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-blue-300 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+                <div id="wrap-fin-split-qr" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP QR</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-blue-300 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+                <div id="wrap-fin-split-card" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Card</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-blue-300 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+              </div>
+            </div>
+
+            <div id="dues-box" class="pt-3 border-t border-slate-200 bg-slate-50 p-3 rounded-xl hidden mt-2">
+              <div class="grid grid-cols-2 gap-3 mb-2">
+                <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
+                  <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
+                  <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
+                </select></div>
+                <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad]" oninput="recalcTotals()" /></div>
+              </div>
+              <div id="dues-split-container" class="grid grid-cols-3 gap-3 hidden">
+                <div id="wrap-dues-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+                <div id="wrap-dues-split-qr" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+                <div id="wrap-dues-split-card" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
+              </div>
+            </div>
             
-            <div class="flex-1 w-full">
-               <!-- SALE PAYMENT MODES -->
-               <div id="sale-payment-section" class="grid grid-cols-2 gap-3">
-                  <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Primary Mode</label>
-                    <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
-                      <option value="Cash">Cash</option><option value="QR">QR (Online)</option><option value="Card Swipe">Card Swipe</option>
-                      <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
-                      <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-                    </select>
-                  </div>
-                  <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Secondary Mode</label>
-                    <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all">
-                      <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Credit</option>
-                    </select>
-                  </div>
-               </div>
-
-               <!-- PURCHASE PAYMENT MODES (NO RED COLOR, CREDIT FIRST) -->
-               <div id="purchase-payment-section" class="hidden w-full">
-                  <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Payment Mode *</label>
-                  <div class="flex justify-between items-center text-[11px] font-black bg-slate-50 border border-slate-200 rounded-xl h-[46px] p-1 shadow-inner gap-1">
-                    <label id="lbl-pay-Credit" class="flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all">
-                      <input type="radio" name="pur_pay_mode" value="Credit" class="hidden" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
-                    </label>
-                    <label id="lbl-pay-Cash" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                      <input type="radio" name="pur_pay_mode" value="Cash" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH</span>
-                    </label>
-                    <label id="lbl-pay-QR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                      <input type="radio" name="pur_pay_mode" value="QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>QR</span>
-                    </label>
-                    <label id="lbl-pay-CashQR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                      <input type="radio" name="pur_pay_mode" value="Cash + QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH+QR</span>
-                    </label>
-                  </div>
-               </div>
+            <div id="pur-split-box" class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 hidden mt-2">
+              <div id="wrap-pur-cash"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
+              <div id="wrap-pur-qr"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
             </div>
 
-            <!-- SHARED TOTAL AMOUNT PAID (IN SAME ROW) -->
-            <div class="w-full sm:w-64">
-               <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Amount Paid *</label>
-               <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full p-2 border-2 border-blue-400 rounded-xl font-black text-[#004aad] text-xl outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200 h-[46px]" placeholder="0" />
+            <div id="finance-loan-row" class="hidden mt-2 flex justify-between items-center text-xs font-black text-[#004aad] bg-blue-100 px-4 py-3 rounded-lg border border-blue-200 shadow-sm">
+              <span class="uppercase tracking-widest">Balance Due / Loan :</span>
+              <span id="fin-loan-display" class="text-base font-black">Rs. 0</span>
+            </div>
+        </div>
+
+        <!-- FIXED: 4-IN-1 ONE ROW SUMMARY -->
+        <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-3 sm:p-4 rounded-b-xl shadow-inner mt-2 flex items-center justify-between text-center divide-x divide-white/20">
+            
+            <div id="box-basic-amt" class="hidden flex-1 px-1 sm:px-2">
+                <span class="text-[8px] sm:text-[9px] text-blue-200 tracking-widest uppercase font-bold block mb-1">Basic Amt</span>
+                <p id="form-basic-amt" class="text-sm sm:text-lg font-black leading-none drop-shadow-md">Rs. 0</p>
+            </div>
+            
+            <div id="box-gst-amt" class="hidden flex-1 px-1 sm:px-2">
+                <span class="text-[8px] sm:text-[9px] text-blue-200 tracking-widest uppercase font-bold block mb-1">GST Amt</span>
+                <p id="form-gst-amt" class="text-sm sm:text-lg font-black leading-none drop-shadow-md">Rs. 0</p>
+            </div>
+
+            <div class="flex-1 px-1 sm:px-2">
+                <span class="text-[9px] sm:text-[10px] text-blue-100 tracking-widest uppercase font-black block mb-1">Grand Total</span>
+                <p id="total-grand" class="text-lg sm:text-2xl font-black leading-none drop-shadow-md text-amber-300">Rs. 0</p>
+            </div>
+
+            <div class="flex-1 px-1 sm:px-2">
+                <span class="text-[9px] sm:text-[10px] text-blue-100 tracking-widest uppercase font-black block mb-1">Balance Due</span>
+                <p id="total-due" class="text-base sm:text-xl font-bold leading-none drop-shadow-md text-white">Rs. 0</p>
             </div>
 
         </div>
-
-        <!-- DYNAMIC SPLIT/FINANCE BOXES -->
-        <div id="split-box" class="pt-3 border-t border-slate-100 grid grid-cols-3 gap-3 hidden mt-3">
-          <div id="wrap-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
-          <div id="wrap-split-qr" class="hidden"><label class="text-[9px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
-          <div id="wrap-split-card" class="hidden"><label class="text-[9px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
-        </div>
-
-        <div id="fin-box" class="pt-3 border-t border-blue-100 bg-blue-50 p-3 rounded-xl hidden mt-3">
-          <div class="grid grid-cols-3 gap-3 mb-2">
-            <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Company *</label><select id="fin-company" class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
-              <option value="">-- Fin. Company --</option><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option>
-              <option value="HDB Finance">HDB Finance</option><option value="TVS Credit">TVS Credit</option><option value="IDFC First Bank">IDFC First Bank</option>
-            </select></div>
-            <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad]" oninput="recalcTotals()" /></div>
-            <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
-              <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-              <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
-            </select></div>
-          </div>
-          <div id="fin-split-container" class="grid grid-cols-3 gap-3 hidden">
-            <div id="wrap-fin-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-            <div id="wrap-fin-split-qr" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP QR</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-            <div id="wrap-fin-split-card" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Card</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-blue-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-          </div>
-        </div>
-
-        <div id="dues-box" class="pt-3 border-t border-slate-200 bg-slate-50 p-3 rounded-xl hidden mt-3">
-          <div class="grid grid-cols-2 gap-3 mb-2">
-            <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]">
-              <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
-              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-            </select></div>
-            <div class="w-full"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad]" oninput="recalcTotals()" /></div>
-          </div>
-          <div id="dues-split-container" class="grid grid-cols-3 gap-3 hidden">
-            <div id="wrap-dues-split-cash" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-            <div id="wrap-dues-split-qr" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-            <div id="wrap-dues-split-card" class="hidden"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad]" /></div>
-          </div>
-        </div>
-        
-        <div id="pur-split-box" class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 hidden mt-3">
-          <div id="wrap-pur-cash"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
-          <div id="wrap-pur-qr"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" /></div>
-        </div>
-
-        <div id="finance-loan-row" class="hidden mt-3 flex justify-between items-center text-xs font-black text-[#004aad] bg-blue-100 px-4 py-3 rounded-xl border border-blue-200 shadow-sm">
-          <span class="uppercase tracking-widest">Balance Due / Loan :</span>
-          <span id="fin-loan-display" class="text-base font-black">Rs. 0</span>
-        </div>
-      </div>
-
-      <!-- FIXED: 4-IN-1 ONE ROW SUMMARY -->
-      <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-3 sm:p-4 rounded-2xl shadow-xl mt-3 flex items-center justify-between text-center divide-x divide-white/20">
-          
-          <div id="box-basic-amt" class="hidden flex-1 px-1 sm:px-2">
-              <span class="text-[8px] sm:text-[9px] text-blue-200 tracking-widest uppercase font-bold block mb-1">Basic Amt</span>
-              <p id="form-basic-amt" class="text-sm sm:text-lg font-black leading-none drop-shadow-md">Rs. 0</p>
-          </div>
-          
-          <div id="box-gst-amt" class="hidden flex-1 px-1 sm:px-2">
-              <span class="text-[8px] sm:text-[9px] text-blue-200 tracking-widest uppercase font-bold block mb-1">GST Amt</span>
-              <p id="form-gst-amt" class="text-sm sm:text-lg font-black leading-none drop-shadow-md">Rs. 0</p>
-          </div>
-
-          <div class="flex-1 px-1 sm:px-2">
-              <span class="text-[9px] sm:text-[10px] text-blue-100 tracking-widest uppercase font-black block mb-1">Grand Total</span>
-              <p id="total-grand" class="text-lg sm:text-2xl font-black leading-none drop-shadow-md text-amber-300">Rs. 0</p>
-          </div>
-
-          <div class="flex-1 px-1 sm:px-2">
-              <span class="text-[9px] sm:text-[10px] text-blue-100 tracking-widest uppercase font-black block mb-1">Balance Due</span>
-              <p id="total-due" class="text-base sm:text-xl font-bold leading-none drop-shadow-md text-white">Rs. 0</p>
-          </div>
-
       </div>
       
       <!-- FIXED: ONLY CANCEL AND SAVE BUTTONS -->
       <div class="flex space-x-3 pt-2">
-        <button type="button" onclick="showView('dashboard')" class="flex-1 py-3.5 bg-slate-100 font-black rounded-xl text-xs text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-widest shadow-sm">CANCEL</button>
-        <button type="button" onclick="saveBill()" class="flex-[2] py-3.5 bg-[#004aad] text-white font-black rounded-xl text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-widest">SAVE</button>
+        <button type="button" onclick="showView('dashboard')" class="flex-1 py-3 bg-slate-100 font-black rounded-xl text-xs text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-widest shadow-sm">CANCEL</button>
+        <button type="button" onclick="saveBill()" class="flex-[2] py-3 bg-[#004aad] text-white font-black rounded-xl text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-widest">SAVE</button>
       </div>
     </div>
 
@@ -429,16 +427,8 @@
         <div id="invoice-capture" class="bg-white p-8 border-2 border-[#004aad] text-xs text-slate-900 w-[750px] min-w-[750px]">
           
           <div class="w-full pb-4 border-b-2 border-[#004aad]">
-            <div class="text-center mb-4">
-              <h1 class="text-[38px] font-black text-[#004aad] tracking-wide uppercase leading-none">SRI RAM ENTERPRISES</h1>
-              <div class="inline-block bg-[#004aad] text-white px-8 py-2 rounded-full text-[13px] font-bold tracking-widest mt-3 shadow-sm">
-                MOBILE • ACCESSORIES • REPAIRING
-              </div>
-            </div>
             <div class="flex justify-between items-end text-xs font-bold text-slate-800 px-2 mt-3">
               <div class="text-left leading-relaxed">
-                <p>GB-15, CITY CENTRE, SECTOR-4</p>
-                <p>B.S. CITY (NEAR INDIAN BANK)</p>
               </div>
               <div class="text-right leading-relaxed">
                 <p>GSTIN: 20APOPK6864K1ZH</p>
@@ -602,20 +592,21 @@
 
   </main>
 
-  <nav class="fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
-     <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-2 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50 transition-colors">
+  <!-- FIXED: BOTTOM NAV VISIBLE ONLY ON DASHBOARD -->
+  <nav id="bottom-nav" class="fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
+     <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-2.5 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-xl leading-none opacity-90">🛒</span><span class="text-[9px] font-black mt-1.5 tracking-widest">SALE</span>
      </button>
-     <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="flex-1 py-2 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
+     <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="flex-1 py-2.5 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-xl leading-none opacity-90">📦</span><span class="text-[9px] font-black mt-1.5 tracking-widest">PURCHASE</span>
      </button>
-     <button onclick="startPayment('OUT')" class="flex-1 py-2 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
+     <button onclick="startPayment('OUT')" class="flex-1 py-2.5 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-xl leading-none opacity-90">💸</span><span class="text-[9px] font-black mt-1.5 tracking-widest">PAYMENT</span>
      </button>
-     <button onclick="startPayment('IN')" class="flex-1 py-2 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
+     <button onclick="startPayment('IN')" class="flex-1 py-2.5 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-xl leading-none opacity-90">🧾</span><span class="text-[9px] font-black mt-1.5 tracking-widest">RECEIPT</span>
      </button>
-     <button onclick="showView('ledger')" class="flex-1 py-2 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
+     <button onclick="showView('ledger')" class="flex-1 py-2.5 text-center text-[#004aad] border-l border-slate-100 flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-xl leading-none opacity-90">📒</span><span class="text-[9px] font-black mt-1.5 tracking-widest">LEDGER</span>
      </button>
   </nav>
@@ -901,11 +892,19 @@
         return null;
     }
 
+    // FIXED: BOTTOM NAV ONLY ON DASHBOARD
     function showView(view) {
       ["dashboard", "new-bill", "invoice", "settings", "ledger", "payment"].forEach(v => document.getElementById("view-" + v).classList.add("hidden"));
       document.getElementById("view-" + view).classList.remove("hidden");
-      if (view === "dashboard") renderDashboard();
-      else if (view === "ledger") updateLedgerView(); 
+      
+      if (view === "dashboard") {
+          renderDashboard();
+          document.getElementById("bottom-nav").classList.remove("hidden");
+      } else {
+          document.getElementById("bottom-nav").classList.add("hidden");
+      }
+      
+      if (view === "ledger") updateLedgerView(); 
       else if (view === "settings") document.getElementById("settings-url").value = gasUrl;
     }
 
@@ -975,7 +974,6 @@
       document.getElementById("sale-payment-section").classList.toggle("hidden", isPurchase);
       document.getElementById("purchase-payment-section").classList.toggle("hidden", !isPurchase);
       
-      // FIXED: Hide GST Breakdown in Summary for Sale, Show for Purchase
       document.getElementById("box-basic-amt").classList.toggle("hidden", !isPurchase);
       document.getElementById("box-gst-amt").classList.toggle("hidden", !isPurchase);
 
@@ -983,7 +981,7 @@
       
       document.getElementById("pur-grid-header").classList.toggle("hidden", !isPurchase);
       document.getElementById("items-wrapper").className = isPurchase ? "overflow-x-auto pb-2" : "overflow-x-visible";
-      document.getElementById("items-container").className = isPurchase ? "space-y-3 min-w-[850px] sm:min-w-full" : "space-y-3";
+      document.getElementById("items-container").className = isPurchase ? "space-y-2 min-w-[850px] sm:min-w-full" : "space-y-3";
       document.getElementById("items-container").innerHTML = "";
       
       if (isPurchase) {
@@ -1043,14 +1041,14 @@
       imeiBox.innerHTML = html;
     }
 
+    // FIXED: ALIGNED PURCHASE GRID AND REMOVED DELETE BUTTON RED COLOR
     function addNewItemRow(isFirst = false) {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
       
       let removeBtn = '';
-      // FIXED: NO RED DELETE BUTTON
-      if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.parentElement.remove(); recalcTotals();" class="text-slate-400 hover:text-[#004aad] font-black text-sm transition-all p-2 bg-slate-100 hover:bg-blue-50 rounded-xl">X</button>`;
-      else removeBtn = `<span class="w-10"></span>`;
+      if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.parentElement.remove(); recalcTotals();" class="text-slate-400 hover:text-[#004aad] font-black text-sm transition-all p-1.5 bg-slate-100 hover:bg-blue-50 rounded-lg">X</button>`;
+      else removeBtn = `<span class="w-[30px]"></span>`;
 
       if (currentEntryType === "PURCHASE") {
         div.className = "item-row bg-white rounded-xl border border-slate-200 shadow-sm min-w-[850px] sm:min-w-full overflow-hidden";
@@ -1058,29 +1056,28 @@
         const imeiPlaceholder = isMobile ? "IMEI-1 *" : "SERIAL-1";
         const imeiDisabled = currentBillType === "ACCESSORIES" ? "disabled bg-slate-100 opacity-50" : "";
         
-        // FIXED COLUMN ORDER: Product Name -> Rate -> GST -> Qty -> IMEI -> Amount -> Act
         div.innerHTML = `
-          <div class="flex items-center gap-3 p-2.5">
-             <input type="text" list="item-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openItemModal(this); }" placeholder="Product Name *" class="item-name flex-[2] min-w-[180px] p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all" />
+          <div class="flex items-center gap-2 p-2">
+             <input type="text" list="item-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openItemModal(this); }" placeholder="Product Name *" class="item-name flex-[2] min-w-[150px] p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all" />
              
-             <input type="number" oninput="recalcTotals()" class="item-rate w-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all text-right" placeholder="Rate" />
+             <input type="number" oninput="recalcTotals()" class="item-rate w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all text-right" placeholder="Rate" />
              
-             <select onchange="recalcTotals()" class="item-gst w-20 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all">
+             <select onchange="recalcTotals()" class="item-gst w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all">
                <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
              </select>
 
-             <input type="number" min="1" value="1" placeholder="Qty" oninput="handlePurQtyChange(this)" class="item-qty w-20 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all text-center" />
+             <input type="number" min="1" value="1" placeholder="Qty" oninput="handlePurQtyChange(this)" class="item-qty w-16 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all text-center" />
 
-             <input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="${imeiPlaceholder}" class="item-imei-main flex-[1.5] min-w-[140px] p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all ${imeiDisabled}" ${imeiDisabled} />
+             <input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="${imeiPlaceholder}" class="item-imei-main flex-[1.5] min-w-[120px] p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all ${imeiDisabled}" ${imeiDisabled} />
              
-             <div class="item-amt-display w-28 text-right text-sm font-black text-[#004aad]">0.00</div>
+             <div class="item-amt-display w-24 text-right text-sm font-black text-[#004aad]">0.00</div>
              
-             <div class="w-12 flex justify-end items-center space-x-2 pr-1">
-                 <button type="button" onclick="togglePurImeis(this)" class="pur-expand-btn hidden text-[#004aad] text-sm hover:scale-110 transition-all p-2 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-100">⬇️</button>
-                 ${!isFirst ? removeBtn : '<span class="w-[36px]"></span>'}
+             <div class="w-10 flex justify-end items-center space-x-2 pr-1">
+                 <button type="button" onclick="togglePurImeis(this)" class="pur-expand-btn hidden text-[#004aad] text-sm hover:scale-110 transition-all p-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-100">⬇️</button>
+                 ${!isFirst ? removeBtn : '<span class="w-[30px]"></span>'}
              </div>
           </div>
-          <div class="pur-extra-imeis hidden p-4 bg-slate-50 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 shadow-inner"></div>
+          <div class="pur-extra-imeis hidden p-3 bg-slate-50 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 shadow-inner"></div>
         `;
       } else {
         div.className = "item-row relative p-4 bg-white rounded-2xl border border-slate-200 shadow-sm";
@@ -1126,11 +1123,9 @@
            let html = '';
            for(let i=2; i<=qty; i++) {
                const val = existing[i-2] || "";
-               // FIXED: MAX 15 NUMERIC DIGITS ONLY FOR BULK ITEMS
-               html += `<input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all shadow-sm" />`;
+               html += `<input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all shadow-sm" />`;
            }
            extraBox.innerHTML = html;
-           // Auto Expand when qty increases
            extraBox.classList.remove("hidden");
            btn.innerText = "⬆️";
        } else {
@@ -1402,7 +1397,7 @@
           }
       } else {
           finalInvoiceNo = document.getElementById("pur-invoice-no").value.trim().toUpperCase();
-          if (!finalInvoiceNo) return showPopup("Validation Error", "Supplier Invoice No. is required!", true);
+          if (!finalInvoiceNo) return showPopup("Validation Error", "Invoice No. is required!", true);
 
           const rawDate = document.getElementById("pur-invoice-date").value;
           if (!rawDate) return showPopup("Validation Error", "Invoice Date is required!", true);
@@ -1494,7 +1489,7 @@
         });
         
         if (err || rateErr) return showPopup("Validation Error", currentEntryType === "PURCHASE" ? "Product Name and Rate (Rs.) are required!" : "Product Name is required!", true);
-        if(imeiErr) return showPopup("Validation Error", "IMEI number must be 15 numeric digits!", true);
+        if(imeiErr) return showPopup("Validation Error", "IMEI number must be exactly 15 digits!", true);
       }
 
       let cashAmt = 0, qrAmt = 0, cardAmt = 0;
@@ -1561,7 +1556,7 @@
 
       billsCache.unshift(billData); 
 
-      // FIXED: Instant display, background sync.
+      // FIXED: Instant Display
       if (gasUrl) {
           fetch(gasUrl, { 
               method: "POST", 
@@ -1638,7 +1633,7 @@
       
       bd.innerHTML = bdHtml;
       
-      const showGrand = (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT")) ? bill.paid : grand;
+      const showGrand = (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT")) ? b.paid : grand;
       document.getElementById("inv-grand-total").innerText = "Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2});
 
       document.getElementById("inv-qr-container").innerHTML = "";
@@ -1654,28 +1649,14 @@
       const blue = [0, 74, 173]; const dark = [15, 23, 42];
 
       doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
-      doc.setFont("helvetica", "bold"); doc.setFontSize(28); doc.setTextColor(...blue); 
-      doc.text("SRI RAM ENTERPRISES", 105, 22, { align: "center" });
-      
-      doc.setFillColor(...blue); doc.roundedRect(60, 25, 90, 5, 2.5, 2.5, "F");
-      doc.setFontSize(9); doc.setTextColor(255, 255, 255);
-      doc.text("MOBILE • ACCESSORIES • REPAIRING", 105, 28.5, { align: "center" });
-
-      doc.setFontSize(9); doc.setTextColor(...dark); 
-      doc.text("GB-15, CITY CENTRE, SECTOR-4", 20, 36);
-      doc.text("B.S. CITY (NEAR INDIAN BANK)", 20, 40.5);
-      
-      doc.text("GSTIN: 20APOPK6864K1ZH", 190, 36, { align: "right" });
-      doc.text("Ph: 9334765000, 9334237111, 9335136000", 190, 40.5, { align: "right" });
-      
-      doc.setFillColor(...blue); doc.rect(15, 45, 180, 6.5, "F");
-      doc.setTextColor(255, 255, 255); doc.setFontSize(9); 
       
       const isPur = b.billType && b.billType.includes("PURCHASE");
       const docTitle = isPur ? "PURCHASE VOUCHER" : (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
-      doc.text(docTitle, 105, 49.5, { align: "center" });
+      
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...blue); 
+      doc.text(docTitle, 105, 25, { align: "center" });
 
-      let y = 57;
+      let y = 35;
       doc.setTextColor(...dark); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
       doc.text("Invoice No.", 20, y); doc.text(":", 40, y); doc.text(b.invoiceNo, 43, y);
       doc.text("Date", 140, y); doc.text(":", 152, y); doc.text(b.billDate, 155, y);
@@ -1756,12 +1737,12 @@
       doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic");
       doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
 
-      doc.save(`SRE_Invoice_${b.invoiceNo}.pdf`);
+      doc.save(`Invoice_${b.invoiceNo}.pdf`);
     }
 
     function shareWhatsApp() {
       const phone = "91" + (activeInvoiceData.customerMobile || "").replace(/\D/g, "");
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent("Hello "+activeInvoiceData.customerName+", your bill: "+activeInvoiceData.publicUrl)}`, "_blank");
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent("Invoice Link: "+activeInvoiceData.publicUrl)}`, "_blank");
     }
 
     window.addEventListener("DOMContentLoaded", () => {
