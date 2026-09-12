@@ -31,7 +31,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col pb-16">
 
-  <!-- DATALISTS FOR AUTO-COMPLETE -->
   <datalist id="party-list"></datalist>
   <datalist id="item-list"></datalist>
 
@@ -48,7 +47,6 @@
     </div>
   </header>
 
-  <!-- PARTY CREATION MODAL -->
   <div id="party-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-4 rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 transform scale-100 mx-3">
       <h3 class="text-sm font-black text-[#004aad] uppercase tracking-wide border-b pb-1 mb-2">Create New Party</h3>
@@ -92,7 +90,6 @@
     </div>
   </div>
 
-  <!-- ITEM CREATION MODAL -->
   <div id="item-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
     <div class="bg-white p-4 rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 mx-3">
       <h3 class="text-sm font-black text-[#004aad] uppercase tracking-wide border-b pb-1 mb-2">Create New Item</h3>
@@ -158,12 +155,14 @@
       </div>
     </div>
 
-    <!-- VIEW 2: NEW BILL FORM (COMPRESSED) -->
+    <!-- VIEW 2: NEW BILL FORM -->
     <div id="view-new-bill" class="bg-white rounded-xl shadow p-2.5 space-y-2 border hidden">
       <div class="flex justify-between items-center border-b pb-2">
-        <div class="flex items-center">
+        <div class="flex items-center space-x-1.5">
+          <!-- FIXED: PUR INVOICE NO INPUT -->
           <h2 id="form-invoice-no" class="text-sm font-black text-slate-900">SRE-2026-001</h2>
-          <span id="form-entry-type" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#004aad] ml-1.5">SALE</span>
+          <input type="text" id="pur-invoice-no" class="hidden w-28 p-1 border border-slate-300 rounded text-xs font-bold outline-none uppercase focus:border-[#004aad] text-[#004aad]" placeholder="Invoice No *" />
+          <span id="form-entry-type" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#004aad]">SALE</span>
         </div>
         <div class="flex bg-slate-100 p-0.5 rounded border">
           <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#004aad] text-white">MOBILE</button>
@@ -178,7 +177,6 @@
             <label id="lbl-cust-name" class="text-[10px] font-bold text-slate-600">Customer Name *</label>
             <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-100 text-[#004aad] border border-blue-200 px-1 py-0.5 rounded text-[8px] font-black">➕ NEW</button>
           </div>
-          <!-- COMPRESSION & EVENT ADDED -->
           <input type="text" id="cust-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C') && currentEntryType==='PURCHASE') { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none uppercase focus:border-[#004aad]" />
         </div>
         <div id="box-cust-phone"><label id="lbl-cust-phone" class="text-[10px] font-bold text-slate-600 block mb-0.5">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none focus:border-[#004aad]" /></div>
@@ -197,7 +195,7 @@
       <div id="items-box" class="space-y-1.5">
         <div class="flex justify-between items-end">
           <h3 class="font-bold text-[10px] uppercase text-[#004aad]">Products</h3>
-          <button onclick="addNewItemRow(false)" class="text-[10px] font-bold text-[#004aad] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">+ Add Item</button>
+          <button onclick="addNewItemRow(false)" class="text-[10px] font-bold text-[#004aad] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 transition">+ Add Item</button>
         </div>
         <div id="items-container" class="space-y-1.5"></div>
       </div>
@@ -261,8 +259,9 @@
           </div>
         </div>
 
+        <!-- FIXED: NEW COMPRESSED PURCHASE PAYMENT SECTION -->
         <div id="purchase-payment-section" class="hidden">
-          <div class="grid grid-cols-2 gap-2 mb-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-1.5">
             <div>
               <label class="text-[10px] font-bold text-slate-600 block mb-0.5">GST Calculation</label>
               <select id="pur-gst-type" onchange="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]">
@@ -270,17 +269,18 @@
                 <option value="INCLUDED">GST Included</option>
               </select>
             </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Payment Mode *</label>
+              <div class="flex flex-wrap gap-1.5 text-[9px] font-bold text-slate-700 bg-white p-1.5 border border-slate-300 rounded items-center h-[30px]">
+                <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Cash" onchange="onPurPaymentModeChange()" checked> <span>Cash</span></label>
+                <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="QR" onchange="onPurPaymentModeChange()"> <span>QR</span></label>
+                <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Cash + QR" onchange="onPurPaymentModeChange()"> <span>Cash+QR</span></label>
+                <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Credit" onchange="onPurPaymentModeChange()"> <span>Credit</span></label>
+              </div>
+            </div>
           </div>
           
-          <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Payment Mode *</label>
-          <div class="flex flex-wrap gap-2 text-[10px] font-bold text-slate-700 bg-white p-1.5 border border-slate-300 rounded">
-            <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Cash" onchange="onPurPaymentModeChange()" checked> <span>Cash</span></label>
-            <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="QR" onchange="onPurPaymentModeChange()"> <span>QR</span></label>
-            <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Cash + QR" onchange="onPurPaymentModeChange()"> <span>Cash+QR</span></label>
-            <label class="flex items-center space-x-1 cursor-pointer text-[#004aad]"><input type="radio" name="pur_pay_mode" value="Credit" onchange="onPurPaymentModeChange()"> <span>Credit</span></label>
-          </div>
-          
-          <div id="pur-split-box" class="pt-2 grid grid-cols-2 gap-2 hidden">
+          <div id="pur-split-box" class="pt-1.5 grid grid-cols-2 gap-2 hidden">
             <div id="wrap-pur-cash"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none focus:border-[#004aad]" /></div>
             <div id="wrap-pur-qr"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none focus:border-[#004aad]" /></div>
           </div>
@@ -774,8 +774,10 @@
 
     function compressBill(b) {
         const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
+        const isPurchase = b.billType && b.billType.includes("PURCHASE");
+        const invData = isPurchase ? b.invoiceNo : String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-3);
         const min = [
-            String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-3), 
+            invData, 
             b.billDate, b.customerName, b.customerMobile, b.customerAddress, 
             validItems.map(x => [x.name.substring(0,20), x.imei.substring(0,25), x.qty, x.rate, x.amount, x.disc||0, x.gst||0]), 
             b.totalTaxable, b.totalGst, b.totalDiscount, b.gstSlab, b.paymentMode, b.paid, b.due, 
@@ -789,11 +791,15 @@
         const min = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(str)))));
         if (Array.isArray(min)) {
             const isPur = min[16] ? min[16].includes("PURCHASE") : false;
-            let prefix = "SRE";
-            if(isPur) prefix = "PUR";
-            if(min[16] && min[16].includes("PAYMENT")) prefix = "PAY";
-            if(min[16] && min[16].includes("RECEIPT")) prefix = "REC";
-            const invNo = `${prefix}-20${String(min[1] || "").slice(-2) || "26"}-${String(min[0] || "0").padStart(3, '0')}`;
+            let invNo = "";
+            if (isPur) {
+                invNo = min[0];
+            } else {
+                let prefix = "SRE";
+                if(min[16] && min[16].includes("PAYMENT")) prefix = "PAY";
+                if(min[16] && min[16].includes("RECEIPT")) prefix = "REC";
+                invNo = `${prefix}-20${String(min[1] || "").slice(-2) || "26"}-${String(min[0] || "0").padStart(3, '0')}`;
+            }
             let gt = Math.round(Number(min[6]) + Number(min[7]));
             return {
                 invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
@@ -849,6 +855,10 @@
       const isPurchase = (entryType === "PURCHASE");
       const isRepairSale = (type === "REPAIRING" && !isPurchase); 
 
+      document.getElementById("form-invoice-no").classList.toggle("hidden", isPurchase);
+      document.getElementById("pur-invoice-no").classList.toggle("hidden", !isPurchase);
+      if (isPurchase) document.getElementById("pur-invoice-no").value = "";
+
       document.getElementById("box-cust-phone").classList.toggle("hidden", isPurchase);
       document.getElementById("box-cust-address").classList.toggle("hidden", isPurchase);
       document.getElementById("box-cust-gstin").classList.toggle("hidden", isPurchase);
@@ -898,7 +908,9 @@
       if(!isPurchase) onPaymentModeChange();
       if(!isRepairSale) addNewItemRow(true);
       
-      document.getElementById("form-invoice-no").innerText = `${isPurchase?"PUR":"SRE"}-${new Date().getFullYear()}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
+      if (!isPurchase) {
+          document.getElementById("form-invoice-no").innerText = `SRE-${new Date().getFullYear()}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
+      }
       recalcTotals();
       showView("new-bill");
     }
@@ -913,7 +925,7 @@
       const isMobile = currentBillType === "MOBILE";
       const existingImeis = Array.from(imeiBox.querySelectorAll(".item-imei")).map(inp => inp.value);
       let qty = Math.max(1, Number(row.querySelector(".item-qty").value) || 1);
-      if (qty > 10) qty = 10; 
+      if (currentEntryType === "SALE" && qty > 10) qty = 10; 
       
       let html = '<div class="grid grid-cols-2 gap-2 mt-1.5">';
       for(let i=0; i < qty; i++){ 
@@ -936,6 +948,8 @@
       let removeBtn = '';
       if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-1.5 right-2 text-[#004aad] font-bold text-[10px]">X Remove</button>`;
 
+      const maxAttr = currentEntryType === "SALE" ? 'max="10"' : '';
+
       const purchaseFieldsHtml = currentEntryType === "PURCHASE" ? `
         <div class="purchase-fields grid grid-cols-3 gap-2 mt-1.5">
            <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Rate (Rs.) *</label><input type="number" oninput="recalcTotals()" class="item-rate w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" placeholder="0" /></div>
@@ -955,7 +969,7 @@
            </div>
            <div class="col-span-1">
              <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Qty *</label>
-             <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" />
+             <input type="number" min="1" ${maxAttr} value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" />
            </div>
         </div>
         ${purchaseFieldsHtml}
@@ -1161,8 +1175,10 @@
 
       let s_val = "", p_val = "", aMode = "";
       let checkSplit = false;
+      let finalInvoiceNo = "";
 
       if (currentEntryType === "SALE") {
+          finalInvoiceNo = document.getElementById("form-invoice-no").innerText;
           s_val = document.getElementById("pay-secondary").value;
           p_val = document.getElementById("pay-primary").value;
           aMode = p_val;
@@ -1199,6 +1215,9 @@
               if (splitErr) return showPopup("Validation Error", "All selected split payment amounts must be filled!", true);
           }
       } else {
+          finalInvoiceNo = document.getElementById("pur-invoice-no").value.trim().toUpperCase();
+          if (!finalInvoiceNo) return showPopup("Validation Error", "Supplier Invoice No. is required!", true);
+
           const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
           if (mode === "Cash + QR") {
               const c = document.getElementById("pur-split-cash").value;
@@ -1323,7 +1342,7 @@
       const formattedDate = getFormattedDate();
 
       const billData = {
-        invoiceNo: document.getElementById("form-invoice-no").innerText,
+        invoiceNo: finalInvoiceNo,
         billDate: formattedDate,
         billType: `${currentEntryType} - ${currentBillType}`,
         customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
