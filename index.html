@@ -158,19 +158,16 @@
     <!-- VIEW 2: NEW BILL FORM (COMPRESSED) -->
     <div id="view-new-bill" class="bg-white rounded-xl shadow p-2.5 space-y-2 border hidden">
       
-      <!-- FIXED: PREMIUM PURCHASE HEADER -->
       <div id="pur-header-title" class="hidden w-full text-center py-2 mb-2 bg-[#004aad] rounded shadow-sm">
          <h2 class="text-sm font-black text-white tracking-[0.2em]">PURCHASE ENTRY</h2>
       </div>
 
       <div class="flex flex-wrap sm:flex-nowrap justify-between items-end border-b pb-2 mb-2 gap-2">
         <div class="flex items-center space-x-1.5">
-          <!-- Sale Mode -->
           <h2 id="form-invoice-no" class="text-sm font-black text-slate-900">SRE-2026-001</h2>
           <span id="form-entry-type" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-[#004aad]">SALE</span>
         </div>
         
-        <!-- FIXED: PURCHASE INVOICE NO & DATE (Fills empty right area) -->
         <div id="pur-top-bar" class="hidden flex-1 grid grid-cols-2 gap-2 w-full">
            <div>
              <label class="text-[8px] font-bold text-slate-500 uppercase">Inv No *</label>
@@ -215,7 +212,20 @@
           <h3 class="font-bold text-[10px] uppercase text-[#004aad]">Products</h3>
           <button onclick="addNewItemRow(false)" class="text-[10px] font-bold text-[#004aad] bg-blue-50 px-2 py-0.5 rounded border border-blue-200 hover:bg-blue-100 transition">+ Add Item</button>
         </div>
-        <div id="items-container" class="space-y-1.5"></div>
+        
+        <!-- FIXED: SINGLE ROW HEADER FOR PURCHASE ONLY -->
+        <div id="items-wrapper" class="overflow-x-visible">
+           <div id="pur-grid-header" class="hidden flex items-center gap-1.5 px-1 pb-1 text-[8px] font-black text-slate-500 uppercase tracking-wider min-w-[600px] sm:min-w-full">
+               <div class="flex-[2]">Product Name</div>
+               <div class="flex-1">IMEI-1 / Serial</div>
+               <div class="w-12 text-center">Qty</div>
+               <div class="w-16 text-right">Rate</div>
+               <div class="w-14">GST</div>
+               <div class="w-16 text-right">Amount</div>
+               <div class="w-12 text-center">Act</div>
+           </div>
+           <div id="items-container" class="space-y-1.5"></div>
+        </div>
       </div>
 
       <div class="p-2.5 bg-slate-50 rounded-lg border space-y-2">
@@ -277,7 +287,6 @@
           </div>
         </div>
 
-        <!-- FIXED: NEW COMPRESSED PURCHASE PAYMENT SECTION WITH CENTERED BIG RADIO BUTTONS -->
         <div id="purchase-payment-section" class="hidden">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
             <div class="sm:col-span-1">
@@ -871,6 +880,7 @@
         billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-2 cursor-pointer flex justify-between border-b border-slate-100"><div><p class="font-bold text-[#004aad] text-[10px]">${b.invoiceNo}</p><p class="text-[8px] text-slate-500">${b.billType}</p></div><div class="font-black text-[10px] text-right text-[#004aad]">Rs. ${(b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? b.paid : b.grandTotal).toLocaleString("en-IN")}<br><span class="text-[7px] text-slate-400">${b.customerName}</span></div></div>`).join("");
     }
 
+    // FIXED: MODIFIED START NEW BILL TO HANDLE GRID HEADERS
     function startNewBill(type, entryType = currentEntryType) {
       currentBillType = type;
       currentEntryType = entryType;
@@ -907,6 +917,11 @@
       document.getElementById("cust-box").classList.toggle("hidden", isRepairSale);
       document.getElementById("items-box").classList.toggle("hidden", isRepairSale);
       document.getElementById("repair-box").classList.toggle("hidden", !isRepairSale);
+      
+      // FIXED: SHOW PUR GRID HEADER ONLY FOR PURCHASE
+      document.getElementById("pur-grid-header").classList.toggle("hidden", !isPurchase);
+      document.getElementById("items-wrapper").className = isPurchase ? "overflow-x-auto pb-2" : "overflow-x-visible";
+      document.getElementById("items-container").className = isPurchase ? "space-y-1.5 min-w-[600px] sm:min-w-full" : "space-y-1.5";
       document.getElementById("items-container").innerHTML = "";
       
       const lblName = document.getElementById("lbl-cust-name");
@@ -977,46 +992,110 @@
       imeiBox.innerHTML = html;
     }
 
+    // FIXED: NEW INLINE ROW UI FOR PURCHASE
     function addNewItemRow(isFirst = false) {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
-      div.className = "item-row relative p-2 bg-white rounded-lg border border-slate-200";
       
       let removeBtn = '';
-      if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-1.5 right-2 text-[#004aad] font-bold text-[10px]">X Remove</button>`;
+      if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.parentElement.remove(); recalcTotals();" class="text-rose-600 font-black text-xs hover:scale-110 transition p-1">❌</button>`;
+      else removeBtn = `<span class="w-4"></span>`;
 
-      const maxAttr = currentEntryType === "SALE" ? 'max="10"' : '';
-
-      const purchaseFieldsHtml = currentEntryType === "PURCHASE" ? `
-        <div class="purchase-fields grid grid-cols-3 gap-2 mt-1.5">
-           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Rate (Rs.) *</label><input type="number" oninput="recalcTotals()" class="item-rate w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" placeholder="0" /></div>
-           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">GST Slab</label><select onchange="recalcTotals()" class="item-gst w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]">
-               <option value="0" selected>0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
-             </select></div>
-           <div class="w-full"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Discount (Rs.)</label><input type="number" oninput="recalcTotals()" class="item-discount w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" placeholder="0" /></div>
-        </div>
-      ` : '';
-
-      div.innerHTML = `
-        ${removeBtn}
-        <div class="grid grid-cols-4 gap-2">
-           <div class="col-span-3">
-             <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Product Name *</label>
-             <input type="text" list="item-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C') && currentEntryType==='PURCHASE') { event.preventDefault(); openItemModal(this); }" placeholder="Enter Product Name" class="item-name w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none uppercase text-[#004aad]" />
-           </div>
-           <div class="col-span-1">
-             <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Qty *</label>
-             <input type="number" min="1" ${maxAttr} value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" />
-           </div>
-        </div>
-        ${purchaseFieldsHtml}
-        <div class="item-imeis-box"></div>
-      `;
+      if (currentEntryType === "PURCHASE") {
+        div.className = "item-row bg-white rounded border border-slate-200 mb-1.5 shadow-sm min-w-[600px] sm:min-w-full overflow-hidden";
+        const isMobile = currentBillType === "MOBILE";
+        const imeiPlaceholder = isMobile ? "IMEI-1 *" : "SERIAL-1";
+        const imeiDisabled = currentBillType === "ACCESSORIES" ? "disabled bg-slate-50 opacity-50" : "";
+        
+        div.innerHTML = `
+          <div class="flex items-center gap-1.5 p-1">
+             <input type="text" list="item-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openItemModal(this); }" placeholder="Product Name *" class="item-name flex-[2] p-1.5 border border-slate-300 rounded text-[10px] font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad]" />
+             
+             <input type="text" placeholder="${imeiPlaceholder}" class="item-imei-main flex-1 p-1.5 border border-slate-300 rounded text-[10px] font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] ${imeiDisabled}" ${imeiDisabled} />
+             
+             <input type="number" min="1" value="1" placeholder="Qty" oninput="handlePurQtyChange(this)" class="item-qty w-12 p-1.5 border border-slate-300 rounded text-[10px] font-bold outline-none text-[#004aad] focus:border-[#004aad] text-center" />
+             
+             <input type="number" oninput="recalcTotals()" class="item-rate w-16 p-1.5 border border-slate-300 rounded text-[10px] font-bold outline-none text-[#004aad] focus:border-[#004aad] text-right" placeholder="Rate" />
+             
+             <select onchange="recalcTotals()" class="item-gst w-14 p-1.5 border border-slate-300 rounded text-[10px] font-bold outline-none text-[#004aad] focus:border-[#004aad]">
+               <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
+             </select>
+             
+             <div class="item-amt-display w-16 text-right text-[11px] font-black text-[#004aad]">0.00</div>
+             
+             <div class="w-12 flex justify-end items-center space-x-1 pr-1">
+                 <button type="button" onclick="togglePurImeis(this)" class="pur-expand-btn hidden text-[#004aad] text-xs hover:scale-110 transition p-1">⬇️</button>
+                 ${!isFirst ? removeBtn : '<span class="w-[18px]"></span>'}
+             </div>
+          </div>
+          <div class="pur-extra-imeis hidden p-2 bg-blue-50 border-t border-blue-100 grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+        `;
+      } else {
+        div.className = "item-row relative p-2 bg-white rounded-lg border border-slate-200";
+        if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-1.5 right-2 text-rose-600 font-black text-[10px]">X Remove</button>`;
+        else removeBtn = '';
+        div.innerHTML = `
+          ${removeBtn}
+          <div class="grid grid-cols-4 gap-2">
+             <div class="col-span-3">
+               <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Product Name *</label>
+               <input type="text" list="item-list" placeholder="Enter Product Name" class="item-name w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none uppercase text-[#004aad]" />
+             </div>
+             <div class="col-span-1">
+               <label class="text-[10px] font-bold text-slate-600 block mb-0.5">Qty *</label>
+               <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full p-1.5 border border-slate-300 rounded text-xs font-bold outline-none text-[#004aad]" />
+             </div>
+          </div>
+          <div class="item-imeis-box"></div>
+        `;
+      }
       container.appendChild(div);
-      renderItemImeis(div);
+      if(currentEntryType === "SALE") renderItemImeis(div);
     }
 
     function handleQtyChange(input) { renderItemImeis(input.closest(".item-row")); recalcTotals(); }
+
+    // FIXED: HANDLING EXTRA IMEI BOXES FOR PURCHASE 
+    function handlePurQtyChange(input) {
+       recalcTotals(); 
+       const row = input.closest(".item-row");
+       const qty = Math.max(1, Number(input.value) || 1);
+       const btn = row.querySelector(".pur-expand-btn");
+       const extraBox = row.querySelector(".pur-extra-imeis");
+       
+       if (currentBillType === "ACCESSORIES") {
+           btn.classList.add("hidden");
+           extraBox.innerHTML = "";
+           return;
+       }
+
+       if (qty > 1) {
+           btn.classList.remove("hidden");
+           const existing = Array.from(extraBox.querySelectorAll("input")).map(i => i.value);
+           let html = '';
+           for(let i=2; i<=qty; i++) {
+               const val = existing[i-2] || "";
+               html += `<input type="text" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full p-1.5 border border-blue-200 rounded text-[9px] font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad]" />`;
+           }
+           extraBox.innerHTML = html;
+       } else {
+           btn.classList.add("hidden");
+           extraBox.innerHTML = "";
+           extraBox.classList.add("hidden");
+           btn.innerText = "⬇️";
+       }
+    }
+
+    function togglePurImeis(btn) {
+       const box = btn.closest(".item-row").querySelector(".pur-extra-imeis");
+       if (box.classList.contains("hidden")) {
+           box.classList.remove("hidden");
+           btn.innerText = "⬆️";
+       } else {
+           box.classList.add("hidden");
+           btn.innerText = "⬇️";
+       }
+    }
 
     function onPaymentModeChange() {
       const p = document.getElementById("pay-primary").value;
@@ -1140,7 +1219,7 @@
           const q = Number(r.querySelector(".item-qty").value) || 1;
           const rate = Number(r.querySelector(".item-rate")?.value) || 0;
           const gstSlab = Number(r.querySelector(".item-gst")?.value) || 0;
-          const disc = Number(r.querySelector(".item-discount")?.value) || 0;
+          const disc = 0; // Removed per-item discount visually
 
           let basicValue = 0; let gstAmount = 0; let itemTotal = 0;
 
@@ -1154,6 +1233,9 @@
              itemTotal = basicValue + gstAmount;
           }
           
+          const amtDisplay = r.querySelector(".item-amt-display");
+          if(amtDisplay) amtDisplay.innerText = itemTotal.toLocaleString("en-IN", {minimumFractionDigits: 2});
+
           totalTaxable += basicValue; totalGst += gstAmount; totalDiscount += disc; grand += itemTotal;
         });
         
@@ -1294,16 +1376,31 @@
           if(!pName) err = true;
           
           let validImeis = [];
-          if(currentBillType === "MOBILE" || currentBillType === "ACCESSORIES" || (currentBillType === "REPAIRING" && currentEntryType === "PURCHASE")){
-            Array.from(r.querySelectorAll(".item-imei")).forEach(inp => {
-               const val = inp.value.trim().toUpperCase();
-               if(currentBillType === "MOBILE") {
-                   if(val.length !== 15) imeiErr = true;
-                   validImeis.push(val);
-               } else {
-                   if(val) validImeis.push(val); 
-               }
-            });
+          if(currentBillType !== "ACCESSORIES" && !(currentBillType === "REPAIRING" && currentEntryType === "SALE")){
+            if (currentEntryType === "PURCHASE") {
+                const mainImei = r.querySelector(".item-imei-main")?.value.trim().toUpperCase();
+                if (mainImei) {
+                    if (currentBillType === "MOBILE" && mainImei.length !== 15) imeiErr = true;
+                    validImeis.push(mainImei);
+                }
+                r.querySelectorAll(".item-imei-extra").forEach(inp => {
+                   const val = inp.value.trim().toUpperCase();
+                   if(val) {
+                       if(currentBillType === "MOBILE" && val.length !== 15) imeiErr = true;
+                       validImeis.push(val);
+                   }
+                });
+            } else {
+                Array.from(r.querySelectorAll(".item-imei")).forEach(inp => {
+                   const val = inp.value.trim().toUpperCase();
+                   if(currentBillType === "MOBILE") {
+                       if(val.length !== 15) imeiErr = true;
+                       validImeis.push(val);
+                   } else {
+                       if(val) validImeis.push(val); 
+                   }
+                });
+            }
           }
           
           const q = Number(r.querySelector(".item-qty").value)||1;
@@ -1312,7 +1409,7 @@
           if (currentEntryType === "PURCHASE") {
               let purGstType = document.getElementById("pur-gst-type") ? document.getElementById("pur-gst-type").value : "EXCLUDED";
               const rate = Number(r.querySelector(".item-rate")?.value) || 0;
-              const disc = Number(r.querySelector(".item-discount")?.value) || 0;
+              const disc = 0; 
               const gst = Number(r.querySelector(".item-gst")?.value) || 0;
               
               if(rate <= 0) rateErr = true;
@@ -1438,7 +1535,7 @@
         if (it) {
           let dispName = it.name;
           if (isPur && (it.disc > 0 || it.gst > 0)) {
-              dispName += ` <span class="text-[9px] text-[#004aad] block mt-0.5">[G:${it.gst}% D:Rs.${it.disc}]</span>`;
+              dispName += ` <span class="text-[9px] text-[#004aad] block mt-0.5">[G:${it.gst}%]</span>`;
           }
 
           tbody.innerHTML += `<tr>
@@ -1549,7 +1646,7 @@
         doc.text(String(i+1), 20.5, y+5, { align:"center" });
         if (item) {
           let dispName = String(item.name).substring(0,24);
-          if (isPur && (item.disc > 0 || item.gst > 0)) dispName += ` [G:${item.gst}% D:${item.disc}]`;
+          if (isPur && (item.disc > 0 || item.gst > 0)) dispName += ` [G:${item.gst}%]`;
           doc.text(dispName, 28, y+5);
           doc.text(String(item.imei || "-").substring(0, 42), 87, y+5);
           doc.text(String(item.qty), 141, y+5, { align:"center" });
