@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>SRI RAM ENTERPRISES - POS</title>
-  <meta name="theme-color" content="#004aad" />
+  <meta name="theme-color" content="#1e293b" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- PREMIUM CHART PLUGIN ADDED -->
+  <!-- Chart.js for Premium Dashboard Graphs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #f4f7fe; }
 
     @media print {
       body * { visibility: hidden; }
@@ -32,41 +32,20 @@
 
     /* Custom Premium Scrollbar */
     ::-webkit-scrollbar { height: 6px; width: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #004aad; }
-
-    /* Hide Autofill Colors */
-    input:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0 30px white inset !important;
-        -webkit-text-fill-color: #004aad !important;
-    }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* Hide Number Input Arrows */
     input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="text-slate-800 antialiased h-screen flex overflow-hidden">
 
   <datalist id="party-list"></datalist>
   <datalist id="item-list"></datalist>
-
-  <header id="main-header" class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white sticky top-0 z-30 px-5 py-3.5 shadow-md flex justify-between items-center transition-all">
-    <div class="flex items-center space-x-3">
-      <button id="global-back-btn" class="hidden text-white text-2xl font-black hover:scale-110 transition-transform -ml-2 p-1" onclick="showView('dashboard')">←</button>
-      <div>
-        <h1 id="app-header-title" class="font-black text-base sm:text-lg leading-none tracking-widest uppercase">POS DASHBOARD</h1>
-        <p id="app-header-sub" class="text-xs text-blue-100 font-bold mt-1 tracking-widest uppercase opacity-90">SRI RAM ENTERPRISES</p>
-      </div>
-    </div>
-  </header>
 
   <!-- MODALS -->
   <div id="party-popup" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity">
@@ -137,106 +116,262 @@
     </div>
   </div>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 w-full max-w-screen-2xl mx-auto p-4 sm:p-6 pb-24">
-
-    <!-- VIEW 1: DASHBOARD -->
-    <div id="view-dashboard" class="space-y-4 max-w-5xl mx-auto">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center"><span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Today's Sale</span><p id="dash-sales" class="text-2xl font-black text-emerald-600 mt-1.5">Rs. 0</p></div>
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center"><span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Today's Purchase</span><p id="dash-purchase" class="text-2xl font-black text-[#004aad] mt-1.5">Rs. 0</p></div>
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center"><span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Gross Profit</span><p id="dash-profit" class="text-2xl font-black text-emerald-600 mt-1.5">Rs. 0</p></div>
-        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center"><span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Loss</span><p id="dash-loss" class="text-2xl font-black text-rose-600 mt-1.5">Rs. 0</p></div>
-      </div>
-
-      <!-- NEW: DASHBOARD FULL WIDTH CHART -->
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 mt-4 p-5 w-full">
-         <div class="flex justify-between items-center mb-4">
-            <span class="font-black text-xs uppercase tracking-widest text-slate-500">Today's Statistics</span>
-         </div>
-         <div class="relative h-56 w-full">
-            <canvas id="dailyChart"></canvas>
-         </div>
-      </div>
-      
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-        <button onclick="startNewBill('MOBILE', 'SALE')" class="p-6 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-3xl shadow-md flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg transition-all group border border-transparent">
-          <span class="text-5xl mb-3 group-hover:scale-110 transition-transform drop-shadow-sm">🛒</span><span class="text-[11px] font-black uppercase tracking-widest">Sale Entry</span>
-        </button>
-        <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="p-6 bg-white text-[#004aad] rounded-3xl shadow-md flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg transition-all group border border-slate-100">
-          <span class="text-5xl mb-3 group-hover:scale-110 transition-transform drop-shadow-sm">📦</span><span class="text-[11px] font-black uppercase tracking-widest">Purchase</span>
-        </button>
-        <button onclick="startPayment('OUT')" class="p-6 bg-white text-[#004aad] rounded-3xl shadow-sm flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg transition-all group border border-slate-100">
-          <span class="text-5xl mb-3 group-hover:scale-110 transition-transform drop-shadow-sm opacity-90">💸</span><span class="text-[10px] font-black uppercase tracking-widest">Payment Out</span>
-        </button>
-        <button onclick="startPayment('IN')" class="p-6 bg-white text-[#004aad] rounded-3xl shadow-sm flex flex-col items-center justify-center hover:-translate-y-1 hover:shadow-lg transition-all group border border-slate-100">
-          <span class="text-5xl mb-3 group-hover:scale-110 transition-transform drop-shadow-sm opacity-90">🧾</span><span class="text-[10px] font-black uppercase tracking-widest">Receipt In</span>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 mt-4">
-        <button onclick="showView('ledger')" class="w-full p-5 bg-white text-[#004aad] rounded-3xl shadow-md flex items-center justify-center space-x-3 hover:-translate-y-1 hover:shadow-lg transition-all border border-slate-100">
-          <span class="text-3xl drop-shadow-sm">📒</span><span class="text-sm font-black uppercase tracking-widest">View Ledger</span>
-        </button>
-        <button onclick="showView('settings')" class="w-full p-5 bg-white text-[#004aad] rounded-3xl shadow-md flex items-center justify-center space-x-3 hover:-translate-y-1 hover:shadow-lg transition-all border border-slate-100">
-          <span class="text-3xl drop-shadow-sm">⚙️</span><span class="text-sm font-black uppercase tracking-widest">Settings</span>
-        </button>
-      </div>
-
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mt-4">
-        <div class="px-5 py-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-          <span class="font-black text-xs uppercase tracking-widest text-slate-500">Recent Invoices</span>
-          <span class="text-[9px] font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-400 uppercase tracking-widest border border-slate-200">Current Session</span>
-        </div>
-        <div id="recent-bills-list" class="divide-y divide-slate-50 max-h-72 overflow-y-auto"></div>
-      </div>
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="hidden lg:flex flex-col w-[260px] bg-[#1e293b] text-slate-300 flex-shrink-0 h-full overflow-y-auto">
+    <div class="p-6 flex items-center space-x-3 border-b border-slate-700/50 mb-4 cursor-pointer" onclick="showView('dashboard')">
+      <div class="bg-white text-[#1e293b] font-black text-xl italic rounded-full w-12 h-12 flex items-center justify-center shadow-lg border-2 border-slate-300">SRE</div>
+      <span class="text-white font-black text-lg tracking-wider uppercase leading-tight">POS<br><span class="text-xs font-semibold text-blue-400">System</span></span>
     </div>
+    <div class="flex-1 px-4 space-y-1.5 font-semibold text-sm">
+      <button onclick="showView('dashboard')" class="w-full flex items-center space-x-3 bg-blue-600 text-white px-4 py-3.5 rounded-xl transition-all shadow-md"><span class="text-lg">🏠</span><span>Dashboard</span></button>
+      <button onclick="openItemModal()" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">📦</span><span>Product</span></button>
+      <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">🛒</span><span>Purchase</span></button>
+      <button onclick="startNewBill('MOBILE', 'SALE')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">📈</span><span>Sales</span></button>
+      <button onclick="openPartyModal('CUSTOMER')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">👥</span><span>Party / Customer</span></button>
+      <button onclick="startPayment('IN')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">💳</span><span>Payment</span></button>
+      <button onclick="startPayment('OUT')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">💸</span><span>Expense</span></button>
+      <button onclick="showView('ledger')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all"><span class="text-lg">📒</span><span>Ledger</span></button>
+      <button onclick="showView('settings')" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all mt-4 border-t border-slate-700/50 pt-6"><span class="text-lg">⚙️</span><span>Settings</span></button>
+    </div>
+    <div class="p-5 mt-auto">
+      <div class="bg-gradient-to-br from-blue-900 to-slate-900 rounded-2xl p-4 text-center border border-slate-700/50">
+         <span class="text-3xl block mb-2">📈</span>
+         <p class="text-white font-bold text-sm leading-snug">Grow<br>Your Business<br>With Us</p>
+      </div>
+      <p class="text-[10px] text-slate-500 text-center mt-4">Version 1.0.0</p>
+    </div>
+  </aside>
 
-    <!-- VIEW 2: NEW BILL FORM (PREMIUM COMPRESSED) -->
-    <div id="view-new-bill" class="bg-white rounded-3xl shadow-xl p-4 sm:p-6 border border-slate-100 hidden">
+  <!-- RIGHT PANEL CONTENT -->
+  <div class="flex-1 flex flex-col h-full relative overflow-hidden bg-[#f4f7fe]">
+    
+    <!-- DESKTOP TOP HEADER -->
+    <header class="bg-[#0f172a] text-white flex justify-between items-center px-4 lg:px-8 py-3.5 shadow-sm z-30 flex-shrink-0">
+      <div class="flex items-center space-x-3 lg:hidden cursor-pointer" onclick="showView('dashboard')">
+        <button id="global-back-btn" class="hidden text-white text-2xl font-black hover:scale-110 transition-transform -ml-1 pr-2" onclick="showView('dashboard')">←</button>
+        <div id="header-logo-sre" class="bg-white text-slate-900 font-black text-sm italic rounded-full w-9 h-9 flex items-center justify-center">SRE</div>
+      </div>
+      <div class="hidden lg:block">
+        <h1 id="app-header-title" class="text-xl font-black text-white tracking-wide">Sri Ram Enterprises</h1>
+        <p id="app-header-sub" class="text-[11px] text-slate-400 font-semibold mt-0.5 tracking-wider">Smart Business | Simple Accounting | Better Growth</p>
+      </div>
       
-      <!-- PURCHASE CLEAN TITLE -->
-      <div id="pur-header-title" class="hidden w-full border-b-2 border-slate-100 pb-3 mb-4">
-         <h2 class="text-lg font-black text-[#004aad] tracking-[0.2em] uppercase">Purchase Entry</h2>
+      <div class="flex items-center space-x-4 sm:space-x-6">
+        <div class="hidden md:flex relative">
+          <input type="text" placeholder="Search (Customer, Product, Invoice, etc...)" class="bg-slate-800/50 border border-slate-700 text-slate-200 px-5 py-2.5 rounded-full text-xs font-semibold outline-none w-80 focus:ring-2 focus:ring-blue-500 transition-all placeholder-slate-500">
+          <span class="absolute right-4 top-2.5 text-slate-400 text-sm">🔍</span>
+        </div>
+        <button class="text-xl relative opacity-80 hover:opacity-100 transition-opacity">🔔<span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm">3</span></button>
+        <button onclick="showView('settings')" class="text-xl opacity-80 hover:opacity-100 hidden sm:block transition-opacity">⚙️</button>
+        <div class="flex items-center space-x-3 border-l border-slate-700 pl-5">
+           <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-inner">A</div>
+           <div class="hidden sm:block text-left">
+             <span class="font-bold text-sm block leading-none">Admin <span class="text-[10px] ml-1 opacity-50">▼</span></span>
+             <span id="header-datetime" class="text-[10px] text-slate-400 font-semibold mt-1 block">...</span>
+           </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SCROLLABLE MAIN AREA -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-6 pb-24 lg:pb-6 relative w-full h-full">
+
+      <!-- VIEW 1: DASHBOARD (REPLICATING IMAGE) -->
+      <div id="view-dashboard" class="space-y-6 max-w-screen-2xl mx-auto w-full pb-8">
+        
+        <!-- TOP 4 CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 w-full">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
+            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-3xl shadow-inner">🛒</div>
+            <div>
+              <p class="text-slate-500 text-[11px] font-bold mb-1 uppercase tracking-wider">Total Sales</p>
+              <h3 class="text-2xl font-black text-slate-800" id="dash-sales">₹ 0</h3>
+              <p class="text-emerald-500 text-[11px] font-black mt-1.5 flex items-center gap-1">↗ +12% <span class="text-slate-400 font-medium text-[9px]">vs. Last Month</span></p>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
+            <div class="w-16 h-16 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-3xl shadow-inner">🛒</div>
+            <div>
+              <p class="text-slate-500 text-[11px] font-bold mb-1 uppercase tracking-wider">Total Purchase</p>
+              <h3 class="text-2xl font-black text-slate-800" id="dash-purchase">₹ 0</h3>
+              <p class="text-rose-500 text-[11px] font-black mt-1.5 flex items-center gap-1">↗ +8% <span class="text-slate-400 font-medium text-[9px]">vs. Last Month</span></p>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl shadow-inner">👥</div>
+            <div>
+              <p class="text-slate-500 text-[11px] font-bold mb-1 uppercase tracking-wider">Total Customers</p>
+              <h3 class="text-2xl font-black text-slate-800" id="dash-customers">0</h3>
+              <p class="text-emerald-500 text-[11px] font-black mt-1.5 flex items-center gap-1">↗ +18% <span class="text-slate-400 font-medium text-[9px]">vs. Last Month</span></p>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-3xl shadow-inner">📦</div>
+            <div>
+              <p class="text-slate-500 text-[11px] font-bold mb-1 uppercase tracking-wider">Total Products</p>
+              <h3 class="text-2xl font-black text-slate-800" id="dash-products">0</h3>
+              <p class="text-emerald-500 text-[11px] font-black mt-1.5 flex items-center gap-1">↗ +5% <span class="text-slate-400 font-medium text-[9px]">vs. Last Month</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 w-full">
+           <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-base text-slate-800 tracking-wide">Sales & Purchase Overview</h3>
+                <div class="flex space-x-4 items-center">
+                   <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span><span class="text-xs font-bold text-slate-600">Sales</span></div>
+                   <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span><span class="text-xs font-bold text-slate-600">Purchase</span></div>
+                   <select class="text-xs font-bold border border-slate-200 rounded-lg px-2 py-1 outline-none text-slate-600 bg-slate-50 ml-2"><option>This Month</option></select>
+                </div>
+             </div>
+             <div class="h-[280px] w-full"><canvas id="salesChart"></canvas></div>
+           </div>
+           <div class="lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-base text-slate-800 tracking-wide">Expense Breakdown</h3>
+                <select class="text-xs font-bold border border-slate-200 rounded-lg px-2 py-1 outline-none text-slate-600 bg-slate-50"><option>This Month</option></select>
+             </div>
+             <div class="h-[240px] w-full flex justify-center relative items-center">
+                 <canvas id="expenseChart"></canvas>
+                 <div class="absolute flex flex-col items-center justify-center pointer-events-none">
+                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</span>
+                     <span class="text-base font-black text-slate-800">₹ 28,450</span>
+                 </div>
+             </div>
+             <div class="mt-4 grid grid-cols-1 gap-2.5 px-2">
+                 <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span><span class="font-bold text-slate-600">Rent</span></div><div class="font-black">₹ 8,000 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">28%</span></div></div>
+                 <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span><span class="font-bold text-slate-600">Salary</span></div><div class="font-black">₹ 7,500 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">26%</span></div></div>
+                 <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#f59e0b]"></span><span class="font-bold text-slate-600">Electricity</span></div><div class="font-black">₹ 3,200 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">11%</span></div></div>
+                 <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#ef4444]"></span><span class="font-bold text-slate-600">Internet</span></div><div class="font-black">₹ 1,250 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">4%</span></div></div>
+                 <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#8b5cf6]"></span><span class="font-bold text-slate-600">Other</span></div><div class="font-black">₹ 8,500 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">31%</span></div></div>
+             </div>
+           </div>
+        </div>
+
+        <!-- BOTTOM SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 w-full">
+           
+           <!-- Recent Transactions -->
+           <div class="lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
+              <div class="flex justify-between items-center mb-5 flex-shrink-0">
+                <h3 class="font-black text-base text-slate-800 tracking-wide">Recent Transactions</h3>
+                <a href="#" onclick="showView('ledger')" class="text-[11px] text-blue-600 font-black hover:underline uppercase tracking-widest">View All</a>
+              </div>
+              <div class="overflow-y-auto flex-1 pr-2">
+                 <table class="w-full text-left text-xs">
+                   <thead class="text-slate-400 border-b border-slate-100 font-bold uppercase tracking-widest sticky top-0 bg-white">
+                     <tr><th class="pb-3 pt-1">Date</th><th class="pb-3 pt-1">Type</th><th class="pb-3 pt-1">Particulars</th><th class="pb-3 pt-1 text-right">Amount</th><th class="pb-3 pt-1 text-center">Status</th></tr>
+                   </thead>
+                   <tbody id="dash-recent-table" class="divide-y divide-slate-50">
+                     <!-- Dynamic Rows Go Here -->
+                   </tbody>
+                 </table>
+              </div>
+           </div>
+
+           <!-- Stock Summary (Static Placeholder matching Image) -->
+           <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
+              <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-base text-slate-800 tracking-wide">Stock Summary</h3>
+                <a href="#" class="text-[11px] text-blue-600 font-black hover:underline uppercase tracking-widest">View All</a>
+              </div>
+              <div class="space-y-6 flex-1">
+                 <div class="flex justify-between items-center pb-5 border-b border-slate-50">
+                    <div class="flex items-center space-x-3"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner">📦</div><span class="font-bold text-slate-600 text-sm">Total Products</span></div>
+                    <span class="font-black text-slate-800 text-lg" id="stock-total">1,420</span>
+                 </div>
+                 <div class="flex justify-between items-center pb-5 border-b border-slate-50">
+                    <div class="flex items-center space-x-3"><div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner">✅</div><span class="font-bold text-slate-600 text-sm">In Stock</span></div>
+                    <span class="font-black text-slate-800 text-lg">1,250</span>
+                 </div>
+                 <div class="flex justify-between items-center pb-5 border-b border-slate-50">
+                    <div class="flex items-center space-x-3"><div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shadow-inner">⚠️</div><span class="font-bold text-slate-600 text-sm">Low Stock</span></div>
+                    <span class="font-black text-slate-800 text-lg">120</span>
+                 </div>
+                 <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3"><div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner">❌</div><span class="font-bold text-slate-600 text-sm">Out of Stock</span></div>
+                    <span class="font-black text-slate-800 text-lg">50</span>
+                 </div>
+              </div>
+           </div>
+
+           <!-- Quick Actions -->
+           <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
+              <div class="mb-5">
+                <h3 class="font-black text-base text-slate-800 tracking-wide">Quick Actions</h3>
+              </div>
+              <div class="grid grid-cols-2 gap-3 flex-1">
+                 <button onclick="startNewBill('MOBILE', 'SALE')" class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-blue-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">🛒</span><span>New Sale</span>
+                 </button>
+                 <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-emerald-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">📦</span><span>New Purchase</span>
+                 </button>
+                 <button onclick="openItemModal()" class="bg-amber-50/50 hover:bg-amber-50 border border-amber-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-amber-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">📦</span><span>Add Product</span>
+                 </button>
+                 <button onclick="openPartyModal('CUSTOMER')" class="bg-purple-50/50 hover:bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-purple-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">👥</span><span>Add Party</span>
+                 </button>
+                 <button onclick="startPayment('IN')" class="bg-rose-50/50 hover:bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-rose-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">💳</span><span>Receive Payment</span>
+                 </button>
+                 <button onclick="startPayment('OUT')" class="bg-teal-50/50 hover:bg-teal-50 border border-teal-100 rounded-xl flex items-center justify-center space-x-2 text-sm font-bold text-teal-700 transition-all hover:shadow-sm hover:-translate-y-0.5">
+                    <span class="text-xl">➔</span><span>Make Payment</span>
+                 </button>
+              </div>
+           </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2 px-2 text-xs font-bold text-slate-400">
+           <p>"Discipline Today, Bigger Tomorrow."</p>
+           <p>Sri Ram Enterprises</p>
+        </div>
       </div>
 
-      <div class="flex flex-wrap sm:flex-nowrap justify-between items-end border-b border-slate-100 pb-4 mb-4 gap-4">
-        <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-start">
-          <h2 id="form-invoice-no" class="text-xl font-black text-[#004aad] tracking-wide">SRE-2026-001</h2>
-          <span id="form-entry-type" class="text-[10px] font-black px-3 py-1 rounded-lg bg-blue-50 text-[#004aad] border border-blue-100 uppercase tracking-widest">SALE</span>
+    <!-- VIEW 2: NEW BILL FORM -->
+    <div id="view-new-bill" class="bg-white rounded-3xl shadow-xl p-4 sm:p-6 border border-slate-100 hidden max-w-screen-2xl mx-auto w-full">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-100 pb-4 mb-4 gap-4">
+        <div id="sale-top-bar" class="w-full sm:flex-1 grid items-end">
+             <div class="flex items-center space-x-3 w-full justify-between sm:justify-start">
+               <h2 id="form-invoice-no" class="text-xl font-black text-[#004aad] tracking-wide">SRE-2026-001</h2>
+               <span id="form-entry-type" class="text-xs font-black px-3 py-1 rounded-lg bg-blue-50 text-[#004aad] border border-blue-100 uppercase tracking-widest">SALE</span>
+             </div>
         </div>
         
         <div id="pur-top-bar" class="hidden w-full sm:flex-1 grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
-           <div class="sm:col-span-6 relative">
+           <div class="sm:col-span-5 relative">
              <div class="flex justify-between items-center mb-1.5">
                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Supplier Name *</label>
-               <button type="button" tabindex="-1" onclick="openPartyModal('SUPPLIER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2.5 py-1 rounded-lg text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ NEW</button>
+               <button type="button" tabindex="-1" onclick="openPartyModal('SUPPLIER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2.5 py-1 rounded-md text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ NEW</button>
              </div>
-             <input type="text" id="pur-supplier-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" placeholder="Search or Enter Name" />
+             <input type="text" id="pur-supplier-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Search or Enter Name" />
            </div>
-           <div class="sm:col-span-3">
-             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Invoice No *</label>
-             <input type="text" id="pur-invoice-no" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" placeholder="Invoice No" />
+           <div class="sm:col-span-4">
+             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Supplier Inv No *</label>
+             <input type="text" id="pur-invoice-no" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Enter Inv No" />
            </div>
            <div class="sm:col-span-3">
              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date *</label>
-             <input type="date" id="pur-invoice-date" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" />
+             <input type="date" id="pur-invoice-date" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" />
            </div>
         </div>
 
-        <div class="flex bg-slate-50 p-1.5 rounded-xl border border-slate-200 self-end shadow-sm gap-1 w-full sm:w-auto overflow-x-auto">
-          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="flex-1 sm:flex-none h-[38px] px-5 rounded-lg text-[10px] font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md transition-all">MOBILE</button>
-          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="flex-1 sm:flex-none h-[38px] px-5 rounded-lg text-[10px] font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">ACCESSORIES</button>
-          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="flex-1 sm:flex-none h-[38px] px-5 rounded-lg text-[10px] font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">REPAIRING</button>
+        <div class="flex bg-slate-100/70 p-1.5 rounded-xl border border-slate-200 self-end shadow-inner gap-1 w-full sm:w-auto overflow-x-auto">
+          <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md transition-all">MOBILE</button>
+          <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">ACCESSORIES</button>
+          <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">REPAIRING</button>
         </div>
       </div>
 
       <!-- CUSTOMER BOX (For Sale Only) -->
-      <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-4">
+      <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div>
           <div class="flex justify-between items-center mb-1.5">
             <label id="lbl-cust-name" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Name *</label>
-            <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2 py-1 rounded-lg text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest">➕ NEW</button>
+            <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2 py-1 rounded text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest">➕ NEW</button>
           </div>
           <input type="text" id="cust-name" list="party-list" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" />
         </div>
@@ -245,7 +380,7 @@
         <div id="box-cust-gstin"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" maxlength="15" /></div>
       </div>
 
-      <div id="repair-box" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 hidden shadow-sm mb-4">
+      <div id="repair-box" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 hidden shadow-sm">
         <div class="grid grid-cols-2 gap-4">
           <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Customer Mobile *</label><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Mobile No" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
           <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Device / Model *</label><input type="text" id="rep-device" placeholder="Model Name" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
@@ -253,38 +388,39 @@
         <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Issue Description *</label><textarea id="rep-issue" rows="1" placeholder="Issue Details..." class="w-full h-[48px] py-3 px-4 bg-white border border-slate-200 rounded-xl text-sm outline-none uppercase focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm"></textarea></div>
       </div>
 
-      <!-- PRODUCT GRID -->
-      <div id="items-box" class="space-y-3 pt-2 border-t border-slate-100">
+      <!-- ITEMS GRID -->
+      <div id="items-box" class="space-y-3 pt-3">
         <div class="flex justify-between items-end pb-2 border-b border-slate-100">
           <h3 class="font-black text-sm uppercase text-[#004aad] tracking-widest">Product Details</h3>
-          <button onclick="addNewItemRow(false)" class="text-[11px] font-black text-[#004aad] bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ Add Row</button>
+          <button onclick="addNewItemRow(false)" class="text-[10px] font-black text-[#004aad] bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ Add Row</button>
         </div>
         
         <div id="items-wrapper" class="overflow-x-visible">
-           <div id="pur-grid-header" class="hidden flex items-center gap-3 px-2.5 pb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest min-w-[850px] sm:min-w-full border-b border-slate-100 mb-2">
-               <div class="flex-[2] min-w-[180px] pl-2">Product Name</div>
+           <!-- FIXED COLUMN ORDER AND EXACT WIDTH -->
+           <div id="pur-grid-header" class="hidden flex items-center gap-3 px-2 pb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest min-w-[850px] sm:min-w-full border-b border-slate-100 mb-2">
+               <div class="flex-[2] min-w-[180px] pl-3">Product Name</div>
                <div class="w-24 text-right">Rate</div>
                <div class="w-20 text-center">GST</div>
                <div class="w-20 text-center">Qty</div>
                <div class="flex-[1.5] min-w-[140px] pl-1">IMEI-1 / Serial</div>
                <div class="w-28 text-right pr-2">Amount</div>
-               <div class="w-12 text-right pr-3">Act</div>
+               <div class="w-12 text-center">Act</div>
            </div>
            <div id="items-container" class="space-y-3"></div>
         </div>
       </div>
 
-      <!-- COMPRESSED BOTTOM SECTION -->
+      <!-- BOTTOM SECTION -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-sm mt-4 flex flex-col overflow-hidden">
         
         <div class="p-5 flex flex-col space-y-4">
             <div id="global-tax-discount-box" class="grid grid-cols-2 gap-5 pb-4 border-b border-slate-100">
               <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Global Discount (Rs.)</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Global Discount (Rs.)</label>
                 <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" placeholder="Discount Amount" />
               </div>
               <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bill GST Slab</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bill GST Slab</label>
                 <select id="global-gst" onchange="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
                   <option value="0" selected>0% GST</option>
                   <option value="5">5% GST</option>
@@ -295,19 +431,18 @@
               </div>
             </div>
 
-            <!-- PAYMENT ROW (COMPRESSED) -->
             <div class="flex flex-col sm:flex-row gap-5 items-start sm:items-end w-full">
                 
                 <div class="flex-1 w-full">
                    <div id="sale-payment-section" class="grid grid-cols-2 gap-4">
-                      <div><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Primary Mode</label>
+                      <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Primary Mode</label>
                         <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
                           <option value="Cash">Cash</option><option value="QR">QR (Online)</option><option value="Card Swipe">Card Swipe</option>
                           <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
                           <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
                         </select>
                       </div>
-                      <div><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Secondary Mode</label>
+                      <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Secondary Mode</label>
                         <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
                           <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Credit</option>
                         </select>
@@ -316,8 +451,8 @@
 
                    <!-- PURCHASE PAYMENT MODE (CREDIT FIRST, NO RED, CENTERED) -->
                    <div id="purchase-payment-section" class="hidden w-full">
-                      <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Payment Mode *</label>
-                      <div class="flex justify-between items-center text-xs font-black bg-slate-50 border border-slate-200 rounded-xl h-[48px] p-1.5 shadow-inner gap-1.5">
+                      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Payment Mode *</label>
+                      <div class="flex justify-between items-center text-xs font-black bg-slate-50 border border-slate-200 rounded-xl h-[48px] p-1.5 shadow-inner gap-1.5 max-w-2xl mx-auto">
                         <label id="lbl-pay-Credit" class="flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all">
                           <input type="radio" name="pur_pay_mode" value="Credit" class="hidden" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
                         </label>
@@ -334,57 +469,57 @@
                    </div>
                 </div>
 
-                <!-- TOTAL AMOUNT PAID -->
+                <!-- TOTAL AMOUNT PAID (SAME ROW AS PAYMENT) -->
                 <div class="w-full sm:w-64">
-                   <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Amount Paid *</label>
+                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Amount Paid *</label>
                    <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full h-[48px] px-4 border-2 border-blue-400 rounded-xl font-black text-[#004aad] text-xl outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200" placeholder="0" />
                 </div>
             </div>
 
             <!-- DYNAMIC SPLIT/FINANCE BOXES -->
             <div id="split-box" class="pt-4 border-t border-slate-100 grid grid-cols-3 gap-4 hidden mt-3">
-              <div id="wrap-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-              <div id="wrap-split-qr" class="hidden"><label class="text-[11px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-              <div id="wrap-split-card" class="hidden"><label class="text-[11px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
+              <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
+              <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
+              <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
             </div>
 
             <div id="fin-box" class="pt-4 border-t border-blue-100 bg-blue-50 p-4 rounded-2xl hidden mt-3">
               <div class="grid grid-cols-3 gap-4 mb-3">
-                <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Company *</label><select id="fin-company" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
+                <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Company *</label><select id="fin-company" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
                   <option value="">-- Fin. Company --</option><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option>
                   <option value="HDB Finance">HDB Finance</option><option value="TVS Credit">TVS Credit</option><option value="IDFC First Bank">IDFC First Bank</option>
                 </select></div>
-                <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
-                <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
+                <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
+                <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
                   <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
                   <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
                 </select></div>
               </div>
               <div id="fin-split-container" class="grid grid-cols-3 gap-4 hidden">
-                <div id="wrap-fin-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                <div id="wrap-fin-split-qr" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                <div id="wrap-fin-split-card" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-fin-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-fin-split-qr" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-fin-split-card" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
               </div>
             </div>
 
             <div id="dues-box" class="pt-4 border-t border-slate-200 bg-slate-50 p-4 rounded-2xl hidden mt-3">
               <div class="grid grid-cols-2 gap-4 mb-3">
-                <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
+                <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
                   <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
                   <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
                 </select></div>
-                <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
+                <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
               </div>
               <div id="dues-split-container" class="grid grid-cols-3 gap-4 hidden">
-                <div id="wrap-dues-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                <div id="wrap-dues-split-qr" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                <div id="wrap-dues-split-card" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-dues-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-dues-split-qr" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
+                <div id="wrap-dues-split-card" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
               </div>
             </div>
             
-            <div id="pur-split-box" class="pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 hidden mt-3">
-              <div id="wrap-pur-cash"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-              <div id="wrap-pur-qr"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
+            <div id="pur-split-box" class="pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 hidden mt-3 max-w-2xl mx-auto">
+              <div id="wrap-pur-cash"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
+              <div id="wrap-pur-qr"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
             </div>
 
             <div id="finance-loan-row" class="hidden mt-3 flex justify-between items-center text-sm font-black text-[#004aad] bg-blue-100 px-5 py-3 rounded-xl border border-blue-200 shadow-sm">
@@ -395,27 +530,22 @@
 
         <!-- 4-IN-1 ONE ROW SUMMARY -->
         <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-4 sm:p-5 flex items-center justify-between text-center divide-x divide-white/20">
-            
             <div id="box-basic-amt" class="hidden flex-1 px-2 sm:px-3">
-                <span class="text-[10px] sm:text-[11px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">Basic Amt</span>
+                <span class="text-[9px] sm:text-[10px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">Basic Amt</span>
                 <p id="form-basic-amt" class="text-base sm:text-xl font-black leading-none drop-shadow-md">Rs. 0</p>
             </div>
-            
             <div id="box-gst-amt" class="hidden flex-1 px-2 sm:px-3">
-                <span class="text-[10px] sm:text-[11px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">GST Amt</span>
+                <span class="text-[9px] sm:text-[10px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">GST Amt</span>
                 <p id="form-gst-amt" class="text-base sm:text-xl font-black leading-none drop-shadow-md">Rs. 0</p>
             </div>
-
             <div class="flex-1 px-2 sm:px-3">
-                <span class="text-[11px] sm:text-sm text-blue-100 tracking-widest uppercase font-black block mb-1.5">Grand Total</span>
+                <span class="text-[10px] sm:text-[11px] text-blue-100 tracking-widest uppercase font-black block mb-1.5">Grand Total</span>
                 <p id="total-grand" class="text-2xl sm:text-3xl font-black leading-none drop-shadow-md text-amber-300">Rs. 0</p>
             </div>
-
             <div class="flex-1 px-2 sm:px-3">
-                <span class="text-[11px] sm:text-sm text-blue-100 tracking-widest uppercase font-black block mb-1.5">Balance Due</span>
+                <span class="text-[10px] sm:text-[11px] text-blue-100 tracking-widest uppercase font-black block mb-1.5">Balance Due</span>
                 <p id="total-due" class="text-xl sm:text-2xl font-bold leading-none drop-shadow-md text-white">Rs. 0</p>
             </div>
-
         </div>
       </div>
       
@@ -599,9 +729,10 @@
     </div>
 
   </main>
+  </div> <!-- End of flex-1 content area -->
 
-  <!-- BOTTOM NAV (ONLY VISIBLE ON DASHBOARD) -->
-  <nav id="bottom-nav" class="fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
+  <!-- MOBILE BOTTOM NAV -->
+  <nav id="bottom-nav" class="lg:hidden fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
      <button onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-3 text-center text-[#004aad] flex flex-col items-center hover:bg-slate-50 transition-colors">
        <span class="text-2xl leading-none opacity-90">🛒</span><span class="text-[10px] font-black mt-1.5 tracking-widest">SALE</span>
      </button>
@@ -624,7 +755,6 @@
     let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
-    let dailyChartInstance = null;
 
     let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || [];
     let itemsCache = JSON.parse(localStorage.getItem("sre_items")) || [];
@@ -898,6 +1028,7 @@
         return null;
     }
 
+    // FIXED: Global Back Arrow Header Logic
     function showView(view) {
       ["dashboard", "new-bill", "invoice", "settings", "ledger", "payment"].forEach(v => document.getElementById("view-" + v).classList.add("hidden"));
       document.getElementById("view-" + view).classList.remove("hidden");
@@ -953,37 +1084,56 @@
       const profit = sales > purchases ? sales - purchases : 0;
       const loss = purchases > sales ? purchases - sales : 0;
 
-      document.getElementById("dash-sales").innerText = "Rs. " + sales.toLocaleString("en-IN");
-      document.getElementById("dash-purchase").innerText = "Rs. " + purchases.toLocaleString("en-IN");
-      document.getElementById("dash-profit").innerText = "Rs. " + profit.toLocaleString("en-IN");
-      document.getElementById("dash-loss").innerText = "Rs. " + loss.toLocaleString("en-IN");
+      // Update 4 Cards
+      document.getElementById("dash-sales").innerText = "₹ " + sales.toLocaleString("en-IN");
+      document.getElementById("dash-purchase").innerText = "₹ " + purchases.toLocaleString("en-IN");
+      document.getElementById("dash-customers").innerText = partiesCache.filter(p=>p.type==='CUSTOMER').length;
+      document.getElementById("dash-products").innerText = itemsCache.length;
 
-      // RENDER CHART
-      const ctx = document.getElementById('dailyChart');
+      // Update Top Dash Stats
+      document.getElementById("dash-profit").innerText = "₹ " + profit.toLocaleString("en-IN");
+      document.getElementById("dash-loss").innerText = "₹ " + loss.toLocaleString("en-IN");
+
+      // RENDER PREMIUM CHARTS
+      const ctx = document.getElementById('salesChart');
       if (ctx) {
-          if (dailyChartInstance) dailyChartInstance.destroy();
-          dailyChartInstance = new Chart(ctx, {
+          if (window.dailyChartInstance) window.dailyChartInstance.destroy();
+          window.dailyChartInstance = new Chart(ctx, {
               type: 'bar',
               data: {
-                  labels: ['Today Overview'],
+                  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                   datasets: [
-                      { label: 'Sale', data: [sales], backgroundColor: '#10b981', borderRadius: 8, barPercentage: 0.5 },
-                      { label: 'Purchase', data: [purchases], backgroundColor: '#004aad', borderRadius: 8, barPercentage: 0.5 },
-                      { label: 'Profit', data: [profit], backgroundColor: '#f59e0b', borderRadius: 8, barPercentage: 0.5 }
+                      { label: 'Sales', data: [0,0,0,0,0,0,0,0, sales, 0,0,0], backgroundColor: '#3b82f6', borderRadius: 4, barPercentage: 0.6 },
+                      { label: 'Purchase', data: [0,0,0,0,0,0,0,0, purchases, 0,0,0], backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.6 }
                   ]
               },
-              options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', weight: 'bold' } } } },
-                  scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
-              }
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] } }, x: { grid: { display: false } } } }
           });
       }
 
-      const list = document.getElementById("recent-bills-list");
-      list.innerHTML = billsCache.length === 0 ? '<p class="p-8 text-center text-sm text-slate-400 font-bold tracking-wider">No bills in session.</p>' :
-        billsCache.slice(0, 15).map(b => `<div onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))' class="p-5 cursor-pointer flex justify-between border-b border-slate-50 hover:bg-slate-50 transition-colors"><div><p class="font-black text-[#004aad] text-sm">${b.invoiceNo}</p><p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">${b.billType}</p></div><div class="font-black text-base text-right text-[#004aad]">Rs. ${(b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? b.paid : b.grandTotal).toLocaleString("en-IN")}<br><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${b.customerName}</span></div></div>`).join("");
+      const ctxExp = document.getElementById('expenseChart');
+      if (ctxExp) {
+          if (window.expChartInstance) window.expChartInstance.destroy();
+          window.expChartInstance = new Chart(ctxExp, {
+              type: 'doughnut',
+              data: {
+                  labels: ['Rent', 'Salary', 'Electricity', 'Internet', 'Other'],
+                  datasets: [{ data: [28, 26, 11, 4, 31], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], borderWidth: 0, cutout: '75%' }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+          });
+      }
+
+      const list = document.getElementById("dash-recent-table");
+      list.innerHTML = billsCache.length === 0 ? '<tr><td colspan="5" class="p-8 text-center text-sm text-slate-400 font-bold tracking-wider">No recent transactions.</td></tr>' :
+        billsCache.slice(0, 15).map(b => `
+          <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))'>
+             <td class="py-3 font-bold text-slate-500 whitespace-nowrap">${b.billDate}</td>
+             <td class="py-3 font-black ${b.billType.includes('SALE') || b.billType.includes('RECEIPT') ? 'text-blue-500' : 'text-rose-500'} whitespace-nowrap">${b.billType.includes('SALE') ? '🛒 Sale' : (b.billType.includes('PURCHASE') ? '📦 Purchase' : '💸 Payment')}</td>
+             <td class="py-3 font-bold text-slate-700 whitespace-nowrap truncate max-w-[120px]">${b.customerName}</td>
+             <td class="py-3 font-black text-slate-800 text-right whitespace-nowrap">₹ ${b.grandTotal > 0 ? b.grandTotal.toLocaleString("en-IN") : b.paid.toLocaleString("en-IN")}</td>
+             <td class="py-3 text-center whitespace-nowrap"><span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${b.due > 0 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">${b.due > 0 ? 'Pending' : 'Paid'}</span></td>
+          </tr>`).join("");
     }
 
     function startNewBill(type, entryType = currentEntryType) {
@@ -1241,7 +1391,7 @@
         payPaidInput.readOnly = false;
         payPaidInput.classList.remove("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300");
         payPaidInput.classList.add("bg-blue-50", "text-[#004aad]", "border-blue-400");
-        payPaidInput.placeholder = "0";
+        payPaidInput.placeholder = "Enter Amount...";
       }
       recalcTotals();
     }
@@ -1283,7 +1433,7 @@
             payPaidInput.readOnly = false;
             payPaidInput.classList.remove("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300");
             payPaidInput.classList.add("bg-blue-50", "text-[#004aad]", "border-blue-400");
-            payPaidInput.placeholder = "0";
+            payPaidInput.placeholder = "Enter Amount...";
         }
         recalcTotals();
     }
@@ -1805,7 +1955,7 @@
              document.getElementById("top-invoice-bar").innerHTML = `<div class="w-full flex justify-between items-center bg-blue-50 px-4 py-3 rounded-2xl border border-blue-100"><span class="font-black text-[#004aad] text-xs uppercase tracking-widest">✅ E-Bill Loaded</span><button onclick="downloadVectorPDF()" class="px-6 py-2.5 bg-[#004aad] text-white font-black text-xs rounded-xl shadow-md animate-bounce hover:shadow-lg transition-all">📥 DOWNLOAD INVOICE</button></div>`;
              displayInvoice(expandBill(scanParam));
           } catch(e) { showPopup("Error", "Invalid or corrupted QR Code data!", true); }
-      } else { renderDashboard(); }
+      } else { showView('dashboard'); }
     });
   </script>
 </body>
