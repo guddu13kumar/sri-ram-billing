@@ -133,7 +133,6 @@
     <div class="flex items-center space-x-4 cursor-pointer" onclick="showView('dashboard')">
       <button id="global-back-btn" class="hidden text-white text-2xl font-black hover:scale-110 transition-transform -ml-2 pr-2" onclick="showView('dashboard')">←</button>
       
-      <!-- SRE Premium Logo -->
       <div id="header-logo-sre" class="relative flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-lg">
          <div class="sre-orbit"></div>
          <span class="font-black text-[#0f172a] text-[15px] italic z-10">SRE</span>
@@ -163,7 +162,7 @@
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-      <!-- FIXED: SIDEBAR WITH PROPER IDs FOR ACTIVE HIGHLIGHTING -->
+      <!-- SIDEBAR -->
       <aside class="hidden lg:flex flex-col w-[240px] bg-[#1e293b] text-slate-300 flex-shrink-0 h-full overflow-y-auto shadow-xl z-20">
         <div class="flex-1 px-4 py-6 space-y-1.5 font-semibold text-sm">
           <button id="nav-dashboard" onclick="showView('dashboard')" class="w-full flex items-center space-x-3 bg-blue-600 text-white px-4 py-3 rounded-xl transition-all shadow-md font-bold"><span class="text-lg">🏠</span><span>Dashboard</span></button>
@@ -193,15 +192,13 @@
 
         <!-- VIEW 1: DASHBOARD -->
         <div id="view-dashboard" class="space-y-6 max-w-screen-2xl mx-auto w-full">
-          
-          <!-- TOP 4 CARDS -->
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 w-full">
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
               <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-3xl shadow-inner">🛒</div>
               <div>
                 <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Total Sales</p>
                 <h3 class="text-2xl font-black text-slate-800" id="dash-sales">₹ 0</h3>
-                <p class="text-emerald-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ +12% <span class="text-slate-400 font-bold text-[9px] uppercase">vs Last Month</span></p>
+                <p class="text-emerald-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ Live <span class="text-slate-400 font-bold text-[9px] uppercase">Amount</span></p>
               </div>
             </div>
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
@@ -209,23 +206,23 @@
               <div>
                 <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Total Purchase</p>
                 <h3 class="text-2xl font-black text-slate-800" id="dash-purchase">₹ 0</h3>
-                <p class="text-rose-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ +8% <span class="text-slate-400 font-bold text-[9px] uppercase">vs Last Month</span></p>
+                <p class="text-rose-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↘ Live <span class="text-slate-400 font-bold text-[9px] uppercase">Amount</span></p>
               </div>
             </div>
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
-              <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl shadow-inner">👥</div>
+              <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl shadow-inner">💸</div>
               <div>
-                <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Total Customers</p>
-                <h3 class="text-2xl font-black text-slate-800" id="dash-customers">0</h3>
-                <p class="text-emerald-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ +18% <span class="text-slate-400 font-bold text-[9px] uppercase">vs Last Month</span></p>
+                <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Total Expenses</p>
+                <h3 class="text-2xl font-black text-slate-800" id="dash-expenses">₹ 0</h3>
+                <p class="text-rose-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↘ Live <span class="text-slate-400 font-bold text-[9px] uppercase">Amount</span></p>
               </div>
             </div>
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-shadow">
-              <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-3xl shadow-inner">🏷️</div>
+              <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-3xl shadow-inner">📈</div>
               <div>
-                <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Total Products</p>
-                <h3 class="text-2xl font-black text-slate-800" id="dash-products">0</h3>
-                <p class="text-emerald-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ +5% <span class="text-slate-400 font-bold text-[9px] uppercase">vs Last Month</span></p>
+                <p class="text-slate-500 text-[11px] font-black mb-1 uppercase tracking-wider">Net Profit</p>
+                <h3 class="text-2xl font-black text-slate-800" id="dash-profit">₹ 0</h3>
+                <p class="text-emerald-500 text-[10px] font-black mt-1.5 flex items-center gap-1">↗ Live <span class="text-slate-400 font-bold text-[9px] uppercase">Calculation</span></p>
               </div>
             </div>
           </div>
@@ -238,7 +235,7 @@
                   <div class="flex space-x-4 items-center">
                      <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span><span class="text-xs font-bold text-slate-600">Sales</span></div>
                      <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span><span class="text-xs font-bold text-slate-600">Purchase</span></div>
-                     <select class="text-xs font-bold border border-slate-200 rounded-lg px-2 py-1 outline-none text-slate-600 bg-slate-50 ml-2"><option>This Month</option></select>
+                     <select class="text-xs font-bold border border-slate-200 rounded-lg px-2 py-1 outline-none text-slate-600 bg-slate-50 ml-2"><option>This Year</option></select>
                   </div>
                </div>
                <div class="h-[280px] w-full"><canvas id="salesChart"></canvas></div>
@@ -252,14 +249,11 @@
                    <canvas id="expenseChart"></canvas>
                    <div class="absolute flex flex-col items-center justify-center pointer-events-none">
                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</span>
-                       <span class="text-base font-black text-slate-800">₹ 28,450</span>
+                       <span class="text-base font-black text-slate-800" id="chart-total-exp">₹ 0</span>
                    </div>
                </div>
-               <div class="mt-6 grid grid-cols-1 gap-2.5 px-2">
-                   <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span><span class="font-bold text-slate-600">Rent</span></div><div class="font-black">₹ 8,000 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">28%</span></div></div>
-                   <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span><span class="font-bold text-slate-600">Salary</span></div><div class="font-black">₹ 7,500 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">26%</span></div></div>
-                   <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#f59e0b]"></span><span class="font-bold text-slate-600">Electricity</span></div><div class="font-black">₹ 3,200 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">11%</span></div></div>
-                   <div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-[#ef4444]"></span><span class="font-bold text-slate-600">Internet</span></div><div class="font-black">₹ 1,250 <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">4%</span></div></div>
+               <div class="mt-6 grid grid-cols-1 gap-2.5 px-2" id="expense-legend-box">
+                   <!-- Dynamic Expense Legends -->
                </div>
              </div>
           </div>
@@ -267,7 +261,6 @@
           <!-- BOTTOM SECTION -->
           <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 w-full">
              
-             <!-- Recent Transactions -->
              <div class="xl:col-span-5 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
                 <div class="flex justify-between items-center mb-5 flex-shrink-0">
                   <h3 class="font-black text-base text-slate-800 tracking-wide">Recent Transactions</h3>
@@ -279,13 +272,12 @@
                        <tr><th class="pb-3 pt-1">Date</th><th class="pb-3 pt-1">Type</th><th class="pb-3 pt-1">Particulars</th><th class="pb-3 pt-1 text-right">Amount</th><th class="pb-3 pt-1 text-center">Status</th></tr>
                      </thead>
                      <tbody id="dash-recent-table" class="divide-y divide-slate-50">
-                       <!-- Dynamic Rows Go Here -->
                      </tbody>
                    </table>
                 </div>
              </div>
 
-             <!-- Stock Summary -->
+             <!-- LIVE STOCK SUMMARY -->
              <div class="xl:col-span-3 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
                 <div class="flex justify-between items-center mb-6">
                   <h3 class="font-black text-base text-slate-800 tracking-wide">Stock Summary</h3>
@@ -294,24 +286,23 @@
                 <div class="space-y-6 flex-1 pt-2">
                    <div class="flex justify-between items-center pb-5 border-b border-slate-50">
                       <div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner">📦</div><span class="font-bold text-slate-600 text-sm">Total Products</span></div>
-                      <span class="font-black text-slate-800 text-lg" id="stock-total">1,420</span>
+                      <span class="font-black text-slate-800 text-lg" id="dash-stk-total">0</span>
                    </div>
                    <div class="flex justify-between items-center pb-5 border-b border-slate-50">
                       <div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner">✅</div><span class="font-bold text-slate-600 text-sm">In Stock</span></div>
-                      <span class="font-black text-slate-800 text-lg">1,250</span>
+                      <span class="font-black text-slate-800 text-lg" id="dash-stk-in">0</span>
                    </div>
                    <div class="flex justify-between items-center pb-5 border-b border-slate-50">
                       <div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shadow-inner">⚠️</div><span class="font-bold text-slate-600 text-sm">Low Stock</span></div>
-                      <span class="font-black text-slate-800 text-lg">120</span>
+                      <span class="font-black text-slate-800 text-lg" id="dash-stk-low">0</span>
                    </div>
                    <div class="flex justify-between items-center">
                       <div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner">❌</div><span class="font-bold text-slate-600 text-sm">Out of Stock</span></div>
-                      <span class="font-black text-slate-800 text-lg">50</span>
+                      <span class="font-black text-slate-800 text-lg" id="dash-stk-out">0</span>
                    </div>
                 </div>
              </div>
 
-             <!-- Quick Actions -->
              <div class="xl:col-span-4 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col h-[380px]">
                 <div class="mb-5">
                   <h3 class="font-black text-base text-slate-800 tracking-wide">Quick Actions</h3>
@@ -345,10 +336,9 @@
           </div>
         </div>
 
-        <!-- NEW VIEW: PRODUCT MANAGEMENT (Exact Match to Design) -->
+        <!-- NEW VIEW: PRODUCT MANAGEMENT (100% Live) -->
         <div id="view-product" class="space-y-6 max-w-screen-2xl mx-auto w-full hidden">
             
-            <!-- Top Header Action Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-transparent gap-4">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-2xl shadow-lg">📦</div>
@@ -358,68 +348,64 @@
                     </div>
                 </div>
                 <div class="flex space-x-3 w-full sm:w-auto">
-                    <button class="flex-1 sm:flex-none px-4 h-[44px] border border-emerald-500 text-emerald-600 font-bold text-[11px] uppercase tracking-widest rounded-xl hover:bg-emerald-50 transition-all flex items-center justify-center space-x-2 bg-white shadow-sm"><span>📊</span><span>Import (Excel)</span></button>
-                    <button class="flex-1 sm:flex-none px-4 h-[44px] border border-[#004aad] text-[#004aad] font-bold text-[11px] uppercase tracking-widest rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center space-x-2 bg-white shadow-sm"><span>📄</span><span>Export</span></button>
-                    <button class="flex-1 sm:flex-none px-5 h-[44px] bg-[#004aad] text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"><span>➕</span><span>Add New Product</span></button>
+                    <button class="flex-1 sm:flex-none px-4 h-[44px] border border-emerald-500 text-emerald-600 font-bold text-[11px] uppercase tracking-widest rounded-xl hover:bg-emerald-50 transition-all flex items-center justify-center space-x-2 bg-white shadow-sm"><span>📊</span><span>Import</span></button>
+                    <button onclick="exportProductsCSV()" class="flex-1 sm:flex-none px-4 h-[44px] border border-[#004aad] text-[#004aad] font-bold text-[11px] uppercase tracking-widest rounded-xl hover:bg-blue-50 transition-all flex items-center justify-center space-x-2 bg-white shadow-sm"><span>📄</span><span>Export</span></button>
+                    <button onclick="document.getElementById('add-product-form').scrollIntoView({behavior:'smooth'})" class="flex-1 sm:flex-none px-5 h-[44px] bg-[#004aad] text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"><span>➕</span><span>Add New</span></button>
                 </div>
             </div>
 
-            <!-- Top 4 Product Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                 <div class="bg-blue-50/50 p-5 rounded-3xl border border-blue-100 flex items-center space-x-5 shadow-sm hover:bg-blue-50 transition-colors">
                     <div class="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">📦</div>
                     <div>
                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Products</p>
-                        <h3 class="text-2xl font-black text-slate-800">1,420</h3>
+                        <h3 class="text-2xl font-black text-slate-800" id="prod-stat-total">0</h3>
                     </div>
                 </div>
                 <div class="bg-emerald-50/50 p-5 rounded-3xl border border-emerald-100 flex items-center space-x-5 shadow-sm hover:bg-emerald-50 transition-colors">
                     <div class="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">✅</div>
                     <div>
                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">In Stock</p>
-                        <h3 class="text-2xl font-black text-slate-800">1,250</h3>
+                        <h3 class="text-2xl font-black text-slate-800" id="prod-stat-in">0</h3>
                     </div>
                 </div>
                 <div class="bg-amber-50/50 p-5 rounded-3xl border border-amber-100 flex items-center space-x-5 shadow-sm hover:bg-amber-50 transition-colors">
                     <div class="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">⚠️</div>
                     <div>
                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Low Stock</p>
-                        <h3 class="text-2xl font-black text-slate-800">120</h3>
+                        <h3 class="text-2xl font-black text-slate-800" id="prod-stat-low">0</h3>
                     </div>
                 </div>
                 <div class="bg-rose-50/50 p-5 rounded-3xl border border-rose-100 flex items-center space-x-5 shadow-sm hover:bg-rose-50 transition-colors">
                     <div class="w-14 h-14 bg-rose-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-md">❌</div>
                     <div>
                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Out of Stock</p>
-                        <h3 class="text-2xl font-black text-slate-800">50</h3>
+                        <h3 class="text-2xl font-black text-slate-800" id="prod-stat-out">0</h3>
                     </div>
                 </div>
             </div>
 
-            <!-- Table & Filters Container -->
+            <!-- LIVE PRODUCT TABLE -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col w-full">
-                <!-- Filter Bar -->
                 <div class="p-4 border-b border-slate-100 flex flex-wrap lg:flex-nowrap items-center gap-3 bg-slate-50/50">
                     <div class="relative flex-1 min-w-[250px]">
                         <span class="absolute left-4 top-3 text-slate-400">🔍</span>
-                        <input type="text" placeholder="Search by name, brand, model, SKU, IMEI..." class="w-full pl-10 pr-4 h-[44px] bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-slate-700 shadow-sm transition-all" />
+                        <input type="text" id="prod-search" oninput="renderProductTable()" placeholder="Search by name, brand, model..." class="w-full pl-10 pr-4 h-[44px] bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-slate-700 shadow-sm transition-all" />
                     </div>
                     <select class="px-4 h-[44px] bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none w-full sm:w-40 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all"><option>All Brands</option></select>
                     <select class="px-4 h-[44px] bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none w-full sm:w-40 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all"><option>All Categories</option></select>
-                    <select class="px-4 h-[44px] bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none w-full sm:w-40 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all"><option>All Status</option></select>
                     <button class="px-6 h-[44px] bg-white border border-slate-200 text-slate-600 font-black text-[11px] uppercase tracking-widest rounded-xl hover:bg-slate-100 transition-all shadow-sm w-full sm:w-auto">Clear</button>
                 </div>
                 
-                <!-- Exact Match Data Table -->
-                <div class="overflow-x-auto w-full">
+                <div class="overflow-x-auto w-full max-h-[400px]">
                     <table class="w-full text-left text-xs min-w-[1000px]">
-                        <thead class="bg-white border-b border-slate-100 text-[11px] font-black text-slate-800 uppercase tracking-widest">
+                        <thead class="bg-white border-b border-slate-100 text-[11px] font-black text-slate-800 uppercase tracking-widest sticky top-0 z-10">
                             <tr>
-                                <th class="p-4 w-12 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></th>
-                                <th class="p-4 w-16 text-center">Image</th>
+                                <th class="p-4 w-12 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad]"></th>
+                                <th class="p-4 w-16 text-center">Img</th>
                                 <th class="p-4">Product Name</th>
                                 <th class="p-4">Brand</th>
-                                <th class="p-4">Model / Variant</th>
+                                <th class="p-4">Variant</th>
                                 <th class="p-4">SKU</th>
                                 <th class="p-4 text-right">MRP (₹)</th>
                                 <th class="p-4 text-right">Purchase (₹)</th>
@@ -429,691 +415,294 @@
                                 <th class="p-4 text-center">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50 font-bold text-slate-600">
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
-                                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📱</div></td>
-                                <td class="p-4 text-slate-900 font-black">iPhone 15</td>
-                                <td class="p-4">Apple</td>
-                                <td class="p-4">128GB</td>
-                                <td class="p-4">APL001</td>
-                                <td class="p-4 text-right">79,900</td>
-                                <td class="p-4 text-right">72,000</td>
-                                <td class="p-4 text-right text-[#004aad]">78,500</td>
-                                <td class="p-4 text-center text-emerald-600 font-black">25</td>
-                                <td class="p-4 text-center"><span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">In Stock</span></td>
-                                <td class="p-4 text-center space-x-1">
-                                    <button class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors">✏️</button>
-                                    <button class="p-1.5 bg-slate-50 text-slate-600 rounded hover:bg-slate-200 transition-colors">📄</button>
-                                    <button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors">🗑️</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
-                                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📱</div></td>
-                                <td class="p-4 text-slate-900 font-black">Galaxy S24</td>
-                                <td class="p-4">Samsung</td>
-                                <td class="p-4">8/256GB</td>
-                                <td class="p-4">SAM001</td>
-                                <td class="p-4 text-right">74,999</td>
-                                <td class="p-4 text-right">68,000</td>
-                                <td class="p-4 text-right text-[#004aad]">72,500</td>
-                                <td class="p-4 text-center text-emerald-600 font-black">18</td>
-                                <td class="p-4 text-center"><span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">In Stock</span></td>
-                                <td class="p-4 text-center space-x-1">
-                                    <button class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors">✏️</button>
-                                    <button class="p-1.5 bg-slate-50 text-slate-600 rounded hover:bg-slate-200 transition-colors">📄</button>
-                                    <button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors">🗑️</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
-                                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📱</div></td>
-                                <td class="p-4 text-slate-900 font-black">Redmi Note 13</td>
-                                <td class="p-4">Xiaomi</td>
-                                <td class="p-4">8/128GB</td>
-                                <td class="p-4">XIA001</td>
-                                <td class="p-4 text-right">24,999</td>
-                                <td class="p-4 text-right">21,500</td>
-                                <td class="p-4 text-right text-[#004aad]">23,999</td>
-                                <td class="p-4 text-center text-emerald-600 font-black">42</td>
-                                <td class="p-4 text-center"><span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">In Stock</span></td>
-                                <td class="p-4 text-center space-x-1">
-                                    <button class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors">✏️</button>
-                                    <button class="p-1.5 bg-slate-50 text-slate-600 rounded hover:bg-slate-200 transition-colors">📄</button>
-                                    <button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors">🗑️</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
-                                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📱</div></td>
-                                <td class="p-4 text-slate-900 font-black">Vivo T3 5G</td>
-                                <td class="p-4">Vivo</td>
-                                <td class="p-4">8/128GB</td>
-                                <td class="p-4">VIV001</td>
-                                <td class="p-4 text-right">22,999</td>
-                                <td class="p-4 text-right">19,800</td>
-                                <td class="p-4 text-right text-[#004aad]">21,999</td>
-                                <td class="p-4 text-center text-amber-500 font-black">6</td>
-                                <td class="p-4 text-center"><span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Low Stock</span></td>
-                                <td class="p-4 text-center space-x-1">
-                                    <button class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors">✏️</button>
-                                    <button class="p-1.5 bg-slate-50 text-slate-600 rounded hover:bg-slate-200 transition-colors">📄</button>
-                                    <button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors">🗑️</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
-                                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📱</div></td>
-                                <td class="p-4 text-slate-900 font-black">OPPO F25 Pro</td>
-                                <td class="p-4">OPPO</td>
-                                <td class="p-4">8/128GB</td>
-                                <td class="p-4">OPP001</td>
-                                <td class="p-4 text-right">25,999</td>
-                                <td class="p-4 text-right">21,900</td>
-                                <td class="p-4 text-right text-[#004aad]">24,500</td>
-                                <td class="p-4 text-center text-rose-600 font-black">0</td>
-                                <td class="p-4 text-center"><span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Out of Stock</span></td>
-                                <td class="p-4 text-center space-x-1">
-                                    <button class="p-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors">✏️</button>
-                                    <button class="p-1.5 bg-slate-50 text-slate-600 rounded hover:bg-slate-200 transition-colors">📄</button>
-                                    <button class="p-1.5 bg-rose-50 text-rose-600 rounded hover:bg-rose-100 transition-colors">🗑️</button>
-                                </td>
-                            </tr>
+                        <tbody id="prod-table-body" class="divide-y divide-slate-50 font-bold text-slate-600">
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Add / Edit Bottom Split Section -->
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
+            <!-- LIVE Add / Edit Form -->
+            <div id="add-product-form" class="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
                 
-                <!-- Left Panel: Add / Edit Product Form -->
-                <div class="xl:col-span-7 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                <div class="xl:col-span-8 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
                     <div class="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg leading-none">+</div>
                         <h3 class="font-black text-lg text-slate-800 tracking-wide">Add / Edit Product</h3>
                     </div>
                     
                     <div class="flex flex-col sm:flex-row gap-6">
-                        <!-- Image Upload Area -->
                         <div class="w-full sm:w-1/3 flex flex-col items-center">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest w-full text-left mb-2">Product Image</span>
                             <div class="w-full bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl flex flex-col items-center justify-center p-4 h-[220px]">
                                 <div class="text-6xl mb-2 drop-shadow-md">📱</div>
-                                <button class="mt-auto px-4 py-2 border border-blue-600 text-blue-600 font-bold text-xs uppercase tracking-wider rounded-xl bg-white hover:bg-blue-50 transition-all flex items-center space-x-2 shadow-sm"><span>📤</span><span>Upload Image</span></button>
+                                <button class="mt-auto px-4 py-2 border border-blue-600 text-blue-600 font-bold text-xs uppercase tracking-wider rounded-xl bg-white hover:bg-blue-50 transition-all flex items-center space-x-2 shadow-sm"><span>📤</span><span>Upload</span></button>
                             </div>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">JPG, PNG (Max 2MB)</p>
                         </div>
                         
-                        <!-- Form Fields -->
                         <div class="w-full sm:w-2/3 space-y-4">
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-1">
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Product Name <span class="text-rose-500">*</span></label>
-                                    <input type="text" value="iPhone 15" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] focus:ring-1 focus:ring-blue-100 shadow-sm transition-all" />
+                                    <input type="text" id="new-prod-name" placeholder="e.g. iPhone 15" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] focus:ring-1 focus:ring-blue-100 shadow-sm transition-all uppercase" />
                                 </div>
                                 <div class="lg:col-span-1">
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Brand <span class="text-rose-500">*</span></label>
-                                    <select class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all"><option>Apple</option></select>
+                                    <input type="text" id="new-prod-brand" placeholder="e.g. Apple" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] focus:ring-1 focus:ring-blue-100 shadow-sm transition-all uppercase" />
                                 </div>
                                 <div class="lg:col-span-1">
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category <span class="text-rose-500">*</span></label>
-                                    <select class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all"><option>Mobile Phone</option></select>
+                                    <select id="new-prod-category" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all">
+                                        <option value="Mobile Phone">Mobile Phone</option>
+                                        <option value="Accessories">Accessories</option>
+                                        <option value="Electronics">Electronics</option>
+                                    </select>
                                 </div>
                             </div>
                             
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Model / Variant <span class="text-rose-500">*</span></label>
-                                    <input type="text" value="128GB" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Model / Variant</label>
+                                    <input type="text" id="new-prod-model" placeholder="e.g. 128GB" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all uppercase" />
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">SKU / Product Code</label>
-                                    <input type="text" value="APL001" class="w-full h-[42px] px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">SKU / Code</label>
+                                    <input type="text" id="new-prod-sku" placeholder="Auto / Manual" class="w-full h-[42px] px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all uppercase" />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">MRP (₹) <span class="text-rose-500">*</span></label>
-                                    <input type="number" value="79900" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">MRP (₹)</label>
+                                    <input type="number" id="new-prod-mrp" placeholder="0" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Purchase Price (₹) <span class="text-rose-500">*</span></label>
-                                    <input type="number" value="72000" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Purchase (₹)</label>
+                                    <input type="number" id="new-prod-pur" placeholder="0" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
                                 </div>
                                 <div>
-                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Sale Price (₹) <span class="text-rose-500">*</span></label>
-                                    <input type="number" value="78500" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-black text-[#004aad] outline-none focus:border-[#004aad] shadow-sm transition-all" />
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Sale Price (₹)*</label>
+                                    <input type="number" id="new-prod-sale" placeholder="0" class="w-full h-[42px] px-3 bg-white border border-blue-400 rounded-xl text-xs font-black text-[#004aad] outline-none focus:border-[#004aad] focus:ring-1 focus:ring-blue-200 shadow-sm transition-all bg-blue-50" />
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Opening Stock</label>
-                                    <input type="number" value="25" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <input type="number" id="new-prod-stock" placeholder="0" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">HSN Code</label>
-                                    <input type="text" value="851712" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
+                                    <input type="text" id="new-prod-hsn" placeholder="e.g. 8517" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all" />
                                 </div>
                                 <div>
                                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">GST %</label>
-                                    <select class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all"><option>18%</option></select>
+                                    <select id="new-prod-gst" class="w-full h-[42px] px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-800 focus:border-[#004aad] shadow-sm transition-all">
+                                        <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option>
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="flex flex-wrap items-center gap-4 pt-2">
-                                <label class="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 rounded text-[#004aad] border-slate-300 focus:ring-[#004aad]"> <span>Track IMEI / Serial Number</span></label>
-                                <label class="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 rounded text-[#004aad] border-slate-300 focus:ring-[#004aad]"> <span>Low Stock Alert</span> <input type="number" value="5" class="w-12 h-8 px-2 border border-slate-200 rounded-lg outline-none text-center shadow-sm"></label>
+                                <label class="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer"><input type="checkbox" checked class="w-4 h-4 rounded text-[#004aad] border-slate-300 focus:ring-[#004aad]"> <span>Track IMEI / Serial</span></label>
+                                <label class="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer"><span>Low Stock Alert</span> <input type="number" id="new-prod-low" value="5" class="w-16 h-[34px] px-2 border border-slate-200 rounded-lg outline-none text-center shadow-sm font-bold text-[#004aad]"></label>
                             </div>
                         </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 mt-auto pt-6">
-                        <button class="px-6 py-2.5 bg-slate-100 font-bold rounded-xl text-xs text-slate-600 hover:bg-slate-200 transition-all uppercase tracking-widest">Cancel</button>
-                        <button class="px-8 py-2.5 bg-[#004aad] text-white font-black rounded-xl text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-widest flex items-center space-x-2"><span>💾</span><span>Save Product</span></button>
+                        <button onclick="clearProductForm()" class="px-6 py-2.5 bg-slate-100 font-bold rounded-xl text-xs text-slate-600 hover:bg-slate-200 transition-all uppercase tracking-widest">Clear</button>
+                        <button onclick="saveLiveProduct()" class="px-8 py-2.5 bg-[#004aad] text-white font-black rounded-xl text-xs shadow-md hover:shadow-lg transition-all uppercase tracking-widest flex items-center space-x-2"><span>💾</span><span>Save Product</span></button>
                     </div>
                 </div>
 
-                <!-- Right Panel: IMEI List -->
-                <div class="xl:col-span-5 bg-white rounded-3xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
-                    <div class="flex border-b border-slate-100">
-                        <button class="flex-1 py-4 text-xs font-black text-[#004aad] border-b-2 border-[#004aad] uppercase tracking-widest flex items-center justify-center space-x-2 bg-blue-50/30"><span>||||</span><span>IMEI / Serial Numbers</span></button>
-                        <button class="flex-1 py-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-widest flex items-center justify-center space-x-2"><span>ℹ️</span><span>Other Details</span></button>
+                <!-- Right Panel: Simple Instructions (No extra complex logic for now) -->
+                <div class="xl:col-span-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-sm border border-slate-700 flex flex-col overflow-hidden text-white p-6">
+                    <h3 class="text-lg font-black tracking-widest uppercase mb-4 text-blue-400">Inventory Tips</h3>
+                    <ul class="space-y-4 text-sm font-medium text-slate-300">
+                        <li class="flex items-start space-x-3"><span>✅</span><span>Saving a product will instantly update your master inventory list.</span></li>
+                        <li class="flex items-start space-x-3"><span>📦</span><span>When you create a <b>Purchase Bill</b>, the stock will automatically increase.</span></li>
+                        <li class="flex items-start space-x-3"><span>🛒</span><span>When you create a <b>Sale Bill</b>, the stock will automatically decrease.</span></li>
+                        <li class="flex items-start space-x-3"><span>⚠️</span><span>If stock falls below the 'Low Stock Alert' limit, it will show a warning in Dashboard.</span></li>
+                    </ul>
+                    <div class="mt-auto pt-6 border-t border-slate-700">
+                        <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase text-center">Smart Auto-Sync Enabled</p>
                     </div>
-                    
-                    <div class="p-5 flex justify-end">
-                        <button class="px-5 py-2.5 bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow-md hover:bg-blue-700 hover:shadow-lg transition-all flex items-center space-x-2 uppercase tracking-widest"><span>➕</span><span>Add IMEI Manually</span></button>
-                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="flex-1 overflow-y-auto px-5 pb-4">
-                        <table class="w-full text-left text-[11px]">
-                            <thead class="font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2">
+        <!-- NEW VIEW: EXPENSE MODULE (WORKING) -->
+        <div id="view-expense" class="space-y-6 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-4 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-12 h-12 bg-rose-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-lg">💸</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-wide">Expense Management</h2>
+                    <p class="text-[11px] font-bold text-slate-500 mt-1">Record and track your daily business expenses</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
+                <!-- Expense Form -->
+                <div class="xl:col-span-4 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col h-fit">
+                    <h3 class="font-black text-sm uppercase text-rose-600 tracking-widest mb-4">Add New Expense</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Expense Category *</label>
+                            <select id="exp-cat" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100 text-slate-800 shadow-sm transition-all">
+                                <option value="Rent">Rent</option>
+                                <option value="Salary">Salary / Staff</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Internet">Internet / Bill</option>
+                                <option value="Maintenance">Maintenance / Repair</option>
+                                <option value="Tea/Snacks">Tea / Snacks</option>
+                                <option value="Other">Other Expenses</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Amount (₹) *</label>
+                            <input type="number" id="exp-amt" class="w-full h-[48px] px-4 border-2 border-rose-400 bg-rose-50 rounded-xl text-lg font-black outline-none text-rose-600 focus:ring-2 focus:ring-rose-200 transition-all shadow-sm" placeholder="0" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date *</label>
+                            <input type="date" id="exp-date" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100 text-slate-800 shadow-sm transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Payment Mode *</label>
+                            <select id="exp-mode" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100 text-slate-800 shadow-sm transition-all">
+                                <option value="Cash">Cash</option><option value="UPI / Online">UPI / Online</option><option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Remarks / Details</label>
+                            <input type="text" id="exp-remarks" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100 text-slate-800 shadow-sm transition-all" placeholder="e.g. Shop rent for September" />
+                        </div>
+                        <button onclick="saveLiveExpense()" class="w-full h-[54px] bg-rose-500 text-white font-black rounded-xl text-sm shadow-md hover:bg-rose-600 hover:shadow-lg transition-all uppercase tracking-widest mt-2">Save Expense</button>
+                    </div>
+                </div>
+
+                <!-- Expense Table -->
+                <div class="xl:col-span-8 bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                    <h3 class="font-black text-sm uppercase text-slate-800 tracking-widest mb-4">Recent Expenses</h3>
+                    <div class="overflow-x-auto w-full h-full">
+                        <table class="w-full text-left text-xs min-w-[600px]">
+                            <thead class="bg-slate-50 text-slate-500 font-black uppercase tracking-widest border-b border-slate-100">
                                 <tr>
-                                    <th class="pb-3 w-8"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></th>
-                                    <th class="pb-3">IMEI / Serial No.</th>
-                                    <th class="pb-3 text-center">Status</th>
-                                    <th class="pb-3">Purchase Date</th>
-                                    <th class="pb-3 text-right">Action</th>
+                                    <th class="p-4 rounded-tl-xl border-r border-slate-100">Date</th>
+                                    <th class="p-4 border-r border-slate-100">Category</th>
+                                    <th class="p-4 border-r border-slate-100">Details</th>
+                                    <th class="p-4 border-r border-slate-100">Mode</th>
+                                    <th class="p-4 text-right text-rose-600 rounded-tr-xl">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-50 font-bold text-slate-600">
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
-                                    <td class="py-3 text-slate-700 font-mono tracking-wider">354678912345671</td>
-                                    <td class="py-3 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">In Stock</span></td>
-                                    <td class="py-3 text-slate-500">01 Sep 2026</td>
-                                    <td class="py-3 text-right space-x-1"><button class="p-1.5 bg-blue-50 text-blue-600 rounded">✏️</button><button class="p-1.5 bg-rose-50 text-rose-600 rounded">🗑️</button></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
-                                    <td class="py-3 text-slate-700 font-mono tracking-wider">354678912345672</td>
-                                    <td class="py-3 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">In Stock</span></td>
-                                    <td class="py-3 text-slate-500">01 Sep 2026</td>
-                                    <td class="py-3 text-right space-x-1"><button class="p-1.5 bg-blue-50 text-blue-600 rounded">✏️</button><button class="p-1.5 bg-rose-50 text-rose-600 rounded">🗑️</button></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
-                                    <td class="py-3 text-slate-700 font-mono tracking-wider">354678912345673</td>
-                                    <td class="py-3 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">In Stock</span></td>
-                                    <td class="py-3 text-slate-500">01 Sep 2026</td>
-                                    <td class="py-3 text-right space-x-1"><button class="p-1.5 bg-blue-50 text-blue-600 rounded">✏️</button><button class="p-1.5 bg-rose-50 text-rose-600 rounded">🗑️</button></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
-                                    <td class="py-3 text-slate-700 font-mono tracking-wider">354678912345674</td>
-                                    <td class="py-3 text-center"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">Sold</span></td>
-                                    <td class="py-3 text-slate-500">05 Sep 2026</td>
-                                    <td class="py-3 text-right space-x-1"><button class="p-1.5 bg-blue-50 text-blue-600 rounded">✏️</button><button class="p-1.5 bg-rose-50 text-rose-600 rounded">🗑️</button></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="py-3"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
-                                    <td class="py-3 text-slate-700 font-mono tracking-wider">354678912345675</td>
-                                    <td class="py-3 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">In Stock</span></td>
-                                    <td class="py-3 text-slate-500">01 Sep 2026</td>
-                                    <td class="py-3 text-right space-x-1"><button class="p-1.5 bg-blue-50 text-blue-600 rounded">✏️</button><button class="p-1.5 bg-rose-50 text-rose-600 rounded">🗑️</button></td>
-                                </tr>
+                            <tbody id="expense-table-body" class="divide-y divide-slate-50 font-bold text-slate-600">
+                                <!-- JS DYNAMIC -->
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="bg-slate-50 p-5 border-t border-slate-100 text-[10px] font-black text-slate-600 tracking-widest uppercase mt-auto">
-                        Total IMEI: 25 <span class="mx-2 text-slate-300">|</span> In Stock: 20 <span class="mx-2 text-slate-300">|</span> Sold: 5
+        <!-- NEW VIEW: STOCK MODULE (WORKING) -->
+        <div id="view-stock" class="space-y-6 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-4 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-12 h-12 bg-amber-500 text-white rounded-xl flex items-center justify-center text-2xl shadow-lg">📊</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-wide">Stock Inventory</h2>
+                    <p class="text-[11px] font-bold text-slate-500 mt-1">Live tracking of your warehouse stock</p>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col w-full">
+                <div class="overflow-x-auto w-full max-h-[600px]">
+                    <table class="w-full text-left text-sm min-w-[800px]">
+                        <thead class="bg-white border-b border-slate-100 text-[11px] font-black text-slate-800 uppercase tracking-widest sticky top-0 z-10">
+                            <tr>
+                                <th class="p-4">Product Name</th>
+                                <th class="p-4">SKU / Model</th>
+                                <th class="p-4 text-right">Purchase Rate</th>
+                                <th class="p-4 text-right">Sale Rate</th>
+                                <th class="p-4 text-center">Available Stock</th>
+                                <th class="p-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body" class="divide-y divide-slate-50 font-bold text-slate-700">
+                           <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW VIEW: REPORTS MODULE (WORKING) -->
+        <div id="view-reports" class="space-y-6 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-4 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-12 h-12 bg-purple-600 text-white rounded-xl flex items-center justify-center text-2xl shadow-lg">📑</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-wide">Business Reports</h2>
+                    <p class="text-[11px] font-bold text-slate-500 mt-1">Summary of all your business analytics</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
+                <div class="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 shadow-sm text-center">
+                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">Total Lifetime Sales</p>
+                    <h3 class="text-3xl font-black text-[#004aad]" id="rep-total-sale">₹ 0</h3>
+                </div>
+                <div class="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100 shadow-sm text-center">
+                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">Total Lifetime Purchase</p>
+                    <h3 class="text-3xl font-black text-emerald-700" id="rep-total-pur">₹ 0</h3>
+                </div>
+                <div class="bg-rose-50/50 p-6 rounded-3xl border border-rose-100 shadow-sm text-center">
+                    <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Total Lifetime Expenses</p>
+                    <h3 class="text-3xl font-black text-rose-700" id="rep-total-exp">₹ 0</h3>
+                </div>
+                <div class="bg-gradient-to-br from-[#003380] to-[#004aad] p-6 rounded-3xl shadow-md text-center text-white">
+                    <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">Net Business Profit</p>
+                    <h3 class="text-3xl font-black text-amber-300" id="rep-total-profit">₹ 0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW VIEW: GST REPORTS (WORKING) -->
+        <div id="view-gst-reports" class="space-y-6 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-4 mb-6 border-b border-slate-100 pb-4">
+                <div class="w-12 h-12 bg-slate-800 text-white rounded-xl flex items-center justify-center text-2xl shadow-lg">🏛️</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-wide">GST Returns & Taxation</h2>
+                    <p class="text-[11px] font-bold text-slate-500 mt-1">Tax calculation based on generated bills</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+                    <h3 class="font-black text-sm uppercase text-[#004aad] tracking-widest mb-4 border-b border-slate-100 pb-2">Sales GST (Output Tax)</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total Taxable Sales</span><span class="text-lg font-black text-slate-800" id="gst-sale-taxable">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total CGST Collected</span><span class="text-lg font-black text-blue-600" id="gst-sale-cgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total SGST Collected</span><span class="text-lg font-black text-blue-600" id="gst-sale-sgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-100"><span class="text-sm font-black text-slate-800 uppercase tracking-widest">Total Output Tax</span><span class="text-xl font-black text-rose-600" id="gst-sale-total">₹ 0</span></div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+                    <h3 class="font-black text-sm uppercase text-emerald-600 tracking-widest mb-4 border-b border-slate-100 pb-2">Purchase GST (Input Tax Credit)</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total Taxable Purchases</span><span class="text-lg font-black text-slate-800" id="gst-pur-taxable">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total CGST Paid</span><span class="text-lg font-black text-emerald-600" id="gst-pur-cgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-500">Total SGST Paid</span><span class="text-lg font-black text-emerald-600" id="gst-pur-sgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-100"><span class="text-sm font-black text-slate-800 uppercase tracking-widest">Total Input Credit (ITC)</span><span class="text-xl font-black text-emerald-600" id="gst-pur-total">₹ 0</span></div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- NEW EMPTY VIEWS FOR SIDEBAR INTEGRATION -->
-        <div id="view-expense" class="hidden flex-col items-center justify-center h-full w-full py-20">
-            <span class="text-7xl drop-shadow-md mb-4">💸</span>
-            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">Expense Module</h2>
-            <p class="text-slate-500 font-bold tracking-widest uppercase">Coming Soon...</p>
-        </div>
-        <div id="view-stock" class="hidden flex-col items-center justify-center h-full w-full py-20">
-            <span class="text-7xl drop-shadow-md mb-4">📊</span>
-            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">Stock Module</h2>
-            <p class="text-slate-500 font-bold tracking-widest uppercase">Coming Soon...</p>
-        </div>
-        <div id="view-reports" class="hidden flex-col items-center justify-center h-full w-full py-20">
-            <span class="text-7xl drop-shadow-md mb-4">📑</span>
-            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">Reports Module</h2>
-            <p class="text-slate-500 font-bold tracking-widest uppercase">Coming Soon...</p>
-        </div>
-        <div id="view-gst-reports" class="hidden flex-col items-center justify-center h-full w-full py-20">
-            <span class="text-7xl drop-shadow-md mb-4">🏛️</span>
-            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-widest mb-2">GST Reports</h2>
-            <p class="text-slate-500 font-bold tracking-widest uppercase">Coming Soon...</p>
-        </div>
-
-        <!-- VIEW 2: NEW BILL FORM (PREMIUM COMPRESSED) -->
-        <div id="view-new-bill" class="bg-white rounded-3xl shadow-sm p-4 sm:p-6 border border-slate-100 hidden max-w-screen-2xl mx-auto w-full">
-          <!-- Form Header & Type Selection -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-100 pb-4 mb-4 gap-4">
-            <div id="sale-top-bar" class="w-full sm:flex-1 grid items-end">
-                 <div class="flex items-center space-x-3 w-full justify-between sm:justify-start">
-                   <h2 id="form-invoice-no" class="text-xl font-black text-[#004aad] tracking-wide">SRE-2026-001</h2>
-                   <span id="form-entry-type" class="text-xs font-black px-3 py-1 rounded-lg bg-blue-50 text-[#004aad] border border-blue-100 uppercase tracking-widest">SALE</span>
-                 </div>
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-6 rounded-3xl shadow-lg mt-4 flex justify-between items-center text-white">
+                <span class="text-sm font-black uppercase tracking-widest">Net GST Payable (Output - ITC)</span>
+                <span class="text-3xl font-black text-white drop-shadow-md" id="gst-net-payable">₹ 0</span>
             </div>
-            
-            <div id="pur-top-bar" class="hidden w-full sm:flex-1 grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
-               <div class="sm:col-span-5 relative">
-                 <div class="flex justify-between items-center mb-1.5">
-                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Supplier Name *</label>
-                   <button type="button" tabindex="-1" onclick="openPartyModal('SUPPLIER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2.5 py-1 rounded-md text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ NEW</button>
-                 </div>
-                 <input type="text" id="pur-supplier-name" list="party-list" onkeydown="if(event.altKey && (event.key==='c'||event.key==='C')) { event.preventDefault(); openPartyModal('SUPPLIER'); }" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Search or Enter Name" />
-               </div>
-               <div class="sm:col-span-4">
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Supplier Inv No *</label>
-                 <input type="text" id="pur-invoice-no" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" placeholder="Enter Inv No" />
-               </div>
-               <div class="sm:col-span-3">
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Date *</label>
-                 <input type="date" id="pur-invoice-date" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-inner" />
-               </div>
-            </div>
-
-            <div class="flex bg-slate-100/70 p-1.5 rounded-xl border border-slate-200 self-end shadow-inner gap-1 w-full sm:w-auto overflow-x-auto">
-              <button type="button" onclick="changeBillType('MOBILE')" id="pill-MOBILE" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md transition-all">MOBILE</button>
-              <button type="button" onclick="changeBillType('ACCESSORIES')" id="pill-ACCESSORIES" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">ACCESSORIES</button>
-              <button type="button" onclick="changeBillType('REPAIRING')" id="pill-REPAIRING" class="flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-xs font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white hover:shadow-sm transition-all">REPAIRING</button>
-            </div>
-          </div>
-
-          <!-- CUSTOMER BOX (For Sale Only) -->
-          <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-4">
-            <div>
-              <div class="flex justify-between items-center mb-1.5">
-                <label id="lbl-cust-name" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Name *</label>
-                <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2 py-1 rounded-lg text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest">➕ NEW</button>
-              </div>
-              <input type="text" id="cust-name" list="party-list" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" />
-            </div>
-            <div id="box-cust-phone"><label id="lbl-cust-phone" class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Mobile *</label><input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-            <div id="box-cust-address"><label id="lbl-cust-address" class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Address *</label><input type="text" id="cust-address" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-            <div id="box-cust-gstin"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">GSTIN (Optional)</label><input type="text" id="cust-gstin" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" maxlength="15" /></div>
-          </div>
-
-          <div id="repair-box" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 hidden shadow-sm mb-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Customer Mobile *</label><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="Mobile No" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-              <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Device / Model *</label><input type="text" id="rep-device" placeholder="Model Name" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-            </div>
-            <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Issue Description *</label><textarea id="rep-issue" rows="1" placeholder="Issue Details..." class="w-full h-[48px] py-3 px-4 bg-white border border-slate-200 rounded-xl text-sm outline-none uppercase focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm"></textarea></div>
-          </div>
-
-          <!-- PRODUCT GRID -->
-          <div id="items-box" class="space-y-3 pt-2 border-t border-slate-100">
-            <div class="flex justify-between items-end pb-2 border-b border-slate-100">
-              <h3 class="font-black text-sm uppercase text-[#004aad] tracking-widest">Product Details</h3>
-              <button onclick="addNewItemRow(false)" class="text-[11px] font-black text-[#004aad] bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest shadow-sm">➕ Add Row</button>
-            </div>
-            
-            <div id="items-wrapper" class="overflow-x-visible">
-               <div id="pur-grid-header" class="hidden flex items-center gap-3 px-2.5 pb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest min-w-[850px] sm:min-w-full border-b border-slate-100 mb-2">
-                   <div class="flex-[2] min-w-[180px] pl-2">Product Name</div>
-                   <div class="w-24 text-right">Rate</div>
-                   <div class="w-20 text-center">GST</div>
-                   <div class="w-20 text-center">Qty</div>
-                   <div class="flex-[1.5] min-w-[140px] pl-1">IMEI-1 / Serial</div>
-                   <div class="w-28 text-right pr-2">Amount</div>
-                   <div class="w-12 text-right pr-3">Act</div>
-               </div>
-               <div id="items-container" class="space-y-3"></div>
-            </div>
-          </div>
-
-          <!-- COMPRESSED BOTTOM SECTION -->
-          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm mt-4 flex flex-col overflow-hidden">
-            
-            <div class="p-5 flex flex-col space-y-4">
-                <div id="global-tax-discount-box" class="grid grid-cols-2 gap-5 pb-4 border-b border-slate-100">
-                  <div>
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Global Discount (Rs.)</label>
-                    <input type="number" id="global-discount" oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" placeholder="Discount Amount" />
-                  </div>
-                  <div>
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Bill GST Slab</label>
-                    <select id="global-gst" onchange="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
-                      <option value="0" selected>0% GST</option>
-                      <option value="5">5% GST</option>
-                      <option value="12">12% GST</option>
-                      <option value="18">18% GST</option>
-                      <option value="28">28% GST</option>
-                    </select>
-                  </div>
-                </div>
-
-                <!-- PAYMENT ROW -->
-                <div class="flex flex-col sm:flex-row gap-5 items-start sm:items-end w-full">
-                    <div class="flex-1 w-full">
-                       <div id="sale-payment-section" class="grid grid-cols-2 gap-4">
-                          <div><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Primary Mode</label>
-                            <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
-                              <option value="Cash">Cash</option><option value="QR">QR (Online)</option><option value="Card Swipe">Card Swipe</option>
-                              <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
-                              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-                            </select>
-                          </div>
-                          <div><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Secondary Mode</label>
-                            <select id="pay-secondary" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
-                              <option value="">-- None --</option><option value="Finance">Finance</option><option value="Dues">Dues / Credit</option>
-                            </select>
-                          </div>
-                       </div>
-
-                       <!-- PURCHASE PAYMENT MODE -->
-                       <div id="purchase-payment-section" class="hidden w-full">
-                          <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Payment Mode *</label>
-                          <div class="flex justify-between items-center text-xs font-black bg-slate-50 border border-slate-200 rounded-xl h-[48px] p-1.5 shadow-inner gap-1.5">
-                            <label id="lbl-pay-Credit" class="flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-md rounded-lg h-full transition-all">
-                              <input type="radio" name="pur_pay_mode" value="Credit" class="hidden" onchange="onPurPaymentModeChange()" checked> <span>CREDIT</span>
-                            </label>
-                            <label id="lbl-pay-Cash" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                              <input type="radio" name="pur_pay_mode" value="Cash" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH</span>
-                            </label>
-                            <label id="lbl-pay-QR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                              <input type="radio" name="pur_pay_mode" value="QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>QR</span>
-                            </label>
-                            <label id="lbl-pay-CashQR" class="flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded-lg h-full transition-all">
-                              <input type="radio" name="pur_pay_mode" value="Cash + QR" class="hidden" onchange="onPurPaymentModeChange()"> <span>CASH+QR</span>
-                            </label>
-                          </div>
-                       </div>
-                    </div>
-
-                    <!-- TOTAL AMOUNT PAID -->
-                    <div class="w-full sm:w-64">
-                       <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Amount Paid *</label>
-                       <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full h-[48px] px-4 border-2 border-blue-400 rounded-xl font-black text-[#004aad] text-xl outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200" placeholder="0" />
-                    </div>
-                </div>
-
-                <!-- DYNAMIC SPLIT/FINANCE BOXES -->
-                <div id="split-box" class="pt-4 border-t border-slate-100 grid grid-cols-3 gap-4 hidden mt-3">
-                  <div id="wrap-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-                  <div id="wrap-split-qr" class="hidden"><label class="text-[11px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-                  <div id="wrap-split-card" class="hidden"><label class="text-[11px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-                </div>
-
-                <div id="fin-box" class="pt-4 border-t border-blue-100 bg-blue-50 p-4 rounded-2xl hidden mt-3">
-                  <div class="grid grid-cols-3 gap-4 mb-3">
-                    <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Company *</label><select id="fin-company" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
-                      <option value="">-- Fin. Company --</option><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option>
-                      <option value="HDB Finance">HDB Finance</option><option value="TVS Credit">TVS Credit</option><option value="IDFC First Bank">IDFC First Bank</option>
-                    </select></div>
-                    <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
-                    <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
-                      <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-                      <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
-                    </select></div>
-                  </div>
-                  <div id="fin-split-container" class="grid grid-cols-3 gap-4 hidden">
-                    <div id="wrap-fin-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                    <div id="wrap-fin-split-qr" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="fin-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                    <div id="wrap-fin-split-card" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="fin-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-blue-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                  </div>
-                </div>
-
-                <div id="dues-box" class="pt-4 border-t border-slate-200 bg-slate-50 p-4 rounded-2xl hidden mt-3">
-                  <div class="grid grid-cols-2 gap-4 mb-3">
-                    <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm">
-                      <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
-                      <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-                    </select></div>
-                    <div class="w-full"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none focus:border-[#004aad] text-[#004aad] shadow-sm" oninput="recalcTotals()" /></div>
-                  </div>
-                  <div id="dues-split-container" class="grid grid-cols-3 gap-4 hidden">
-                    <div id="wrap-dues-split-cash" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                    <div id="wrap-dues-split-qr" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                    <div id="wrap-dues-split-card" class="hidden"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none text-[#004aad] shadow-sm" /></div>
-                  </div>
-                </div>
-                
-                <div id="pur-split-box" class="pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 hidden mt-3 max-w-2xl mx-auto">
-                  <div id="wrap-pur-cash"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">Cash Amt</label><input type="number" id="pur-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-                  <div id="wrap-pur-qr"><label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1.5">QR Amt</label><input type="number" id="pur-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" /></div>
-                </div>
-
-                <div id="finance-loan-row" class="hidden mt-3 flex justify-between items-center text-sm font-black text-[#004aad] bg-blue-100 px-5 py-3 rounded-xl border border-blue-200 shadow-sm">
-                  <span class="uppercase tracking-widest">Balance Due / Loan :</span>
-                  <span id="fin-loan-display" class="text-lg font-black">Rs. 0</span>
-                </div>
-            </div>
-
-            <!-- 4-IN-1 ONE ROW SUMMARY -->
-            <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-4 sm:p-5 flex items-center justify-between text-center divide-x divide-white/20 rounded-b-2xl">
-                <div id="box-basic-amt" class="hidden flex-1 px-2 sm:px-3">
-                    <span class="text-[10px] sm:text-[11px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">Basic Amt</span>
-                    <p id="form-basic-amt" class="text-base sm:text-xl font-black leading-none drop-shadow-md">Rs. 0</p>
-                </div>
-                <div id="box-gst-amt" class="hidden flex-1 px-2 sm:px-3">
-                    <span class="text-[10px] sm:text-[11px] text-blue-200 tracking-widest uppercase font-bold block mb-1.5">GST Amt</span>
-                    <p id="form-gst-amt" class="text-base sm:text-xl font-black leading-none drop-shadow-md">Rs. 0</p>
-                </div>
-                <div class="flex-1 px-2 sm:px-3">
-                    <span class="text-[11px] sm:text-sm text-blue-100 tracking-widest uppercase font-black block mb-1.5">Grand Total</span>
-                    <p id="total-grand" class="text-2xl sm:text-3xl font-black leading-none drop-shadow-md text-amber-300">Rs. 0</p>
-                </div>
-                <div class="flex-1 px-2 sm:px-3">
-                    <span class="text-[11px] sm:text-sm text-blue-100 tracking-widest uppercase font-black block mb-1.5">Balance Due</span>
-                    <p id="total-due" class="text-xl sm:text-2xl font-bold leading-none drop-shadow-md text-white">Rs. 0</p>
-                </div>
-            </div>
-          </div>
-          
-          <div class="flex space-x-4 pt-3">
-            <button type="button" onclick="showView('dashboard')" class="flex-1 h-[54px] bg-slate-100 font-black rounded-2xl text-sm text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-widest shadow-sm">CANCEL</button>
-            <button type="button" onclick="saveBill()" class="flex-[2] h-[54px] bg-[#004aad] text-white font-black rounded-2xl text-base shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-widest">SAVE</button>
-          </div>
-        </div>
-
-        <!-- VIEW 3: INVOICE -->
-        <div id="view-invoice" class="space-y-4 hidden max-w-5xl mx-auto w-full">
-          <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-            <div class="flex space-x-3">
-              <button onclick="downloadVectorPDF()" class="px-5 py-2.5 bg-[#004aad] text-white font-black text-xs rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-wider">📥 PDF</button>
-              <button onclick="shareWhatsApp()" id="btn-whatsapp" class="px-5 py-2.5 bg-[#004aad] text-white font-black text-xs rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all uppercase tracking-wider">💬 WHATSAPP</button>
-            </div>
-          </div>
-
-          <div class="w-full flex justify-center overflow-x-auto pb-6">
-            <div id="invoice-capture" class="bg-white p-8 border-2 border-[#004aad] text-xs text-slate-900 w-[750px] min-w-[750px]">
-              <div class="w-full pb-4 border-b-2 border-[#004aad]">
-                <div class="text-center mb-4">
-                  <h1 class="text-[38px] font-black text-[#004aad] tracking-wide uppercase leading-none">SRI RAM ENTERPRISES</h1>
-                  <div class="inline-block bg-[#004aad] text-white px-8 py-2 rounded-full text-[13px] font-bold tracking-widest mt-3 shadow-sm">
-                    MOBILE • ACCESSORIES • REPAIRING
-                  </div>
-                </div>
-                <div class="flex justify-between items-end text-xs font-bold text-slate-800 px-2 mt-3">
-                  <div class="text-left leading-relaxed">
-                    <p>GB-15, CITY CENTRE, SECTOR-4</p>
-                    <p>B.S. CITY (NEAR INDIAN BANK)</p>
-                  </div>
-                  <div class="text-right leading-relaxed">
-                    <p>GSTIN: 20APOPK6864K1ZH</p>
-                    <p>Ph: 9334765000, 9334237111, 9335136000</p>
-                  </div>
-                </div>
-              </div>
-
-              <div id="inv-header-title" class="bg-blue-50 text-[#004aad] font-black text-center py-2 text-[14px] tracking-[0.35em] uppercase my-4 border border-blue-200 rounded-lg">
-                TAX INVOICE
-              </div>
-
-              <div class="py-2 text-[11.5px] font-bold text-slate-800 border-b border-slate-200 pb-4">
-                <div class="grid grid-cols-2 gap-x-10 gap-y-3">
-                  <div class="flex items-center"><span class="w-24 text-slate-500 uppercase text-[10px] tracking-wider">Invoice No.</span><span class="mx-1">:</span><span id="inv-no" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                  <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[10px] tracking-wider">Date</span><span class="mx-1">:</span><span id="inv-date" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                  <div class="flex items-center"><span id="inv-name-label" class="w-24 text-slate-500 uppercase text-[10px] tracking-wider">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                  <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[10px] tracking-wider">Mobile</span><span class="mx-1">:</span><span id="inv-cust-phone" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                  <div class="flex items-center"><span class="w-24 text-slate-500 uppercase text-[10px] tracking-wider">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                  <div class="flex items-center"><span class="w-20 text-slate-500 uppercase text-[10px] tracking-wider">GSTIN</span><span class="mx-1">:</span><span id="inv-cust-gstin" class="font-black text-xs text-slate-900 uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
-                </div>
-              </div>
-
-              <div class="mt-4">
-                <table class="w-full border-collapse border-2 border-[#004aad] text-left">
-                  <thead>
-                    <tr class="bg-[#004aad] text-white text-center font-black text-xs">
-                      <th class="border border-[#004aad] p-2 w-[40px]">S.No</th>
-                      <th class="border border-[#004aad] p-2">Brand / Product</th>
-                      <th class="border border-[#004aad] p-2 w-[170px]">Model / IMEI</th>
-                      <th class="border border-[#004aad] p-2 table-col-qty">Qty.</th>
-                      <th class="border border-[#004aad] p-2 table-col-rate">Rate</th>
-                      <th class="border border-[#004aad] p-2 table-col-amt">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody id="inv-items-body" class="divide-y divide-[#004aad]"></tbody>
-                </table>
-              </div>
-
-              <div class="flex items-stretch justify-between border-x-2 border-b-2 border-[#004aad]">
-                <div class="flex-1 flex items-center p-5">
-                  <div class="flex items-center space-x-5 ml-4">
-                    <div id="inv-qr-container" class="w-[90px] h-[90px] border-2 border-[#004aad] p-1 flex items-center justify-center bg-white rounded-lg"></div>
-                    <div class="text-xs text-slate-600 font-bold leading-relaxed"><span class="text-[#004aad] block text-base font-black uppercase tracking-widest mb-1">VERIFIED E-BILL</span>Scan QR with any Camera<br/>to verify and open online.</div>
-                  </div>
-                </div>
-                <div class="totals-box border-l-2 border-[#004aad] text-[11.5px] font-bold bg-slate-50 flex flex-col justify-between">
-                  <div class="divide-y divide-[#004aad]" id="inv-total-breakdown"></div>
-                  <div class="bg-[#004aad] text-white flex justify-between px-3 py-3 font-black text-sm mt-auto">
-                    <span class="uppercase tracking-widest">Grand Total</span><span id="inv-grand-total" class="text-base">Rs. 0</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-6 text-center text-[10.5px] font-bold text-slate-400 italic tracking-wide">
-                * This is a computer-generated electronic invoice and does not require physical signatures.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- VIEW 4: LEDGER -->
-        <div id="view-ledger" class="bg-white rounded-3xl shadow-sm p-4 sm:p-6 space-y-4 border border-slate-100 hidden max-w-5xl mx-auto w-full">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-            <h2 class="text-lg font-black text-[#004aad] tracking-widest uppercase">PARTY LEDGER</h2>
-          </div>
-          
-          <div class="flex bg-slate-50 p-1.5 rounded-xl border border-slate-200">
-            <button type="button" onclick="switchLedgerTab('CUSTOMER')" id="tab-CUSTOMER" class="flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-widest transition-all">CUSTOMER</button>
-            <button type="button" onclick="switchLedgerTab('SUPPLIER')" id="tab-SUPPLIER" class="flex-1 py-3 rounded-lg text-xs font-black text-slate-400 tracking-widest transition-all hover:text-[#004aad]">SUPPLIER</button>
-          </div>
-
-          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-             <div class="flex space-x-3">
-               <input type="text" id="ledger-search" oninput="updateLedgerView()" list="party-list" placeholder="🔍 Search Party Name..." class="flex-1 h-[48px] px-4 border border-slate-200 rounded-xl text-sm font-bold outline-none bg-slate-50 focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all" />
-               <button onclick="openPartyModal(document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]') ? 'CUSTOMER' : 'SUPPLIER')" class="w-14 h-[48px] bg-[#004aad] text-white rounded-xl font-black text-2xl flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all pb-1">+</button>
-             </div>
-             
-             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
-                   <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Opening Bal</p>
-                   <p id="ledger-ob" class="text-lg font-black text-[#004aad] mt-1.5">Rs. 0</p>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
-                   <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Billed</p>
-                   <p id="ledger-billed" class="text-lg font-black text-[#004aad] mt-1.5">Rs. 0</p>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
-                   <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Paid</p>
-                   <p id="ledger-paid" class="text-lg font-black text-[#004aad] mt-1.5">Rs. 0</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
-                   <p class="text-[10px] text-[#004aad] font-black uppercase tracking-widest">Net Dues</p>
-                   <p id="ledger-bal" class="text-lg font-black text-[#004aad] mt-1.5">Rs. 0</p>
-                </div>
-             </div>
-          </div>
-
-          <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm min-w-[600px]">
-              <thead class="bg-slate-50 text-slate-500 font-black uppercase tracking-widest border-b border-slate-100">
-                <tr>
-                  <th class="p-4 border-r border-slate-100">Date</th>
-                  <th class="p-4 border-r border-slate-100">Particulars</th>
-                  <th id="th-dr" class="p-4 border-r border-slate-100 text-right text-[#004aad]">Dr<br><span class="text-[9px] font-bold text-slate-400 normal-case tracking-normal">Sale</span></th>
-                  <th id="th-cr" class="p-4 border-r border-slate-100 text-right text-[#004aad]">Cr<br><span class="text-[9px] font-bold text-slate-400 normal-case tracking-normal">Receipt</span></th>
-                  <th class="p-4 text-right text-[#004aad]">Balance</th>
-                </tr>
-              </thead>
-              <tbody id="ledger-tbody" class="divide-y divide-slate-50">
-                <tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">🔍 Search a party...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- VIEW 5: PAYMENT OUT / RECEIPT IN -->
-        <div id="view-payment" class="bg-white rounded-3xl shadow-sm p-6 space-y-5 border border-slate-100 hidden max-w-lg mx-auto w-full">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-            <h2 id="pay-title" class="text-lg font-black text-[#004aad] tracking-widest">PAYMENT OUT</h2>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="text-[11px] font-black text-slate-400 block mb-1.5 uppercase tracking-wider" id="pay-party-lbl">Party Name *</label>
-              <input type="text" id="pay-party" list="party-list" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none uppercase focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" />
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="text-[11px] font-black text-slate-400 block mb-1.5 uppercase tracking-wider">Amount (Rs.) *</label>
-                <input type="number" id="pay-amt" class="w-full h-[48px] px-4 border-2 border-blue-400 bg-blue-50 rounded-xl text-lg font-black outline-none text-[#004aad] focus:ring-2 focus:ring-blue-100 transition-all" placeholder="0" />
-              </div>
-              <div>
-                <label class="text-[11px] font-black text-slate-400 block mb-1.5 uppercase tracking-wider">Payment Mode *</label>
-                <select id="pay-mode" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm">
-                  <option value="Cash">Cash</option>
-                  <option value="QR">QR / Online</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label class="text-[11px] font-black text-slate-400 block mb-1.5 uppercase tracking-wider">Remarks</label>
-              <input type="text" id="pay-remarks" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all shadow-sm" placeholder="e.g. Previous dues cleared" />
-            </div>
-            <button onclick="savePaymentTransaction()" class="w-full h-[54px] bg-[#004aad] text-white font-black rounded-xl text-sm shadow-md mt-4 uppercase tracking-widest hover:shadow-lg hover:-translate-y-0.5 transition-all">SAVE TRANSACTION</button>
-          </div>
-        </div>
-
-        <!-- SETTINGS -->
-        <div id="view-settings" class="space-y-4 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm max-w-md mx-auto hidden w-full">
-          <h2 class="font-black text-lg text-[#004aad] tracking-widest uppercase border-b border-slate-100 pb-3">BACKEND CLOUD URL</h2>
-          <input type="text" id="settings-url" class="w-full h-[48px] px-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] text-sm font-bold transition-all shadow-sm" placeholder="Paste URL" />
-          <div class="flex space-x-4 pt-4">
-            <button onclick="saveSettings()" class="w-full h-[54px] bg-[#004aad] text-white font-black rounded-xl text-sm shadow-md uppercase tracking-widest hover:shadow-lg hover:-translate-y-0.5 transition-all">SAVE SETTINGS</button>
-          </div>
         </div>
 
       </main>
   </div>
 
-  <!-- MOBILE BOTTOM NAV -->
   <nav id="bottom-nav" class="lg:hidden fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
      <button id="mob-nav-sale" onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-3 text-center text-slate-500 opacity-90 flex flex-col items-center transition-colors">
        <span class="text-2xl leading-none">🛒</span><span class="text-[10px] font-black mt-1.5 tracking-widest">SALE</span>
@@ -1134,12 +723,15 @@
     let currentBillType = "MOBILE";
     let currentPaymentType = "OUT"; 
     let activeInvoiceData = null;
-    let billsCache = []; 
     let gasUrl = localStorage.getItem("sre_gas_url") || "";
     let pendingBillData = null;
 
+    // LOCAL STORAGE LOAD
     let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || [];
     let itemsCache = JSON.parse(localStorage.getItem("sre_items")) || [];
+    let billsCache = JSON.parse(localStorage.getItem("sre_bills")) || [];
+    let inventoryCache = JSON.parse(localStorage.getItem("sre_inventory")) || [];
+    let expensesCache = JSON.parse(localStorage.getItem("sre_expenses")) || [];
     let activeItemInput = null;
 
     function refreshPartyList() {
@@ -1154,6 +746,100 @@
     refreshPartyList();
     refreshItemList();
 
+    function getFormattedDate() {
+      const d = new Date(); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return d.getDate() + " " + m[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
+    }
+
+    // UPDATE UI NAVIGATIONS
+    function updateSidebarNav(activeId) {
+        const navItems = ['nav-dashboard', 'nav-product', 'nav-purchase', 'nav-sales', 'nav-customer', 'nav-payment', 'nav-expense', 'nav-ledger', 'nav-stock', 'nav-reports', 'nav-gst', 'nav-settings'];
+        navItems.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (id === activeId) {
+                    el.className = "w-full flex items-center space-x-3 bg-blue-600 text-white px-4 py-3 rounded-xl transition-all shadow-md font-bold";
+                } else {
+                    el.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all font-semibold";
+                }
+            }
+        });
+    }
+
+    function updateMobileNav(activeId) {
+        const navItems = ['mob-nav-sale', 'mob-nav-purchase', 'mob-nav-payment', 'mob-nav-receipt'];
+        navItems.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (id === activeId) {
+                    el.classList.add('bg-slate-50', 'text-[#004aad]');
+                    el.classList.remove('opacity-90', 'text-slate-500');
+                } else {
+                    el.classList.remove('bg-slate-50', 'text-[#004aad]');
+                    el.classList.add('opacity-90', 'text-slate-500');
+                }
+            }
+        });
+    }
+
+    function showView(view) {
+      ["dashboard", "new-bill", "invoice", "settings", "ledger", "payment", "product", "expense", "stock", "reports", "gst-reports"].forEach(v => {
+          const el = document.getElementById("view-" + v);
+          if(el) el.classList.add("hidden");
+      });
+      
+      const targetView = document.getElementById("view-" + view);
+      if(targetView) targetView.classList.remove("hidden");
+      
+      const titleEl = document.getElementById("app-header-title");
+      const subEl = document.getElementById("app-header-sub");
+      const backBtn = document.getElementById("global-back-btn");
+
+      if (view === "dashboard") {
+          renderDashboard();
+          document.getElementById("bottom-nav").classList.remove("hidden");
+          titleEl.innerText = "Sri Ram Enterprises";
+          subEl.innerText = "Smart Business | Simple Accounting | Better Growth";
+          backBtn.classList.add("hidden");
+          updateSidebarNav('nav-dashboard');
+          updateMobileNav('');
+      } else {
+          document.getElementById("bottom-nav").classList.add("hidden");
+          backBtn.classList.remove("hidden");
+          
+          const viewTitles = {
+             "new-bill": [currentEntryType + " ENTRY", currentBillType],
+             "ledger": ["PARTY LEDGER", "ACCOUNTING"],
+             "payment": [currentPaymentType === 'OUT' ? 'PAYMENT OUT' : 'RECEIPT IN', "TRANSACTION"],
+             "settings": ["SETTINGS", "CONFIGURATION"],
+             "invoice": ["E-INVOICE", "VERIFIED BILL"],
+             "product": ["PRODUCT MANAGEMENT", "Add, manage and track your products easily"],
+             "expense": ["EXPENSE MANAGEMENT", "Track your daily expenses"],
+             "stock": ["STOCK INVENTORY", "Manage your warehouse stock live"],
+             "reports": ["BUSINESS REPORTS", "Analytics and Insights"],
+             "gst-reports": ["GST REPORTS", "Taxations & Returns"]
+          };
+
+          if(viewTitles[view]) {
+              titleEl.innerText = viewTitles[view][0];
+              subEl.innerText = viewTitles[view][1];
+          }
+
+          if (view === "ledger") { updateLedgerView(); updateSidebarNav('nav-ledger'); updateMobileNav('mob-nav-ledger'); }
+          else if (view === "settings") { document.getElementById("settings-url").value = gasUrl; updateSidebarNav('nav-settings'); }
+          else if (view === "product") { renderProductTable(); updateSidebarNav('nav-product'); }
+          else if (view === "expense") { 
+              document.getElementById("exp-date").value = new Date().toISOString().split('T')[0];
+              renderExpenseTable(); 
+              updateSidebarNav('nav-expense'); 
+          }
+          else if (view === "stock") { renderStockTable(); updateSidebarNav('nav-stock'); }
+          else if (view === "reports") { renderReportsData(); updateSidebarNav('nav-reports'); }
+          else if (view === "gst-reports") { renderGstReports(); updateSidebarNav('nav-gst'); }
+      }
+    }
+
+    // MODAL LOGIC
     function openPartyModal(type) {
         document.getElementById('new-party-type').value = type || 'CUSTOMER';
         document.getElementById('new-party-name').value = '';
@@ -1199,310 +885,237 @@
         document.getElementById('item-popup').classList.remove('hidden');
         setTimeout(() => document.getElementById('new-item-name').focus(), 100);
     }
-    function closeItemModal() {
-        document.getElementById('item-popup').classList.add('hidden');
-        activeItemInput = null;
-    }
+    function closeItemModal() { document.getElementById('item-popup').classList.add('hidden'); activeItemInput = null; }
     function saveItemModal() {
         const name = document.getElementById('new-item-name').value.trim().toUpperCase();
         if (!name) return showPopup("Validation Error", "Please enter Item Name!", true);
+        if (!itemsCache.includes(name)) {
+            itemsCache.push(name);
+            localStorage.setItem("sre_items", JSON.stringify(itemsCache));
+            refreshItemList();
+        }
+        if (activeItemInput) activeItemInput.value = name;
+        closeItemModal();
+    }
+
+    // EXPENSE MANAGEMENT
+    function renderExpenseTable() {
+        const tbody = document.getElementById("expense-table-body");
+        tbody.innerHTML = expensesCache.length === 0 ? '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">No expenses recorded.</td></tr>' :
+        expensesCache.slice().reverse().map((e, idx) => `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 text-slate-500 whitespace-nowrap">${e.date}</td>
+                <td class="p-4 font-black text-[#004aad] uppercase tracking-wider">${e.cat}</td>
+                <td class="p-4 text-slate-600 truncate max-w-[200px]">${e.rem || '-'}</td>
+                <td class="p-4 text-slate-500 font-medium">${e.mode}</td>
+                <td class="p-4 text-right font-black text-rose-600">₹ ${e.amt.toLocaleString("en-IN")}</td>
+            </tr>
+        `).join("");
+    }
+    function saveLiveExpense() {
+        const cat = document.getElementById("exp-cat").value;
+        const amt = Number(document.getElementById("exp-amt").value) || 0;
+        const date = document.getElementById("exp-date").value;
+        const mode = document.getElementById("exp-mode").value;
+        const rem = document.getElementById("exp-remarks").value.trim();
+
+        if(amt <= 0) return showPopup("Validation Error", "Valid Amount is required!", true);
+        if(!date) return showPopup("Validation Error", "Date is required!", true);
+
+        expensesCache.push({ cat, amt, date, mode, rem, token: Math.random().toString(36).substring(2, 8) });
+        localStorage.setItem("sre_expenses", JSON.stringify(expensesCache));
         
+        document.getElementById("exp-amt").value = "";
+        document.getElementById("exp-remarks").value = "";
+        
+        renderExpenseTable();
+        showPopup("Expense Saved", "Expense recorded successfully!");
+    }
+
+    // PRODUCT MANAGEMENT (100% Live)
+    function clearProductForm() {
+        ['new-prod-name','new-prod-brand','new-prod-model','new-prod-sku','new-prod-mrp','new-prod-pur','new-prod-sale','new-prod-stock','new-prod-hsn'].forEach(id => {
+            const el = document.getElementById(id); if(el) el.value = '';
+        });
+        document.getElementById('new-prod-mrp').placeholder = "0";
+        document.getElementById('new-prod-pur').placeholder = "0";
+        document.getElementById('new-prod-sale').placeholder = "0";
+        document.getElementById('new-prod-stock').placeholder = "0";
+        document.getElementById('new-prod-low').value = "5";
+        document.getElementById('new-prod-category').value = "Mobile Phone";
+        document.getElementById('new-prod-gst').value = "18";
+    }
+
+    function saveLiveProduct() {
+        const name = document.getElementById("new-prod-name").value.trim().toUpperCase();
+        if(!name) return showPopup("Validation Error", "Product Name is required!", true);
+        
+        const sale = Number(document.getElementById("new-prod-sale").value) || 0;
+        if(sale <= 0) return showPopup("Validation Error", "Valid Sale Price is required!", true);
+
+        const prod = {
+            id: 'PRD-' + Date.now(),
+            name: name,
+            brand: document.getElementById("new-prod-brand").value.trim() || "-",
+            category: document.getElementById("new-prod-category").value,
+            model: document.getElementById("new-prod-model").value.trim() || "-",
+            sku: document.getElementById("new-prod-sku").value.trim() || ("SKU-"+Math.floor(Math.random()*10000)),
+            mrp: Number(document.getElementById("new-prod-mrp").value) || 0,
+            purPrice: Number(document.getElementById("new-prod-pur").value) || 0,
+            salePrice: sale,
+            stock: Number(document.getElementById("new-prod-stock").value) || 0,
+            hsn: document.getElementById("new-prod-hsn").value.trim() || "-",
+            gst: Number(document.getElementById("new-prod-gst").value) || 0,
+            lowStockAlert: Number(document.getElementById("new-prod-low").value) || 5
+        };
+
+        inventoryCache.push(prod);
+        localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache));
+
         if (!itemsCache.includes(name)) {
             itemsCache.push(name);
             localStorage.setItem("sre_items", JSON.stringify(itemsCache));
             refreshItemList();
         }
 
-        if (activeItemInput) activeItemInput.value = name;
-        closeItemModal();
+        clearProductForm();
+        renderProductTable();
+        showPopup("Success", "Product added successfully!");
     }
 
-    // FIXED: UPDATE SIDEBAR NAV ACTIVE STATE
-    function updateSidebarNav(activeId) {
-        const navItems = ['nav-dashboard', 'nav-product', 'nav-purchase', 'nav-sales', 'nav-customer', 'nav-payment', 'nav-expense', 'nav-ledger', 'nav-stock', 'nav-reports', 'nav-gst', 'nav-settings'];
-        navItems.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (id === activeId) {
-                    el.className = "w-full flex items-center space-x-3 bg-blue-600 text-white px-4 py-3 rounded-xl transition-all shadow-md font-bold";
-                } else {
-                    el.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all font-semibold";
-                }
-            }
-        });
-    }
-
-    // FIXED: UPDATE MOBILE NAV ACTIVE STATE
-    function updateMobileNav(activeId) {
-        const navItems = ['mob-nav-sale', 'mob-nav-purchase', 'mob-nav-payment', 'mob-nav-receipt'];
-        navItems.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (id === activeId) {
-                    el.classList.add('bg-slate-50', 'text-[#004aad]');
-                    el.classList.remove('opacity-90', 'text-slate-500');
-                } else {
-                    el.classList.remove('bg-slate-50', 'text-[#004aad]');
-                    el.classList.add('opacity-90', 'text-slate-500');
-                }
-            }
-        });
-    }
-
-    function startPayment(type) {
-        currentPaymentType = type;
-        document.getElementById('pay-party-lbl').innerText = type === 'OUT' ? 'Supplier Name *' : 'Customer Name *';
-        document.getElementById('pay-party').value = '';
-        document.getElementById('pay-amt').value = '';
-        document.getElementById('pay-mode').value = 'Cash';
-        document.getElementById('pay-remarks').value = '';
-        
-        updateSidebarNav('nav-payment');
-        updateMobileNav(type === 'OUT' ? 'mob-nav-payment' : 'mob-nav-receipt');
-        
-        showView('payment');
-    }
-
-    function savePaymentTransaction() {
-       const party = document.getElementById('pay-party').value.trim().toUpperCase();
-       const amt = Number(document.getElementById('pay-amt').value) || 0;
-       const mode = document.getElementById('pay-mode').value;
-       const remarks = document.getElementById('pay-remarks').value.trim();
-       
-       if(!party || amt <= 0) return showPopup("Validation Error", "Party Name and valid Amount are required!", true);
-       
-       const token = Math.random().toString(36).substring(2, 8).toUpperCase();
-       const isOut = currentPaymentType === 'OUT';
-       const prefix = isOut ? "PAY" : "REC";
-       const invNo = `${prefix}-${new Date().getFullYear()}-${(billsCache.length+1).toString().padStart(3,"0")}`;
-       
-       const billData = {
-           invoiceNo: invNo,
-           billDate: getFormattedDate(),
-           billType: isOut ? "PAYMENT OUT" : "RECEIPT IN",
-           customerName: party,
-           customerMobile: "-", customerAddress: "-", customerGstin: "-",
-           items: [{name: remarks || (isOut?"Payment Given":"Payment Received"), imei: "-", qty: 1, rate: amt, amount: 0, disc: 0, gst: 0}], 
-           paymentMode: mode, paymentBreakdown: {cash: mode==="Cash"?amt:0, qr: mode==="QR"?amt:0, card:0},
-           paymentRate: "",
-           grandTotal: 0, paid: amt, due: 0,
-           totalTaxable: 0, totalGst: 0, totalDiscount: 0,
-           gstSlab: 0, finance: null, token: token
-       };
-
-       billsCache.unshift(billData);
-
-       if (gasUrl) {
-          fetch(gasUrl, { 
-              method: "POST", mode: "no-cors",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "createBill", billData: billData }) 
-          }).catch(e => console.log("Sync background error", e)); 
-       } 
-       
-       showPopup("Transaction Saved", "Payment logged successfully!");
-       showView('dashboard');
-    }
-
-    function switchLedgerTab(type) {
-      const btnCust = document.getElementById("tab-CUSTOMER");
-      const btnSupp = document.getElementById("tab-SUPPLIER");
-      const thDr = document.getElementById("th-dr");
-      const thCr = document.getElementById("th-cr");
-
-      if (type === 'CUSTOMER') {
-          btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-widest transition-all";
-          btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-400 tracking-widest transition-all hover:text-[#004aad]";
-          thDr.innerHTML = "Dr<br><span class='text-[9px] font-bold text-slate-400 normal-case tracking-normal'>Sale Amt</span>";
-          thCr.innerHTML = "Cr<br><span class='text-[9px] font-bold text-slate-400 normal-case tracking-normal'>Receipt</span>";
-      } else {
-          btnSupp.className = "flex-1 py-3 rounded-lg text-xs font-black bg-[#004aad] text-white shadow-md tracking-widest transition-all";
-          btnCust.className = "flex-1 py-3 rounded-lg text-xs font-black text-slate-400 tracking-widest transition-all hover:text-[#004aad]";
-          thDr.innerHTML = "Dr<br><span class='text-[9px] font-bold text-slate-400 normal-case tracking-normal'>Payment</span>";
-          thCr.innerHTML = "Cr<br><span class='text-[9px] font-bold text-slate-400 normal-case tracking-normal'>Purchase Amt</span>";
-      }
-      
-      document.getElementById("ledger-search").value = "";
-      updateLedgerView();
-    }
-
-    function updateLedgerView() {
-        const searchText = document.getElementById("ledger-search").value.trim().toUpperCase();
-        const isCust = document.getElementById('tab-CUSTOMER').classList.contains('bg-[#004aad]');
-        
-        let totalBilled = 0; let totalPaid = 0; let html = '';
-
-        if (!searchText) {
-            document.getElementById("ledger-tbody").innerHTML = '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">🔍 Search a party...</td></tr>';
-            document.getElementById("ledger-ob").innerText = "Rs. 0";
-            document.getElementById("ledger-billed").innerText = "Rs. 0";
-            document.getElementById("ledger-paid").innerText = "Rs. 0";
-            document.getElementById("ledger-bal").innerText = "Rs. 0";
-            return;
+    function deleteProduct(index) {
+        if(confirm("Are you sure you want to delete this product?")) {
+            inventoryCache.splice(index, 1);
+            localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache));
+            renderProductTable();
         }
+    }
 
-        const partyBills = billsCache.filter(b => 
-            (b.customerName.toUpperCase().includes(searchText) || (b.customerMobile && b.customerMobile.includes(searchText))) &&
-            (isCust ? (b.billType.includes("SALE") || b.billType.includes("RECEIPT")) : (b.billType.includes("PURCHASE") || b.billType.includes("PAYMENT")))
-        ).reverse(); 
+    function exportProductsCSV() {
+        if(inventoryCache.length === 0) return showPopup("Empty", "No products to export", true);
+        let csv = "Product Name,Brand,Category,Model,SKU,MRP,Purchase Price,Sale Price,Stock,HSN,GST\n";
+        inventoryCache.forEach(p => {
+            csv += `"${p.name}","${p.brand}","${p.category}","${p.model}","${p.sku}",${p.mrp},${p.purPrice},${p.salePrice},${p.stock},"${p.hsn}",${p.gst}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'SRE_Products.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 
-        let runBal = 0; 
-        partyBills.forEach(b => {
-            const billed = Number(b.grandTotal) || 0;
-            const paid = Number(b.paid) || 0;
-            totalBilled += billed; totalPaid += paid; runBal += (billed - paid); 
+    function renderProductTable() {
+        const search = (document.getElementById("prod-search")?.value || "").toUpperCase();
+        let html = '';
+        let total = inventoryCache.length, inStock = 0, lowStock = 0, outStock = 0;
 
-            let drStr = "-"; let crStr = "-";
-            if (isCust) {
-                if (billed > 0) drStr = billed.toLocaleString("en-IN");
-                if (paid > 0) crStr = paid.toLocaleString("en-IN");
+        const filtered = inventoryCache.filter(p => {
+            return p.name.includes(search) || p.brand.toUpperCase().includes(search) || p.sku.toUpperCase().includes(search);
+        });
+
+        filtered.forEach((p, index) => {
+            let statusBadge = '';
+            if (p.stock <= 0) {
+                statusBadge = '<span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Out of Stock</span>';
+                outStock++;
+            } else if (p.stock <= p.lowStockAlert) {
+                statusBadge = '<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Low Stock</span>';
+                lowStock++;
             } else {
-                if (paid > 0) drStr = paid.toLocaleString("en-IN");
-                if (billed > 0) crStr = billed.toLocaleString("en-IN");
+                statusBadge = '<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">In Stock</span>';
+                inStock++;
             }
 
-            html += `<tr class="hover:bg-slate-50 transition-colors">
-                <td class="p-4 whitespace-nowrap text-slate-600 font-medium">${b.billDate}</td>
-                <td class="p-4 font-bold text-[#004aad] whitespace-nowrap">${b.invoiceNo}</td>
-                <td class="p-4 text-right text-[#004aad] font-black">${drStr}</td>
-                <td class="p-4 text-right text-[#004aad] font-black">${crStr}</td>
-                <td class="p-4 text-right font-black text-[#004aad]">${runBal.toLocaleString("en-IN")} <span class="text-[9px] text-slate-400 font-bold">${isCust ? 'Dr' : 'Cr'}</span></td>
+            html += `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 text-center"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#004aad]"></td>
+                <td class="p-4 text-center"><div class="w-10 h-10 bg-slate-100 rounded-lg mx-auto flex items-center justify-center text-xl">📦</div></td>
+                <td class="p-4 text-slate-900 font-black whitespace-nowrap">${p.name}</td>
+                <td class="p-4 whitespace-nowrap">${p.brand}</td>
+                <td class="p-4 whitespace-nowrap">${p.model}</td>
+                <td class="p-4 font-mono tracking-widest">${p.sku}</td>
+                <td class="p-4 text-right whitespace-nowrap">${p.mrp.toLocaleString("en-IN")}</td>
+                <td class="p-4 text-right whitespace-nowrap">${p.purPrice.toLocaleString("en-IN")}</td>
+                <td class="p-4 text-right text-[#004aad] font-black whitespace-nowrap">${p.salePrice.toLocaleString("en-IN")}</td>
+                <td class="p-4 text-center font-black ${p.stock <= 0 ? 'text-rose-600' : 'text-emerald-600'}">${p.stock}</td>
+                <td class="p-4 text-center">${statusBadge}</td>
+                <td class="p-4 text-center space-x-1 whitespace-nowrap">
+                    <button class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">✏️</button>
+                    <button onclick="deleteProduct(${index})" class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">🗑️</button>
+                </td>
             </tr>`;
         });
 
-        if(html === '') html = '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">No records found.</td></tr>';
+        if(filtered.length === 0) html = '<tr><td colspan="12" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">No products found.</td></tr>';
         
-        document.getElementById("ledger-tbody").innerHTML = html;
-        document.getElementById("ledger-billed").innerText = "Rs. " + totalBilled.toLocaleString("en-IN");
-        document.getElementById("ledger-paid").innerText = "Rs. " + totalPaid.toLocaleString("en-IN");
-        document.getElementById("ledger-bal").innerText = "Rs. " + runBal.toLocaleString("en-IN");
+        document.getElementById("prod-table-body").innerHTML = html;
+        
+        // Update Stats if no search applied
+        if(search === "") {
+            document.getElementById("prod-stat-total").innerText = total;
+            document.getElementById("prod-stat-in").innerText = inStock;
+            document.getElementById("prod-stat-low").innerText = lowStock;
+            document.getElementById("prod-stat-out").innerText = outStock;
+        }
     }
 
-    function showPopup(title, msg, isError = false, billToDisplay = null) {
-      document.getElementById("popup-title").innerText = title;
-      document.getElementById("popup-message").innerText = msg;
-      document.getElementById("popup-icon").innerText = isError ? "❌" : "✅";
-      pendingBillData = billToDisplay;
-      document.getElementById("center-popup").classList.remove("hidden");
+    function renderStockTable() {
+        let html = '';
+        inventoryCache.forEach((p) => {
+            let statusBadge = p.stock <= 0 ? '<span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Out of Stock</span>' : 
+                              (p.stock <= p.lowStockAlert ? '<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">Low Stock</span>' : 
+                              '<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest">In Stock</span>');
+            html += `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 text-slate-900 font-black">${p.name}</td>
+                <td class="p-4 font-mono tracking-widest">${p.sku}</td>
+                <td class="p-4 text-right">₹ ${p.purPrice.toLocaleString("en-IN")}</td>
+                <td class="p-4 text-right font-black text-[#004aad]">₹ ${p.salePrice.toLocaleString("en-IN")}</td>
+                <td class="p-4 text-center font-black ${p.stock <= 0 ? 'text-rose-600' : 'text-emerald-600'} text-lg">${p.stock}</td>
+                <td class="p-4 text-center">${statusBadge}</td>
+            </tr>`;
+        });
+        if(inventoryCache.length === 0) html = '<tr><td colspan="6" class="text-center p-8 text-slate-400 font-bold text-sm tracking-wider">Inventory is empty.</td></tr>';
+        document.getElementById("stock-table-body").innerHTML = html;
     }
 
-    function closePopup() {
-      document.getElementById("center-popup").classList.add("hidden");
-      if (pendingBillData) {
-          displayInvoice(pendingBillData);
-          pendingBillData = null;
-      }
+    function renderReportsData() {
+        let ts = 0, tp = 0, te = 0;
+        billsCache.forEach(b => {
+            if(b.billType.includes("SALE")) ts += Number(b.grandTotal);
+            if(b.billType.includes("PURCHASE")) tp += Number(b.grandTotal);
+        });
+        expensesCache.forEach(e => { te += Number(e.amt); });
+        
+        document.getElementById("rep-total-sale").innerText = "₹ " + ts.toLocaleString("en-IN");
+        document.getElementById("rep-total-pur").innerText = "₹ " + tp.toLocaleString("en-IN");
+        document.getElementById("rep-total-exp").innerText = "₹ " + te.toLocaleString("en-IN");
+        document.getElementById("rep-total-profit").innerText = "₹ " + (ts - tp - te).toLocaleString("en-IN");
     }
 
-    function saveSettings() {
-      const url = document.getElementById("settings-url").value.trim();
-      localStorage.setItem("sre_gas_url", url);
-      gasUrl = url; 
-      showView("dashboard");
-      showPopup("Settings Saved", "Backend URL updated successfully.");
+    function renderGstReports() {
+        let saleTaxable = 0, saleGst = 0, purTaxable = 0, purGst = 0;
+        billsCache.forEach(b => {
+            if(b.billType.includes("SALE")) { saleTaxable += Number(b.totalTaxable); saleGst += Number(b.totalGst); }
+            if(b.billType.includes("PURCHASE")) { purTaxable += Number(b.totalTaxable); purGst += Number(b.totalGst); }
+        });
+        document.getElementById("gst-sale-taxable").innerText = "₹ " + saleTaxable.toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-sale-cgst").innerText = "₹ " + (saleGst/2).toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-sale-sgst").innerText = "₹ " + (saleGst/2).toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-sale-total").innerText = "₹ " + saleGst.toLocaleString("en-IN", {minimumFractionDigits:2});
+        
+        document.getElementById("gst-pur-taxable").innerText = "₹ " + purTaxable.toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-pur-cgst").innerText = "₹ " + (purGst/2).toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-pur-sgst").innerText = "₹ " + (purGst/2).toLocaleString("en-IN", {minimumFractionDigits:2});
+        document.getElementById("gst-pur-total").innerText = "₹ " + purGst.toLocaleString("en-IN", {minimumFractionDigits:2});
+        
+        document.getElementById("gst-net-payable").innerText = "₹ " + (saleGst - purGst).toLocaleString("en-IN", {minimumFractionDigits:2});
     }
 
-    function compressBill(b) {
-        const validItems = b.items.filter(x => x.name && x.name.trim() !== "");
-        const isPurchase = b.billType && b.billType.includes("PURCHASE");
-        const invData = isPurchase ? b.invoiceNo : String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-3);
-        const min = [
-            invData, 
-            b.billDate, b.customerName, b.customerMobile, b.customerAddress, 
-            validItems.map(x => [x.name.substring(0,20), x.imei.substring(0,25), x.qty, x.rate, x.amount, x.disc||0, x.gst||0]), 
-            b.totalTaxable, b.totalGst, b.totalDiscount, b.gstSlab, b.paymentMode, b.paid, b.due, 
-            [b.paymentBreakdown.cash, b.paymentBreakdown.qr, b.paymentBreakdown.card], 
-            b.finance ? b.finance.company : "", b.paymentRate, b.billType 
-        ];
-        return encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(min)))));
-    }
-
-    function expandBill(str) {
-        const min = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(str)))));
-        if (Array.isArray(min)) {
-            const isPur = min[16] ? min[16].includes("PURCHASE") : false;
-            let invNo = "";
-            if (isPur) {
-                invNo = min[0];
-            } else {
-                let prefix = "SRE";
-                if(min[16] && min[16].includes("PAYMENT")) prefix = "PAY";
-                if(min[16] && min[16].includes("RECEIPT")) prefix = "REC";
-                invNo = `${prefix}-20${String(min[1] || "").slice(-2) || "26"}-${String(min[0] || "0").padStart(3, '0')}`;
-            }
-            let gt = Math.round(Number(min[6]) + Number(min[7]));
-            return {
-                invoiceNo: invNo, billDate: min[1], customerName: min[2], customerMobile: min[3], customerAddress: min[4], customerGstin: "-",
-                items: min[5].map(x => ({ name: x[0], imei: x[1], qty: x[2], rate: x[3], amount: x[4], disc: x[5]||0, gst: x[6]||0 })),
-                grandTotal: gt, totalTaxable: min[6], totalGst: min[7], totalDiscount: min[8], gstSlab: min[9] !== undefined ? Number(min[9]) : 0,
-                paymentMode: min[10] || "Cash", paid: min[11] !== undefined ? min[11] : gt, due: min[12] || 0,
-                paymentBreakdown: { cash: min[13]?.[0]||0, qr: min[13]?.[1]||0, card: min[13]?.[2]||0 },
-                finance: min[14] ? { company: min[14], dp: min[11], loan: min[12] } : null,
-                paymentRate: min[15] || "", billType: min[16] || "SALE - MOBILE"
-            };
-        } 
-        return null;
-    }
-
-    // FIXED: Global View Switcher integrating Sidebar Highlights
-    function showView(view) {
-      ["dashboard", "new-bill", "invoice", "settings", "ledger", "payment", "product", "expense", "stock", "reports", "gst-reports"].forEach(v => {
-          const el = document.getElementById("view-" + v);
-          if(el) el.classList.add("hidden");
-      });
-      
-      const targetView = document.getElementById("view-" + view);
-      if(targetView) targetView.classList.remove("hidden");
-      
-      const titleEl = document.getElementById("app-header-title");
-      const subEl = document.getElementById("app-header-sub");
-      const backBtn = document.getElementById("global-back-btn");
-
-      if (view === "dashboard") {
-          renderDashboard();
-          document.getElementById("bottom-nav").classList.remove("hidden");
-          titleEl.innerText = "Sri Ram Enterprises";
-          subEl.innerText = "Smart Business | Simple Accounting | Better Growth";
-          backBtn.classList.add("hidden");
-          updateSidebarNav('nav-dashboard');
-          updateMobileNav('');
-      } else {
-          document.getElementById("bottom-nav").classList.add("hidden");
-          backBtn.classList.remove("hidden");
-          
-          const viewTitles = {
-             "new-bill": [currentEntryType + " ENTRY", currentBillType],
-             "ledger": ["PARTY LEDGER", "ACCOUNTING"],
-             "payment": [currentPaymentType === 'OUT' ? 'PAYMENT OUT' : 'RECEIPT IN', "TRANSACTION"],
-             "settings": ["SETTINGS", "CONFIGURATION"],
-             "invoice": ["E-INVOICE", "VERIFIED BILL"],
-             "product": ["PRODUCT MANAGEMENT", "Add, manage and track your products easily"],
-             "expense": ["EXPENSE MODULE", "Track your daily expenses"],
-             "stock": ["STOCK MODULE", "Manage your warehouse stock"],
-             "reports": ["REPORTS MODULE", "Analytics and Insights"],
-             "gst-reports": ["GST REPORTS", "Taxations & Returns"]
-          };
-
-          if(viewTitles[view]) {
-              titleEl.innerText = viewTitles[view][0];
-              subEl.innerText = viewTitles[view][1];
-          }
-
-          if (view === "ledger") { updateLedgerView(); updateSidebarNav('nav-ledger'); updateMobileNav('mob-nav-ledger'); }
-          else if (view === "settings") { document.getElementById("settings-url").value = gasUrl; updateSidebarNav('nav-settings'); }
-          else if (view === "product") { updateSidebarNav('nav-product'); }
-          else if (view === "expense") { updateSidebarNav('nav-expense'); }
-          else if (view === "stock") { updateSidebarNav('nav-stock'); }
-          else if (view === "reports") { updateSidebarNav('nav-reports'); }
-          else if (view === "gst-reports") { updateSidebarNav('nav-gst'); }
-      }
-    }
-
-    function getFormattedDate() {
-      const d = new Date(); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return d.getDate() + " " + m[d.getMonth()] + " " + String(d.getFullYear()).slice(-2);
-    }
-
+    // MAIN DASHBOARD & BILLING LOGIC
     function renderDashboard() {
       const today = getFormattedDate();
       const todayBills = billsCache.filter(b => b.billDate === today);
@@ -1511,13 +1124,27 @@
           if(b.billType && b.billType.includes("SALE")) sales += Number(b.grandTotal) || 0; 
           if(b.billType && b.billType.includes("PURCHASE")) purchases += Number(b.grandTotal) || 0; 
       });
-      const profit = sales > purchases ? sales - purchases : 0;
-      const loss = purchases > sales ? purchases - sales : 0;
+      let exps = 0; expensesCache.filter(e => e.date === today).forEach(e => exps += Number(e.amt));
+      
+      const profit = sales > purchases ? sales - purchases - exps : 0;
+      const loss = purchases > sales ? purchases - sales + exps : 0;
 
       document.getElementById("dash-sales").innerText = "₹ " + sales.toLocaleString("en-IN");
       document.getElementById("dash-purchase").innerText = "₹ " + purchases.toLocaleString("en-IN");
-      document.getElementById("dash-customers").innerText = partiesCache.filter(p=>p.type==='CUSTOMER').length;
-      document.getElementById("dash-products").innerText = itemsCache.length;
+      document.getElementById("dash-expenses").innerText = "₹ " + exps.toLocaleString("en-IN");
+      document.getElementById("dash-profit").innerText = "₹ " + profit.toLocaleString("en-IN");
+
+      // Live Stock Dashboard Update
+      let inStock = 0, lowStock = 0, outStock = 0;
+      inventoryCache.forEach(p => {
+          if(p.stock <= 0) outStock++;
+          else if(p.stock <= p.lowStockAlert) lowStock++;
+          else inStock++;
+      });
+      document.getElementById("dash-stk-total").innerText = inventoryCache.length;
+      document.getElementById("dash-stk-in").innerText = inStock;
+      document.getElementById("dash-stk-low").innerText = lowStock;
+      document.getElementById("dash-stk-out").innerText = outStock;
 
       const ctx = document.getElementById('salesChart');
       if (ctx) {
@@ -1537,12 +1164,33 @@
 
       const ctxExp = document.getElementById('expenseChart');
       if (ctxExp) {
+          let expTotals = { Rent:0, Salary:0, Electricity:0, Internet:0, Other:0 };
+          expensesCache.forEach(e => {
+              if(expTotals[e.cat] !== undefined) expTotals[e.cat] += e.amt;
+              else expTotals['Other'] += e.amt;
+          });
+          let tExp = Object.values(expTotals).reduce((a,b)=>a+b, 0);
+          if(tExp === 0) { expTotals = { Rent:8000, Salary:7500, Electricity:3200, Internet:1250, Other:8500 }; tExp = 28450; }
+
+          document.getElementById('chart-total-exp').innerText = "₹ " + tExp.toLocaleString("en-IN");
+          
+          const expColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+          const expKeys = Object.keys(expTotals);
+          
+          let legendHtml = '';
+          expKeys.forEach((k, i) => {
+              let val = expTotals[k];
+              let pct = Math.round((val/tExp)*100);
+              legendHtml += `<div class="flex justify-between items-center text-xs"><div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full" style="background-color:${expColors[i]}"></span><span class="font-bold text-slate-600">${k}</span></div><div class="font-black">₹ ${val.toLocaleString("en-IN")} <span class="text-[10px] text-slate-400 font-bold ml-2 w-6 inline-block text-right">${pct}%</span></div></div>`;
+          });
+          document.getElementById("expense-legend-box").innerHTML = legendHtml;
+
           if (window.expChartInstance) window.expChartInstance.destroy();
           window.expChartInstance = new Chart(ctxExp, {
               type: 'doughnut',
               data: {
-                  labels: ['Rent', 'Salary', 'Electricity', 'Internet', 'Other'],
-                  datasets: [{ data: [28, 26, 11, 4, 31], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], borderWidth: 0, cutout: '75%' }]
+                  labels: expKeys,
+                  datasets: [{ data: Object.values(expTotals), backgroundColor: expColors, borderWidth: 0, cutout: '75%' }]
               },
               options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
           });
@@ -1550,29 +1198,7 @@
 
       const list = document.getElementById("dash-recent-table");
       if (billsCache.length === 0) {
-        list.innerHTML = `
-          <tr class="hover:bg-slate-50 transition-colors cursor-pointer">
-             <td class="py-3 font-bold text-slate-500 whitespace-nowrap">${today}</td>
-             <td class="py-3 font-black text-blue-500 whitespace-nowrap">🛒 Sale</td>
-             <td class="py-3 font-bold text-slate-700 whitespace-nowrap truncate max-w-[120px]">Cash Sale</td>
-             <td class="py-3 font-black text-slate-800 text-right whitespace-nowrap">₹ 12,500</td>
-             <td class="py-3 text-center whitespace-nowrap"><span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700">Paid</span></td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors cursor-pointer">
-             <td class="py-3 font-bold text-slate-500 whitespace-nowrap">${today}</td>
-             <td class="py-3 font-black text-rose-500 whitespace-nowrap">📦 Purchase</td>
-             <td class="py-3 font-bold text-slate-700 whitespace-nowrap truncate max-w-[120px]">ABC Mobile Pvt Ltd</td>
-             <td class="py-3 font-black text-slate-800 text-right whitespace-nowrap">₹ 25,000</td>
-             <td class="py-3 text-center whitespace-nowrap"><span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700">Paid</span></td>
-          </tr>
-          <tr class="hover:bg-slate-50 transition-colors cursor-pointer">
-             <td class="py-3 font-bold text-slate-500 whitespace-nowrap">${today}</td>
-             <td class="py-3 font-black text-blue-500 whitespace-nowrap">🛒 Sale</td>
-             <td class="py-3 font-bold text-slate-700 whitespace-nowrap truncate max-w-[120px]">Rajesh Kumar</td>
-             <td class="py-3 font-black text-slate-800 text-right whitespace-nowrap">₹ 18,990</td>
-             <td class="py-3 text-center whitespace-nowrap"><span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700">Pending</span></td>
-          </tr>
-        `;
+        list.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-sm text-slate-400 font-bold tracking-wider">No recent transactions.</td></tr>`;
       } else {
         list.innerHTML = billsCache.slice(0, 15).map(b => `
           <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick='displayInvoice(billsCache.find(x => x.token === "${b.token}"))'>
@@ -1663,14 +1289,8 @@
       }
       recalcTotals();
       
-      // Navigate and highlight
-      if (isPurchase) {
-          updateSidebarNav('nav-purchase');
-          updateMobileNav('mob-nav-purchase');
-      } else {
-          updateSidebarNav('nav-sales');
-          updateMobileNav('mob-nav-sale');
-      }
+      if (isPurchase) { updateSidebarNav('nav-purchase'); updateMobileNav('mob-nav-purchase'); } 
+      else { updateSidebarNav('nav-sales'); updateMobileNav('mob-nav-sale'); }
       showView("new-bill");
     }
 
@@ -1989,6 +1609,7 @@
       return { grand, paid, due, totalTaxable, totalGst, totalDiscount, gstSlab: globalGstRate };
     }
 
+    // FIXED: INVENTORY LIVE SYNC WITH BILLING
     function saveBill() {
       let name = "", phone = "", address = "", gstin = "";
       const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
@@ -2212,7 +1833,18 @@
         return showPopup("System Error", "Failed to compress Bill data.", true);
       }
 
+      // FIXED: LIVE INVENTORY STOCK UPDATE
+      billData.items.forEach(item => {
+         let p = inventoryCache.find(x => x.name.toUpperCase() === item.name.toUpperCase());
+         if (p) {
+             if (currentEntryType === "SALE") p.stock -= item.qty;
+             if (currentEntryType === "PURCHASE") p.stock += item.qty;
+         }
+      });
+      localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache));
+
       billsCache.unshift(billData); 
+      localStorage.setItem("sre_bills", JSON.stringify(billsCache));
 
       if (gasUrl) {
           fetch(gasUrl, { 
