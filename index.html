@@ -57,8 +57,7 @@
           <div>
             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Party Type *</label>
             <select id="new-party-type" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] focus:ring-2 focus:ring-blue-100 text-[#004aad] transition-all font-bold">
-              <option value="CUSTOMER">Customer</option>
-              <option value="SUPPLIER">Supplier</option>
+              <option value="CUSTOMER">Customer</option><option value="SUPPLIER">Supplier</option>
             </select>
           </div>
           <div>
@@ -117,7 +116,7 @@
     </div>
   </div>
 
-  <!-- TOP HEADER -->
+  <!-- HEADER -->
   <header class="bg-[#0f172a] text-white flex justify-between items-center px-4 lg:px-6 py-3 shadow-md z-30 flex-shrink-0">
     <div class="flex items-center space-x-3 cursor-pointer" onclick="showView('dashboard')">
       <button id="global-back-btn" class="hidden text-white text-xl font-black hover:scale-110 transition-transform -ml-1 pr-1" onclick="showView('dashboard')">←</button>
@@ -164,46 +163,34 @@
         </div>
       </aside>
 
-      <!-- SCROLLABLE MAIN AREA -->
+      <!-- MAIN CONTENT -->
       <main class="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6 pb-24 relative w-full h-full bg-slate-50">
 
-        <!-- VIEW 1: DASHBOARD -->
+        <!-- DASHBOARD -->
         <div id="view-dashboard" class="space-y-5 max-w-screen-2xl mx-auto w-full">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg">🛒</div>
-              <div>
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Total Sales</p>
-                <h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-sales">₹ 0</h3>
-              </div>
+              <div><p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Total Sales</p><h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-sales">₹ 0</h3></div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg">📦</div>
-              <div>
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Total Purchase</p>
-                <h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-purchase">₹ 0</h3>
-              </div>
+              <div><p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Total Purchase</p><h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-purchase">₹ 0</h3></div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg">👥</div>
-              <div>
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Customers</p>
-                <h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-customers">0</h3>
-              </div>
+              <div><p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Customers</p><h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-customers">0</h3></div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3 hover:shadow-md transition-shadow">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg">🏷️</div>
-              <div>
-                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Products</p>
-                <h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-products">0</h3>
-              </div>
+              <div><p class="text-slate-500 text-[9px] font-black uppercase tracking-widest">Products</p><h3 class="text-sm font-black text-slate-800 mt-0.5" id="dash-products">0</h3></div>
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 w-full">
              <div class="lg:col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                <div class="flex justify-between items-center mb-4">
-                  <h3 class="font-black text-[10px] uppercase tracking-widest text-slate-800">Sales & Purchase</h3>
+                  <h3 class="font-black text-[10px] uppercase tracking-widest text-slate-800">Sales & Purchase (Live Data)</h3>
                </div>
                <div class="h-[220px] w-full"><canvas id="salesChart"></canvas></div>
              </div>
@@ -261,28 +248,18 @@
              </div>
 
              <div class="xl:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col h-[320px]">
-                <div class="mb-4">
-                  <h3 class="font-black text-[10px] uppercase tracking-widest text-slate-800">Quick Actions</h3>
-                </div>
+                <div class="mb-4"><h3 class="font-black text-[10px] uppercase tracking-widest text-slate-800">Quick Actions</h3></div>
                 <div class="grid grid-cols-2 gap-3 flex-1">
-                   <button onclick="startNewBill('MOBILE', 'SALE')" class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-blue-700 transition-all hover:-translate-y-0.5">
-                      <span class="text-sm">🛒</span><span>Sale</span>
-                   </button>
-                   <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-emerald-700 transition-all hover:-translate-y-0.5">
-                      <span class="text-sm">📦</span><span>Purchase</span>
-                   </button>
-                   <button onclick="showView('product')" class="bg-amber-50/50 hover:bg-amber-50 border border-amber-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-amber-700 transition-all hover:-translate-y-0.5">
-                      <span class="text-sm">🏷️</span><span>Product</span>
-                   </button>
-                   <button onclick="openPartyModal('CUSTOMER')" class="bg-purple-50/50 hover:bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-purple-700 transition-all hover:-translate-y-0.5">
-                      <span class="text-sm">👥</span><span>Party</span>
-                   </button>
+                   <button onclick="startNewBill('MOBILE', 'SALE')" class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-blue-700 transition-all hover:-translate-y-0.5"><span class="text-sm">🛒</span><span>Sale</span></button>
+                   <button onclick="startNewBill('MOBILE', 'PURCHASE')" class="bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-emerald-700 transition-all hover:-translate-y-0.5"><span class="text-sm">📦</span><span>Purchase</span></button>
+                   <button onclick="showView('product')" class="bg-amber-50/50 hover:bg-amber-50 border border-amber-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-amber-700 transition-all hover:-translate-y-0.5"><span class="text-sm">🏷️</span><span>Product</span></button>
+                   <button onclick="openPartyModal('CUSTOMER')" class="bg-purple-50/50 hover:bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center space-x-2 text-[10px] font-black uppercase tracking-widest text-purple-700 transition-all hover:-translate-y-0.5"><span class="text-sm">👥</span><span>Party</span></button>
                 </div>
              </div>
           </div>
         </div>
 
-        <!-- VIEW 2: NEW BILL FORM (PURCHASE/SALE FIXED) -->
+        <!-- NEW BILL FORM (PURCHASE & SALE) -->
         <div id="view-new-bill" class="bg-white rounded-3xl shadow-sm p-4 sm:p-5 border border-slate-100 hidden max-w-screen-2xl mx-auto w-full">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-100 pb-4 mb-4 gap-4">
             <div id="sale-top-bar" class="w-full sm:flex-1 grid items-end">
@@ -315,47 +292,38 @@
             </div>
           </div>
 
-          <!-- FIXED: PERFECT ALIGNMENT CUSTOMER BOX -->
-          <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
-            <div class="flex flex-col">
-              <div class="flex justify-between items-center h-5 mb-1">
+          <!-- FIXED ALIGNMENT: CUSTOMER BOX -->
+          <div id="cust-box" class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4 items-end">
+            <div class="w-full">
+              <div class="flex justify-between items-center mb-1">
                 <label id="lbl-cust-name" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Name *</label>
                 <button id="btn-add-party" type="button" tabindex="-1" onclick="openPartyModal('CUSTOMER')" class="bg-blue-50 text-[#004aad] border border-blue-100 px-2 py-0.5 rounded text-[9px] font-black hover:bg-[#004aad] hover:text-white transition-all uppercase tracking-widest">➕ NEW</button>
               </div>
               <input type="text" id="cust-name" list="party-list" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none uppercase focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" placeholder="Select/Type Name" />
             </div>
-            <div class="flex flex-col">
-              <div class="flex items-center h-5 mb-1"><label id="lbl-cust-phone" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mobile *</label></div>
+            <div class="w-full">
+              <div class="mb-1"><label id="lbl-cust-phone" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mobile *</label></div>
               <input type="tel" id="cust-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" placeholder="10 Digits" />
             </div>
-            <div class="flex flex-col">
-              <div class="flex items-center h-5 mb-1"><label id="lbl-cust-address" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Address *</label></div>
+            <div class="w-full">
+              <div class="mb-1"><label id="lbl-cust-address" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Address *</label></div>
               <input type="text" id="cust-address" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none uppercase focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" placeholder="Address" />
             </div>
-            <div class="flex flex-col">
-              <div class="flex items-center h-5 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">GSTIN (Optional)</label></div>
+            <div class="w-full">
+              <div class="mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">GSTIN (Optional)</label></div>
               <input type="text" id="cust-gstin" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none uppercase focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" maxlength="15" placeholder="GST Number" />
             </div>
           </div>
 
           <div id="repair-box" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 hidden shadow-sm mb-4">
             <div class="grid grid-cols-2 gap-3">
-              <div class="w-full">
-                <div class="flex items-center h-5 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Mobile *</label></div>
-                <input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" />
-              </div>
-              <div class="w-full">
-                <div class="flex items-center h-5 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Device / Model *</label></div>
-                <input type="text" id="rep-device" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none uppercase focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" />
-              </div>
+              <div class="w-full"><div class="mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer Mobile *</label></div><input type="tel" id="rep-phone" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" /></div>
+              <div class="w-full"><div class="mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Device / Model *</label></div><input type="text" id="rep-device" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none uppercase focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" /></div>
             </div>
-            <div class="w-full">
-               <div class="flex items-center h-5 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Issue Description *</label></div>
-               <textarea id="rep-issue" rows="1" class="w-full premium-input py-2 px-3 bg-white border border-slate-200 rounded-lg outline-none uppercase focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm"></textarea>
-            </div>
+            <div class="w-full"><div class="mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Issue Description *</label></div><textarea id="rep-issue" rows="1" class="w-full premium-input py-2 px-3 bg-white border border-slate-200 rounded-lg outline-none uppercase focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm"></textarea></div>
           </div>
 
-          <!-- FIXED: UNIFIED CSS GRID (SALE AND PURCHASE SHARE THE SAME LAYOUT) -->
+          <!-- FIXED ALIGNMENT: GRID COLUMNS FOR SALE & PURCHASE -->
           <div id="items-box" class="space-y-2 pt-1 border-t border-slate-100">
             <div class="flex justify-between items-end pb-1 border-b border-slate-100">
               <h3 class="font-black text-[10px] uppercase text-[#004aad] tracking-widest">Product Details</h3>
@@ -375,6 +343,7 @@
             </div>
           </div>
 
+          <!-- BOTTOM BILLING CALCULATIONS -->
           <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mt-3 flex flex-col overflow-hidden">
             <div class="p-4 flex flex-col space-y-3">
                 <div id="global-tax-discount-box" class="grid grid-cols-2 gap-4 pb-3 border-b border-slate-100">
@@ -397,7 +366,6 @@
                             <select id="pay-primary" onchange="onPaymentModeChange()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm">
                               <option value="Cash">Cash</option><option value="QR">QR (Online)</option><option value="Card Swipe">Card Swipe</option>
                               <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option>
-                              <option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
                             </select>
                           </div>
                           <div><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Secondary Mode</label>
@@ -426,27 +394,22 @@
                     </div>
                     <div class="w-full sm:w-56">
                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Amount Paid *</label>
-                       <input type="number" id="pay-paid" oninput="recalcTotals()" class="w-full premium-input px-3 border-2 border-blue-400 rounded-lg font-black text-[#004aad] outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200" placeholder="0" />
+                       <!-- FIXED: Auto-calc triggers correct paid amt -->
+                       <input type="number" id="pay-paid" oninput="recalcTotals(true)" class="w-full premium-input px-3 border-2 border-blue-400 rounded-lg font-black text-[#004aad] outline-none bg-blue-50 shadow-inner transition-all focus:ring-2 focus:ring-blue-200" placeholder="0" />
                     </div>
                 </div>
 
                 <div id="split-box" class="pt-3 border-t border-slate-100 grid grid-cols-3 gap-3 hidden mt-2">
-                  <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" /></div>
-                  <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" /></div>
-                  <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] transition-all font-bold shadow-sm" /></div>
+                  <div id="wrap-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cash Amt</label><input type="number" id="split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none text-[#004aad] transition-all font-bold shadow-sm" /></div>
+                  <div id="wrap-split-qr" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">QR Amt</label><input type="number" id="split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none text-[#004aad] transition-all font-bold shadow-sm" /></div>
+                  <div id="wrap-split-card" class="hidden"><label class="text-[10px] font-bold text-slate-600 block mb-0.5">Card Amt</label><input type="number" id="split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none text-[#004aad] transition-all font-bold shadow-sm" /></div>
                 </div>
 
                 <div id="fin-box" class="pt-3 border-t border-blue-100 bg-blue-50 p-3 rounded-xl hidden mt-2">
                   <div class="grid grid-cols-3 gap-3 mb-2">
-                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Company *</label><select id="fin-company" class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm">
-                      <option value="">-- Fin. Company --</option><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option>
-                      <option value="HDB Finance">HDB Finance</option><option value="TVS Credit">TVS Credit</option><option value="IDFC First Bank">IDFC First Bank</option>
-                    </select></div>
+                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Company *</label><select id="fin-company" class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm"><option value="Kisto Pe">Kisto Pe</option><option value="Bajaj Finserv">Bajaj Finserv</option><option value="HDB Finance">HDB Finance</option></select></div>
                     <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="fin-rate" placeholder="Rs." class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none focus:border-[#004aad] text-[#004aad] font-bold shadow-sm" oninput="recalcTotals()" /></div>
-                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm">
-                      <option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option>
-                      <option value="Cash + QR">DP Cash + QR</option><option value="Cash + Card">DP Cash + Card</option><option value="QR + Card">DP QR + Card</option><option value="Cash + QR + Card">DP Cash + QR + Card</option>
-                    </select></div>
+                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="fin-dp-mode" onchange="onPaymentModeChange()" class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm"><option value="Cash">DP Cash</option><option value="QR">DP QR</option><option value="Card">DP Card</option><option value="Cash + QR">DP Cash + QR</option></select></div>
                   </div>
                   <div id="fin-split-container" class="grid grid-cols-3 gap-3 hidden">
                     <div id="wrap-fin-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="fin-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-white border border-blue-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm" /></div>
@@ -457,16 +420,12 @@
 
                 <div id="dues-box" class="pt-3 border-t border-slate-200 bg-slate-50 p-3 rounded-xl hidden mt-2">
                   <div class="grid grid-cols-2 gap-3 mb-2">
-                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm">
-                      <option value="Cash">Cash</option><option value="QR">QR</option><option value="Card">Card</option>
-                      <option value="Cash + QR">Cash + QR</option><option value="Cash + Card">Cash + Card</option><option value="QR + Card">QR + Card</option><option value="Cash + QR + Card">Cash + QR + Card</option>
-                    </select></div>
+                    <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Mode</label><select id="dues-mode" onchange="onPaymentModeChange()" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm"><option value="Cash">Cash</option><option value="QR">QR</option><option value="Cash + QR">Cash + QR</option></select></div>
                     <div class="w-full"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total Rate *</label><input type="number" id="dues-rate" placeholder="Rs." class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none focus:border-[#004aad] text-[#004aad] font-bold shadow-sm" oninput="recalcTotals()" /></div>
                   </div>
                   <div id="dues-split-container" class="grid grid-cols-3 gap-3 hidden">
                     <div id="wrap-dues-split-cash" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Cash</label><input type="number" id="dues-split-cash" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm" /></div>
                     <div id="wrap-dues-split-qr" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP QR</label><input type="number" id="dues-split-qr" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm" /></div>
-                    <div id="wrap-dues-split-card" class="hidden"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">DP Card</label><input type="number" id="dues-split-card" placeholder="Rs." oninput="recalcTotals()" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-[#004aad] font-bold shadow-sm" /></div>
                   </div>
                 </div>
                 
@@ -481,7 +440,8 @@
                 </div>
             </div>
 
-            <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-3 flex items-center justify-between text-center divide-x divide-white/20 rounded-b-2xl">
+            <!-- 4-IN-1 ONE ROW SUMMARY -->
+            <div class="bg-gradient-to-r from-[#003380] to-[#004aad] text-white p-3 flex items-center justify-between text-center divide-x divide-white/20 rounded-b-2xl shadow-inner mt-1">
                 <div id="box-basic-amt" class="flex-1 px-1 sm:px-2">
                     <span class="text-[9px] text-blue-200 tracking-widest uppercase font-bold block mb-1">Basic Amt</span>
                     <p id="form-basic-amt" class="text-xs sm:text-sm font-black leading-none drop-shadow-md">Rs. 0</p>
@@ -503,13 +463,334 @@
           
           <div class="flex space-x-3 pt-3">
             <button type="button" onclick="showView('dashboard')" class="flex-1 h-[44px] bg-slate-100 font-black rounded-xl text-[10px] text-slate-500 hover:bg-slate-200 transition-all uppercase tracking-widest shadow-sm">CANCEL</button>
-            <button type="button" onclick="saveBill()" class="flex-[2] h-[44px] bg-[#004aad] text-white font-black rounded-xl text-[11px] shadow-md hover:shadow-lg transition-all uppercase tracking-widest">SAVE</button>
+            <button type="button" onclick="saveBill()" class="flex-[2] h-[44px] bg-[#004aad] text-white font-black rounded-xl text-[11px] shadow-md hover:shadow-lg transition-all uppercase tracking-widest">SAVE BILL</button>
+          </div>
+        </div>
+
+        <!-- PRODUCT MANAGEMENT (WITH IMAGE UPLOAD & Excel) -->
+        <div id="view-product" class="space-y-4 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-transparent gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center text-lg shadow-lg">📦</div>
+                    <div>
+                        <h2 class="text-sm font-black text-slate-800 tracking-wide uppercase">Product Management</h2>
+                    </div>
+                </div>
+                <div class="flex space-x-2 w-full sm:w-auto">
+                    <!-- CSV IMPORT -->
+                    <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="importProductsCSV(event)" />
+                    <button onclick="document.getElementById('csv-upload').click()" class="flex-1 sm:flex-none px-3 h-[38px] border border-emerald-500 text-emerald-600 font-bold text-[9px] uppercase tracking-widest rounded-lg hover:bg-emerald-50 transition-all bg-white shadow-sm">Import (CSV)</button>
+                    <button onclick="exportProductsCSV()" class="flex-1 sm:flex-none px-3 h-[38px] border border-[#004aad] text-[#004aad] font-bold text-[9px] uppercase tracking-widest rounded-lg hover:bg-blue-50 transition-all bg-white shadow-sm">Export</button>
+                    <button onclick="document.getElementById('add-product-form').scrollIntoView({behavior:'smooth'})" class="flex-1 sm:flex-none px-4 h-[38px] bg-[#004aad] text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-md hover:shadow-lg transition-all">➕ Add New</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 flex items-center space-x-3 shadow-sm">
+                    <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center text-lg shadow-md">📦</div>
+                    <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Total Products</p><h3 class="text-lg font-black text-slate-800" id="prod-stat-total">0</h3></div>
+                </div>
+                <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 flex items-center space-x-3 shadow-sm">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-lg shadow-md">✅</div>
+                    <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">In Stock</p><h3 class="text-lg font-black text-slate-800" id="prod-stat-in">0</h3></div>
+                </div>
+                <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 flex items-center space-x-3 shadow-sm">
+                    <div class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center text-lg shadow-md">⚠️</div>
+                    <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Low Stock</p><h3 class="text-lg font-black text-slate-800" id="prod-stat-low">0</h3></div>
+                </div>
+                <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-100 flex items-center space-x-3 shadow-sm">
+                    <div class="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center text-lg shadow-md">❌</div>
+                    <div><p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Out of Stock</p><h3 class="text-lg font-black text-slate-800" id="prod-stat-out">0</h3></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col w-full">
+                <div class="p-3 border-b border-slate-100 flex flex-wrap lg:flex-nowrap items-center gap-2 bg-slate-50/50">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <span class="absolute left-3 top-2.5 text-slate-400 text-[10px]">🔍</span>
+                        <!-- FIXED: IMEI SEARCH -->
+                        <input type="text" id="prod-search" oninput="renderProductTable()" placeholder="Search by name, IMEI, SKU..." class="w-full pl-8 pr-3 h-[38px] premium-input bg-white border border-slate-200 rounded-lg outline-none focus:border-[#004aad] text-slate-700 shadow-sm transition-all" />
+                    </div>
+                    <button onclick="document.getElementById('prod-search').value=''; renderProductTable();" class="px-4 h-[38px] bg-white border border-slate-200 text-slate-600 font-black text-[9px] uppercase tracking-widest rounded-lg hover:bg-slate-100 transition-all shadow-sm w-full sm:w-auto">Clear Filters</button>
+                </div>
+                <div class="overflow-x-auto w-full max-h-[400px]">
+                    <table class="w-full text-left text-[10px] min-w-[900px]">
+                        <thead class="bg-white border-b border-slate-100 font-black text-slate-800 uppercase tracking-widest sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3">Img</th>
+                                <th class="p-3">Product Name</th>
+                                <th class="p-3">Brand</th>
+                                <th class="p-3">SKU</th>
+                                <th class="p-3 text-right">MRP (₹)</th>
+                                <th class="p-3 text-right">Purchase (₹)</th>
+                                <th class="p-3 text-right">Sale (₹)</th>
+                                <th class="p-3 text-center">Stock</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center">Act</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prod-table-body" class="divide-y divide-slate-50 font-bold text-slate-600"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="add-product-form" class="grid grid-cols-1 xl:grid-cols-12 gap-5 w-full">
+                <div class="xl:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col">
+                    <div class="flex items-center space-x-2 mb-4 border-b border-slate-100 pb-3">
+                        <div class="w-6 h-6 bg-blue-600 text-white rounded-md flex items-center justify-center font-bold text-sm leading-none">+</div>
+                        <h3 class="font-black text-[11px] text-slate-800 tracking-widest uppercase">Add / Edit Product</h3>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="w-full sm:w-1/3 flex flex-col items-center">
+                            <input type="file" id="img-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+                            <div class="w-full bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex flex-col items-center justify-center p-2 h-[160px] relative overflow-hidden">
+                                <div id="prod-img-placeholder" class="flex flex-col items-center">
+                                    <div class="text-4xl mb-2 drop-shadow-md">📱</div>
+                                    <button onclick="document.getElementById('img-upload').click()" class="px-3 py-1.5 border border-blue-600 text-blue-600 font-bold text-[9px] uppercase tracking-wider rounded-lg bg-white shadow-sm hover:bg-blue-100">Upload Image</button>
+                                </div>
+                                <img id="prod-img-preview" class="hidden w-full h-full object-cover rounded-lg absolute inset-0 cursor-pointer" onclick="document.getElementById('img-upload').click()" />
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-2/3 space-y-3">
+                            <input type="hidden" id="edit-prod-id" value="">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Name *</label><input type="text" id="new-prod-name" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-slate-800 focus:border-[#004aad] shadow-sm uppercase font-bold" /></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Brand</label><input type="text" id="new-prod-brand" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-slate-800 focus:border-[#004aad] shadow-sm uppercase font-bold" /></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label><select id="new-prod-category" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg outline-none text-slate-800 focus:border-[#004aad] shadow-sm font-bold"><option value="Mobile Phone">Mobile Phone</option><option value="Accessories">Accessories</option><option value="Electronics">Electronics</option></select></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">SKU</label><input type="text" id="new-prod-sku" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none text-slate-800 focus:border-[#004aad] shadow-sm uppercase font-bold" /></div>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">MRP</label><input type="number" id="new-prod-mrp" placeholder="0" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Pur Price</label><input type="number" id="new-prod-pur" placeholder="0" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Sale Price*</label><input type="number" id="new-prod-sale" placeholder="0" class="w-full premium-input px-3 bg-blue-50 border border-blue-400 rounded-lg font-black text-[#004aad] shadow-sm" /></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Opening Stock</label><input type="number" id="new-prod-stock" oninput="handleOpeningStockChange()" placeholder="0" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">HSN Code</label><input type="text" id="new-prod-hsn" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                                <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">GST %</label><select id="new-prod-gst" class="w-full premium-input px-3 bg-white border border-slate-200 rounded-lg font-bold shadow-sm"><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option></select></div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 pt-1">
+                                <label class="flex items-center space-x-1.5 text-[10px] font-bold text-slate-700"><input type="checkbox" id="new-prod-track-imei" onchange="handleOpeningStockChange()" checked class="w-3 h-3 rounded text-[#004aad]"> <span>Track IMEI</span></label>
+                                <label class="flex items-center space-x-1.5 text-[10px] font-bold text-slate-700"><span>Low Alert</span> <input type="number" id="new-prod-low" value="5" class="w-12 h-6 px-1 border border-slate-200 rounded outline-none text-center font-bold text-[#004aad]"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIXED: OPENING STOCK IMEI BOX -->
+                    <div id="new-prod-imei-box" class="hidden mt-4 pt-3 border-t border-slate-100">
+                        <h4 class="text-[10px] font-black text-[#004aad] uppercase tracking-widest mb-2">Enter Opening Stock IMEIs</h4>
+                        <div id="new-prod-imei-list" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2 mt-4 pt-4 border-t border-slate-100">
+                        <button onclick="clearProductForm()" class="px-5 py-2 bg-slate-100 font-black rounded-lg text-[9px] text-slate-600 hover:bg-slate-200 uppercase tracking-widest">Clear</button>
+                        <button onclick="saveLiveProduct()" class="px-6 py-2 bg-[#004aad] text-white font-black rounded-lg text-[10px] shadow-md hover:shadow-lg uppercase tracking-widest">💾 Save Product</button>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-4 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-sm border border-slate-700 flex flex-col overflow-hidden text-white p-5">
+                    <h3 class="text-[11px] font-black tracking-widest uppercase mb-3 text-blue-400">Inventory Tips</h3>
+                    <ul class="space-y-3 text-[10px] font-bold text-slate-300">
+                        <li class="flex items-start space-x-2"><span>✅</span><span>Saving updates master inventory list instantly.</span></li>
+                        <li class="flex items-start space-x-2"><span>📦</span><span><b>Purchase Bills</b> increase stock automatically.</span></li>
+                        <li class="flex items-start space-x-2"><span>🛒</span><span><b>Sale Bills</b> decrease stock automatically.</span></li>
+                        <li class="flex items-start space-x-2"><span>⚠️</span><span>Dashboard warns if stock falls below limit.</span></li>
+                    </ul>
+                    <div class="mt-auto pt-4 border-t border-slate-700 flex justify-between items-center">
+                        <button onclick="dummyAlert('IMEI History tracking feature is active!')" class="text-[9px] bg-white/10 px-3 py-1.5 rounded hover:bg-white/20 uppercase tracking-widest font-black">View IMEI Data</button>
+                        <p class="text-[9px] text-slate-500 font-black tracking-widest uppercase text-center">Smart Auto-Sync</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OTHER VIEWS (Party, Expense, Stock, Reports, GST) -->
+        <div id="view-party" class="space-y-4 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-3"><div class="w-10 h-10 bg-purple-600 text-white rounded-lg flex items-center justify-center text-lg shadow-md">👥</div><div><h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">Party Management</h2></div></div>
+                <button onclick="openPartyModal('CUSTOMER')" class="px-4 h-[40px] bg-[#004aad] text-white font-black text-[10px] uppercase tracking-widest rounded-lg shadow-md hover:shadow-lg transition-all">➕ New Party</button>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col w-full">
+                <div class="overflow-x-auto w-full max-h-[500px]">
+                    <table class="w-full text-left text-[10px] min-w-[700px]">
+                        <thead class="bg-slate-50 text-slate-500 font-black uppercase tracking-widest sticky top-0 z-10 border-b border-slate-100">
+                            <tr><th class="p-4">Party Name</th><th class="p-4">Type</th><th class="p-4">Mobile</th><th class="p-4">GSTIN</th><th class="p-4">Address</th><th class="p-4 text-right">Opening Bal</th></tr>
+                        </thead>
+                        <tbody id="party-table-body" class="divide-y divide-slate-50 font-bold text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-expense" class="space-y-5 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-3 mb-4 border-b border-slate-100 pb-3">
+                <div class="w-10 h-10 bg-rose-500 text-white rounded-lg flex items-center justify-center text-lg shadow-md">💸</div>
+                <div><h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">Expense Management</h2></div>
+            </div>
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 w-full">
+                <div class="xl:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col h-fit">
+                    <h3 class="font-black text-[10px] uppercase text-rose-600 tracking-widest mb-3">Add New Expense</h3>
+                    <div class="space-y-3">
+                        <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category *</label><select id="exp-cat" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold shadow-sm"><option value="Rent">Rent</option><option value="Salary">Salary / Staff</option><option value="Electricity">Electricity</option><option value="Internet">Internet / Bill</option><option value="Other">Other Expenses</option></select></div>
+                        <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Amount (₹) *</label><input type="number" id="exp-amt" class="w-full premium-input px-3 border-2 border-rose-400 bg-rose-50 rounded-lg font-black text-rose-600 shadow-sm" placeholder="0" /></div>
+                        <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Date *</label><input type="date" id="exp-date" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                        <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Mode *</label><select id="exp-mode" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold shadow-sm"><option value="Cash">Cash</option><option value="UPI / Online">UPI / Online</option></select></div>
+                        <div><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Remarks</label><input type="text" id="exp-remarks" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold shadow-sm" /></div>
+                        <button onclick="saveLiveExpense()" class="w-full h-[40px] bg-rose-500 text-white font-black rounded-lg text-[10px] shadow-md uppercase tracking-widest mt-2">Save</button>
+                    </div>
+                </div>
+                <div class="xl:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-100 p-5 flex flex-col">
+                    <h3 class="font-black text-[10px] uppercase text-slate-800 tracking-widest mb-3">Recent Expenses</h3>
+                    <div class="overflow-x-auto w-full h-full max-h-[400px]">
+                        <table class="w-full text-left text-[10px] min-w-[500px]">
+                            <thead class="bg-slate-50 text-slate-500 font-black uppercase tracking-widest border-b border-slate-100 sticky top-0">
+                                <tr><th class="p-3">Date</th><th class="p-3">Category</th><th class="p-3">Details</th><th class="p-3">Mode</th><th class="p-3 text-right text-rose-600">Amount</th></tr>
+                            </thead>
+                            <tbody id="expense-table-body" class="divide-y divide-slate-50 font-bold text-slate-600"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-stock" class="space-y-5 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-3 mb-4 border-b border-slate-100 pb-3">
+                <div class="w-10 h-10 bg-amber-500 text-white rounded-lg flex items-center justify-center text-lg shadow-md">📊</div>
+                <div><h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">Stock Inventory</h2></div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col w-full">
+                <div class="overflow-x-auto w-full max-h-[500px]">
+                    <table class="w-full text-left text-[10px] min-w-[700px]">
+                        <thead class="bg-white border-b border-slate-100 font-black text-slate-800 uppercase tracking-widest sticky top-0 z-10">
+                            <tr><th class="p-3">Product Name</th><th class="p-3">SKU</th><th class="p-3 text-right">Pur Rate</th><th class="p-3 text-right">Sale Rate</th><th class="p-3 text-center">Available Stock</th><th class="p-3 text-center">Status</th></tr>
+                        </thead>
+                        <tbody id="stock-table-body" class="divide-y divide-slate-50 font-bold text-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-reports" class="space-y-5 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-3 mb-4 border-b border-slate-100 pb-3">
+                <div class="w-10 h-10 bg-purple-600 text-white rounded-lg flex items-center justify-center text-lg shadow-md">📑</div>
+                <div><h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">Business Reports</h2></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
+                <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 shadow-sm text-center">
+                    <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-1">Total Sales</p><h3 class="text-xl font-black text-[#004aad]" id="rep-total-sale">₹ 0</h3>
+                </div>
+                <div class="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100 shadow-sm text-center">
+                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Total Purchase</p><h3 class="text-xl font-black text-emerald-700" id="rep-total-pur">₹ 0</h3>
+                </div>
+                <div class="bg-rose-50/50 p-5 rounded-2xl border border-rose-100 shadow-sm text-center">
+                    <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">Total Expenses</p><h3 class="text-xl font-black text-rose-700" id="rep-total-exp">₹ 0</h3>
+                </div>
+                <div class="bg-gradient-to-br from-[#003380] to-[#004aad] p-5 rounded-2xl shadow-md text-center text-white">
+                    <p class="text-[9px] font-black text-blue-200 uppercase tracking-widest mb-1">Net Profit</p><h3 class="text-xl font-black text-amber-300" id="rep-total-profit">₹ 0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-gst-reports" class="space-y-5 max-w-screen-2xl mx-auto w-full hidden">
+            <div class="flex items-center space-x-3 mb-4 border-b border-slate-100 pb-3">
+                <div class="w-10 h-10 bg-slate-800 text-white rounded-lg flex items-center justify-center text-lg shadow-md">🏛️</div>
+                <div><h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">GST Returns</h2></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <h3 class="font-black text-[10px] uppercase text-[#004aad] tracking-widest mb-3 border-b border-slate-100 pb-2">Output Tax (Sales)</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">Taxable</span><span class="text-sm font-black text-slate-800" id="gst-sale-taxable">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">CGST</span><span class="text-sm font-black text-blue-600" id="gst-sale-cgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">SGST</span><span class="text-sm font-black text-blue-600" id="gst-sale-sgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-100"><span class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Total Output</span><span class="text-base font-black text-rose-600" id="gst-sale-total">₹ 0</span></div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <h3 class="font-black text-[10px] uppercase text-emerald-600 tracking-widest mb-3 border-b border-slate-100 pb-2">Input Tax (Purchase)</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">Taxable</span><span class="text-sm font-black text-slate-800" id="gst-pur-taxable">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">CGST</span><span class="text-sm font-black text-emerald-600" id="gst-pur-cgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-500">SGST</span><span class="text-sm font-black text-emerald-600" id="gst-pur-sgst">₹ 0</span></div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-100"><span class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Total ITC</span><span class="text-base font-black text-emerald-600" id="gst-pur-total">₹ 0</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 p-5 rounded-2xl shadow-lg mt-3 flex justify-between items-center text-white">
+                <span class="text-[10px] font-black uppercase tracking-widest">Net Payable (Output - ITC)</span>
+                <span class="text-xl font-black text-white drop-shadow-md" id="gst-net-payable">₹ 0</span>
+            </div>
+        </div>
+
+        <div id="view-invoice" class="space-y-4 hidden max-w-5xl mx-auto w-full">
+          <div id="top-invoice-bar" class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+            <div class="flex space-x-3">
+              <button onclick="downloadVectorPDF()" class="px-5 py-2.5 bg-[#004aad] text-white font-black text-[10px] uppercase rounded-xl shadow-md hover:shadow-lg transition-all tracking-wider">📥 PDF</button>
+              <button onclick="shareWhatsApp()" id="btn-whatsapp" class="px-5 py-2.5 bg-[#004aad] text-white font-black text-[10px] uppercase rounded-xl shadow-md hover:shadow-lg transition-all tracking-wider">💬 WHATSAPP</button>
+            </div>
+          </div>
+          <div class="w-full flex justify-center overflow-x-auto pb-6">
+            <div id="invoice-capture" class="bg-white p-8 border-2 border-[#004aad] text-[10px] text-slate-900 w-[750px] min-w-[750px]">
+              <div class="w-full pb-4 border-b-2 border-[#004aad]">
+                <div class="text-center mb-4">
+                  <h1 class="text-[32px] font-black text-[#004aad] tracking-wide uppercase leading-none">SRI RAM ENTERPRISES</h1>
+                  <div class="inline-block bg-[#004aad] text-white px-6 py-1.5 rounded-full text-[10px] font-bold tracking-widest mt-2 shadow-sm">MOBILE • ACCESSORIES • REPAIRING</div>
+                </div>
+                <div class="flex justify-between items-end text-[10px] font-bold text-slate-800 px-2 mt-2">
+                  <div class="text-left leading-relaxed"><p>GB-15, CITY CENTRE, SECTOR-4</p><p>B.S. CITY (NEAR INDIAN BANK)</p></div>
+                  <div class="text-right leading-relaxed"><p>GSTIN: 20APOPK6864K1ZH</p><p>Ph: 9334765000, 9334237111, 9335136000</p></div>
+                </div>
+              </div>
+              <div id="inv-header-title" class="bg-blue-50 text-[#004aad] font-black text-center py-2 text-[12px] tracking-[0.35em] uppercase my-3 border border-blue-200 rounded-lg">TAX INVOICE</div>
+              <div class="py-2 text-[10px] font-bold text-slate-800 border-b border-slate-200 pb-3">
+                <div class="grid grid-cols-2 gap-x-8 gap-y-2">
+                  <div class="flex items-center"><span class="w-20 text-slate-500 uppercase tracking-wider">Invoice No.</span><span class="mx-1">:</span><span id="inv-no" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                  <div class="flex items-center"><span class="w-16 text-slate-500 uppercase tracking-wider">Date</span><span class="mx-1">:</span><span id="inv-date" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                  <div class="flex items-center"><span id="inv-name-label" class="w-20 text-slate-500 uppercase tracking-wider">Name</span><span class="mx-1">:</span><span id="inv-cust-name" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                  <div class="flex items-center"><span class="w-16 text-slate-500 uppercase tracking-wider">Mobile</span><span class="mx-1">:</span><span id="inv-cust-phone" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                  <div class="flex items-center"><span class="w-20 text-slate-500 uppercase tracking-wider">Address</span><span class="mx-1">:</span><span id="inv-cust-address" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                  <div class="flex items-center"><span class="w-16 text-slate-500 uppercase tracking-wider">GSTIN</span><span class="mx-1">:</span><span id="inv-cust-gstin" class="font-black uppercase border-b border-dotted border-slate-400 flex-1 pb-0.5"></span></div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <table class="w-full border-collapse border-2 border-[#004aad] text-left">
+                  <thead><tr class="bg-[#004aad] text-white text-center font-black text-[10px]"><th class="border border-[#004aad] p-2 w-[35px]">S.No</th><th class="border border-[#004aad] p-2">Brand / Product</th><th class="border border-[#004aad] p-2 w-[160px]">Model / IMEI</th><th class="border border-[#004aad] p-2 table-col-qty">Qty.</th><th class="border border-[#004aad] p-2 table-col-rate">Rate</th><th class="border border-[#004aad] p-2 table-col-amt">Amount</th></tr></thead>
+                  <tbody id="inv-items-body" class="divide-y divide-[#004aad]"></tbody>
+                </table>
+              </div>
+              <div class="flex items-stretch justify-between border-x-2 border-b-2 border-[#004aad]">
+                <div class="flex-1 flex items-center p-4">
+                  <div class="flex items-center space-x-4 ml-4">
+                    <div id="inv-qr-container" class="w-[80px] h-[80px] border-2 border-[#004aad] p-1 flex items-center justify-center bg-white rounded-lg"></div>
+                    <div class="text-[9px] text-slate-600 font-bold leading-relaxed"><span class="text-[#004aad] block text-sm font-black uppercase tracking-widest mb-1">VERIFIED E-BILL</span>Scan QR with any Camera<br/>to verify and open online.</div>
+                  </div>
+                </div>
+                <div class="totals-box border-l-2 border-[#004aad] text-[10px] font-bold bg-slate-50 flex flex-col justify-between">
+                  <div class="divide-y divide-[#004aad]" id="inv-total-breakdown"></div>
+                  <div class="bg-[#004aad] text-white flex justify-between px-3 py-2.5 font-black text-[11px] mt-auto">
+                    <span class="uppercase tracking-widest">Grand Total</span><span id="inv-grand-total" class="text-sm">Rs. 0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-5 text-center text-[9px] font-bold text-slate-400 italic tracking-wide">* This is a computer-generated electronic invoice and does not require physical signatures.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-settings" class="space-y-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm max-w-md mx-auto hidden w-full">
+          <h2 class="font-black text-sm text-[#004aad] tracking-widest uppercase border-b border-slate-100 pb-2">BACKEND CLOUD URL</h2>
+          <input type="text" id="settings-url" class="w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-[#004aad] text-[#004aad] font-bold transition-all shadow-sm" placeholder="Paste URL" />
+          <div class="flex space-x-3 pt-3">
+            <button onclick="saveSettings()" class="w-full h-[44px] bg-[#004aad] text-white font-black rounded-xl text-[10px] shadow-md uppercase tracking-widest hover:shadow-lg transition-all">SAVE SETTINGS</button>
           </div>
         </div>
 
       </main>
   </div>
 
+  <!-- BOTTOM NAV -->
   <nav id="bottom-nav" class="lg:hidden fixed bottom-0 w-full bg-white shadow-[0_-4px_15px_-2px_rgba(0,0,0,0.1)] flex justify-between z-40 border-t border-slate-100">
      <button id="mob-nav-sale" onclick="startNewBill('MOBILE', 'SALE')" class="flex-1 py-3 text-center text-slate-500 opacity-90 flex flex-col items-center transition-colors">
        <span class="text-2xl leading-none">🛒</span><span class="text-[10px] font-black mt-1.5 tracking-widest">SALE</span>
@@ -526,20 +807,12 @@
   </nav>
 
   <script>
-    let currentEntryType = "SALE";
-    let currentBillType = "MOBILE";
-    let currentPaymentType = "OUT"; 
-    let activeInvoiceData = null;
-    let gasUrl = localStorage.getItem("sre_gas_url") || "";
-    let pendingBillData = null;
-
-    let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || [];
-    let itemsCache = JSON.parse(localStorage.getItem("sre_items")) || [];
-    let billsCache = JSON.parse(localStorage.getItem("sre_bills")) || [];
-    let inventoryCache = JSON.parse(localStorage.getItem("sre_inventory")) || [];
+    let currentEntryType = "SALE"; let currentBillType = "MOBILE"; let currentPaymentType = "OUT"; 
+    let activeInvoiceData = null; let gasUrl = localStorage.getItem("sre_gas_url") || ""; let pendingBillData = null;
+    let partiesCache = JSON.parse(localStorage.getItem("sre_parties")) || []; let itemsCache = JSON.parse(localStorage.getItem("sre_items")) || [];
+    let billsCache = JSON.parse(localStorage.getItem("sre_bills")) || []; let inventoryCache = JSON.parse(localStorage.getItem("sre_inventory")) || [];
     let expensesCache = JSON.parse(localStorage.getItem("sre_expenses")) || [];
-    let activeItemInput = null;
-    let currentUploadedImage = "";
+    let activeItemInput = null; let currentUploadedImage = "";
 
     function getFormattedDate() {
       const d = new Date(); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -556,25 +829,19 @@
 
     function closePopup() {
       document.getElementById("center-popup").classList.add("hidden");
-      if (pendingBillData) {
-          displayInvoice(pendingBillData);
-          pendingBillData = null;
-      }
+      if (pendingBillData) { displayInvoice(pendingBillData); pendingBillData = null; }
     }
     
-    function dummyAlert(msg) {
-        showPopup("Info", msg, false);
-    }
+    function dummyAlert(msg) { showPopup("Info", msg, false); }
 
     function saveSettings() {
       const url = document.getElementById("settings-url").value.trim();
       localStorage.setItem("sre_gas_url", url);
       gasUrl = url; 
-      showView("dashboard");
-      showPopup("Settings Saved", "Backend URL updated successfully.");
+      showView("dashboard"); showPopup("Settings Saved", "Backend URL updated successfully.");
     }
 
-    // NEW IMAGE UPLOAD LOGIC
+    // 1. & 2. AUTO-FILL AND IMAGE UPLOAD
     function handleImageUpload(event) {
         const file = event.target.files[0];
         if(file) {
@@ -590,7 +857,6 @@
         }
     }
 
-    // AUTO-FILL SALE RATE LOGIC
     function handleItemNameChange(input) {
         const row = input.closest(".item-row");
         const prodName = input.value.trim().toUpperCase();
@@ -607,47 +873,54 @@
         }
     }
 
-    // HTML ROW GENERATOR
+    // 3. PERFECT ALIGNMENT CSS GRID
     function addNewItemRow(isFirst = false) {
       const container = document.getElementById("items-container");
       const div = document.createElement("div");
       let removeBtn = !isFirst ? `<button type="button" onclick="this.parentElement.parentElement.remove(); recalcTotals();" class="text-slate-400 hover:text-rose-500 font-black text-[10px] w-6 h-6 flex items-center justify-center bg-slate-100 hover:bg-rose-50 rounded transition-all">X</button>` : `<span class="w-[24px]"></span>`;
 
-      div.className = "item-row bg-white rounded-lg border border-slate-200 shadow-sm min-w-[850px] sm:min-w-full overflow-hidden mb-2";
-      const isMobile = currentBillType === "MOBILE";
-      const imeiPlaceholder = isMobile ? "IMEI-1 *" : "SERIAL-1";
-      const imeiDisabled = currentBillType === "ACCESSORIES" ? "disabled bg-slate-100 opacity-50" : "";
-      
-      div.innerHTML = `
-        <div class="grid grid-cols-12 gap-2 w-full items-center p-2 min-w-[850px] sm:min-w-full">
-           <div class="col-span-3 pl-1">
-             <input type="text" list="item-list" oninput="handleItemNameChange(this)" placeholder="Product Name *" class="item-name w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" />
-           </div>
-           <div class="col-span-2">
-             <input type="number" oninput="recalcTotals()" class="item-rate w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all text-right shadow-sm" placeholder="Rate" />
-           </div>
-           <div class="col-span-1">
-             <select onchange="recalcTotals()" class="item-gst w-full premium-input px-1 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm text-center">
-               <option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option>
-             </select>
-           </div>
-           <div class="col-span-1">
-             <input type="number" min="1" value="1" placeholder="Qty" oninput="handlePurQtyChange(this)" class="item-qty w-full premium-input px-1 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all text-center shadow-sm" />
-           </div>
-           <div class="col-span-2 relative flex items-center pr-2">
-             <input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="${imeiPlaceholder}" class="item-imei-main w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm ${imeiDisabled}" ${imeiDisabled} />
-             <button type="button" onclick="togglePurImeis(this)" class="pur-expand-btn hidden absolute right-3 text-[#004aad] text-[10px] font-black w-5 h-5 flex items-center justify-center bg-blue-100 hover:bg-blue-200 rounded border border-blue-200">⬇️</button>
-           </div>
-           <div class="col-span-2 text-right">
-             <div class="item-amt-display w-full text-right text-[10px] font-black text-[#004aad] px-1">0.00</div>
-           </div>
-           <div class="col-span-1 flex justify-center items-center">
-               ${removeBtn}
-           </div>
-        </div>
-        <div class="pur-extra-imeis hidden p-3 bg-slate-50 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 shadow-inner"></div>
-      `;
+      if (currentEntryType === "PURCHASE") {
+        div.className = "item-row bg-white rounded-lg border border-slate-200 shadow-sm min-w-[850px] sm:min-w-full overflow-hidden mb-2";
+        const isMobile = currentBillType === "MOBILE"; const imeiPlaceholder = isMobile ? "IMEI-1 *" : "SERIAL-1"; const imeiDisabled = currentBillType === "ACCESSORIES" ? "disabled bg-slate-100 opacity-50" : "";
+        
+        div.innerHTML = `
+          <div class="grid grid-cols-12 gap-2 w-full items-center p-2 min-w-[850px] sm:min-w-full">
+             <div class="col-span-3 pl-1"><input type="text" list="item-list" oninput="handleItemNameChange(this)" placeholder="Product Name *" class="item-name w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" /></div>
+             <div class="col-span-2"><input type="number" oninput="recalcTotals()" class="item-rate w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all text-right shadow-sm" placeholder="Rate" /></div>
+             <div class="col-span-1"><select onchange="recalcTotals()" class="item-gst w-full premium-input px-1 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm text-center"><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
+             <div class="col-span-1"><input type="number" min="1" value="1" placeholder="Qty" oninput="handlePurQtyChange(this)" class="item-qty w-full premium-input px-1 bg-slate-50 border border-slate-200 rounded font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all text-center shadow-sm" /></div>
+             <div class="col-span-2 relative flex items-center pr-2">
+               <input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="${imeiPlaceholder}" class="item-imei-main w-full premium-input px-2 bg-slate-50 border border-slate-200 rounded font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm ${imeiDisabled}" ${imeiDisabled} />
+               <button type="button" onclick="togglePurImeis(this)" class="pur-expand-btn hidden absolute right-3 text-[#004aad] text-[10px] font-black w-5 h-5 flex items-center justify-center bg-blue-100 hover:bg-blue-200 rounded border border-blue-200">⬇️</button>
+             </div>
+             <div class="col-span-2 text-right"><div class="item-amt-display w-full text-right text-[10px] font-black text-[#004aad] px-1">0.00</div></div>
+             <div class="col-span-1 flex justify-center items-center">${removeBtn}</div>
+          </div>
+          <div class="pur-extra-imeis hidden p-3 bg-slate-50 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 shadow-inner"></div>
+        `;
+      } else {
+        div.className = "item-row relative p-3 bg-white rounded-xl border border-slate-200 shadow-sm mb-2";
+        if (!isFirst) removeBtn = `<button type="button" onclick="this.parentElement.remove(); recalcTotals();" class="absolute top-3 right-4 text-slate-400 hover:text-rose-500 font-black text-[9px] uppercase tracking-widest bg-slate-50 hover:bg-rose-50 px-2 py-1 rounded transition-all">X</button>`;
+        div.innerHTML = `
+          ${removeBtn}
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+             <div class="sm:col-span-3">
+               <div class="flex items-center h-4 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Product Name *</label></div>
+               <input type="text" list="item-list" oninput="handleItemNameChange(this)" placeholder="Enter Product Name" class="item-name w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" />
+             </div>
+             <div class="sm:col-span-1">
+               <div class="flex items-center h-4 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty *</label></div>
+               <input type="number" min="1" max="10" value="1" placeholder="Qty" oninput="handleQtyChange(this)" class="item-qty w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-bold outline-none text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" />
+             </div>
+             <!-- Hidden rate/gst for sale calculation logic -->
+             <input type="hidden" class="item-rate" value="0">
+             <select class="item-gst hidden"><option value="0">0</option><option value="5">5</option><option value="12">12</option><option value="18">18</option><option value="28">28</option></select>
+          </div>
+          <div class="item-imeis-box"></div>
+        `;
+      }
       container.appendChild(div);
+      if(currentEntryType === "SALE") renderItemImeis(div);
     }
 
     function updateSidebarNav(activeId) {
@@ -674,25 +947,18 @@
 
     function showView(view) {
       ["dashboard", "new-bill", "invoice", "settings", "ledger", "payment", "product", "expense", "stock", "reports", "gst-reports", "party"].forEach(v => {
-          const el = document.getElementById("view-" + v);
-          if(el) el.classList.add("hidden");
+          const el = document.getElementById("view-" + v); if(el) el.classList.add("hidden");
       });
-      const targetView = document.getElementById("view-" + view);
-      if(targetView) targetView.classList.remove("hidden");
+      const targetView = document.getElementById("view-" + view); if(targetView) targetView.classList.remove("hidden");
       
-      const titleEl = document.getElementById("app-header-title");
-      const subEl = document.getElementById("app-header-sub");
-      const backBtn = document.getElementById("global-back-btn");
+      const titleEl = document.getElementById("app-header-title"); const subEl = document.getElementById("app-header-sub"); const backBtn = document.getElementById("global-back-btn");
 
       if (view === "dashboard") {
-          renderDashboard();
-          document.getElementById("bottom-nav").classList.remove("hidden");
+          renderDashboard(); document.getElementById("bottom-nav").classList.remove("hidden");
           titleEl.innerText = "Sri Ram Enterprises"; subEl.innerText = "Smart Business | Better Growth";
-          backBtn.classList.add("hidden");
-          updateSidebarNav('nav-dashboard'); updateMobileNav('');
+          backBtn.classList.add("hidden"); updateSidebarNav('nav-dashboard'); updateMobileNav('');
       } else {
-          document.getElementById("bottom-nav").classList.add("hidden");
-          backBtn.classList.remove("hidden");
+          document.getElementById("bottom-nav").classList.add("hidden"); backBtn.classList.remove("hidden");
           const viewTitles = {
              "new-bill": [currentEntryType + " ENTRY", currentBillType], "ledger": ["PARTY LEDGER", "ACCOUNTING"],
              "payment": [currentPaymentType === 'OUT' ? 'PAYMENT OUT' : 'RECEIPT IN', "TRANSACTION"], "settings": ["SETTINGS", "CONFIGURATION"],
@@ -713,48 +979,52 @@
       }
     }
 
+    // Party Management
     function renderPartyTable() {
         let html = '';
         partiesCache.forEach((p) => {
-            html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-3 text-[#004aad] font-black">${p.name}</td><td class="p-3 font-black ${p.type==='CUSTOMER'?'text-emerald-600':'text-rose-600'}">${p.type}</td><td class="p-3 font-mono">${p.phone}</td><td class="p-3">${p.gstin || '-'}</td><td class="p-3">${p.address || '-'}</td></tr>`;
+            html += `<tr class="hover:bg-slate-50 transition-colors"><td class="p-3 text-[#004aad] font-black">${p.name}</td><td class="p-3 font-black ${p.type==='CUSTOMER'?'text-emerald-600':'text-rose-600'}">${p.type}</td><td class="p-3 font-mono">${p.phone}</td><td class="p-3">${p.gstin || '-'}</td><td class="p-3">${p.address || '-'}</td><td class="p-3 text-right font-black">₹ ${p.ob || 0}</td></tr>`;
         });
-        if(partiesCache.length === 0) html = '<tr><td colspan="5" class="text-center p-8 text-slate-400 font-bold text-[10px] tracking-wider">No parties found.</td></tr>';
+        if(partiesCache.length === 0) html = '<tr><td colspan="6" class="text-center p-8 text-slate-400 font-bold text-[10px] tracking-wider">No parties found.</td></tr>';
         document.getElementById("party-table-body").innerHTML = html;
     }
-
-    function handlePurQtyChange(input) {
-       recalcTotals(); 
-       const row = input.closest(".item-row");
-       const qty = Math.max(1, Number(input.value) || 1);
-       const btn = row.querySelector(".pur-expand-btn");
-       const extraBox = row.querySelector(".pur-extra-imeis");
-       if (currentBillType === "ACCESSORIES") { btn.classList.add("hidden"); extraBox.innerHTML = ""; return; }
-
-       if (qty > 1) {
-           btn.classList.remove("hidden");
-           const existing = Array.from(extraBox.querySelectorAll("input")).map(i => i.value);
-           let html = '';
-           for(let i=2; i<=qty; i++) {
-               const val = existing[i-2] || "";
-               html += `<input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full premium-input px-2 bg-white border border-slate-200 rounded font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] shadow-sm" />`;
-           }
-           extraBox.innerHTML = html;
-           extraBox.classList.remove("hidden");
-           btn.innerText = "⬆️";
-       } else {
-           btn.classList.add("hidden");
-           extraBox.innerHTML = "";
-           extraBox.classList.add("hidden");
-           btn.innerText = "⬇️";
-       }
+    function openPartyModal(type) {
+        document.getElementById('new-party-type').value = type || 'CUSTOMER';
+        document.getElementById('new-party-name').value = ''; document.getElementById('new-party-phone').value = '';
+        document.getElementById('new-party-ob').value = ''; document.getElementById('new-party-address').value = ''; document.getElementById('new-party-gstin').value = '';
+        document.getElementById('party-popup').classList.remove('hidden'); setTimeout(()=>document.getElementById('new-party-name').focus(), 100);
     }
-
-    function togglePurImeis(btn) {
-       const box = btn.closest(".item-row").querySelector(".pur-extra-imeis");
-       if (box.classList.contains("hidden")) { box.classList.remove("hidden"); btn.innerText = "⬆️"; } 
-       else { box.classList.add("hidden"); btn.innerText = "⬇️"; }
+    function closePartyModal() { document.getElementById('party-popup').classList.add('hidden'); }
+    function savePartyModal() {
+        const name = document.getElementById('new-party-name').value.trim().toUpperCase(); const phone = document.getElementById('new-party-phone').value.trim();
+        const address = document.getElementById('new-party-address').value.trim().toUpperCase(); const gstin = document.getElementById('new-party-gstin').value.trim().toUpperCase();
+        const type = document.getElementById('new-party-type').value; const ob = Number(document.getElementById('new-party-ob').value) || 0;
+        if (!name || phone.length !== 10) return showPopup("Validation Error", "Please enter valid Party Name and 10-digit Mobile Number!", true);
+        if (!partiesCache.find(p => p.name === name)) {
+            partiesCache.push({name, phone, type, address, gstin, ob}); localStorage.setItem("sre_parties", JSON.stringify(partiesCache)); refreshPartyList();
+        }
+        if (!document.getElementById('view-new-bill').classList.contains('hidden')) {
+            if (currentEntryType === 'PURCHASE') { document.getElementById('pur-supplier-name').value = name; } 
+            else { document.getElementById('cust-name').value = name; document.getElementById('cust-phone').value = phone; document.getElementById('cust-address').value = address; document.getElementById('cust-gstin').value = gstin; }
+        }
+        closePartyModal();
     }
+    function refreshPartyList() { const dl = document.getElementById("party-list"); if(dl) dl.innerHTML = partiesCache.map(p => `<option value="${p.name}"></option>`).join(""); }
 
+    // Item Management
+    function openItemModal(inputEl = null) { activeItemInput = inputEl; document.getElementById('new-item-name').value = ''; document.getElementById('item-popup').classList.remove('hidden'); setTimeout(() => document.getElementById('new-item-name').focus(), 100); }
+    function closeItemModal() { document.getElementById('item-popup').classList.add('hidden'); activeItemInput = null; }
+    function saveItemModal() {
+        const name = document.getElementById('new-item-name').value.trim().toUpperCase();
+        if (!name) return showPopup("Validation Error", "Please enter Item Name!", true);
+        if (!itemsCache.includes(name)) { itemsCache.push(name); localStorage.setItem("sre_items", JSON.stringify(itemsCache)); refreshItemList(); }
+        if (activeItemInput) activeItemInput.value = name; closeItemModal();
+    }
+    function refreshItemList() { const dl = document.getElementById("item-list"); if(dl) dl.innerHTML = itemsCache.map(i => `<option value="${i}"></option>`).join(""); }
+
+    refreshPartyList(); refreshItemList();
+
+    // 4. OPENING STOCK IMEI LOGIC
     function handleOpeningStockChange() {
         const stock = Number(document.getElementById('new-prod-stock').value) || 0;
         const track = document.getElementById('new-prod-track-imei').checked;
@@ -770,57 +1040,24 @@
             }
             list.innerHTML = html;
         } else {
-            box.classList.add('hidden');
-            list.innerHTML = '';
+            box.classList.add('hidden'); list.innerHTML = '';
         }
     }
 
     function clearProductForm() {
-        ['new-prod-name','new-prod-brand','new-prod-model','new-prod-sku','new-prod-mrp','new-prod-pur','new-prod-sale','new-prod-stock','new-prod-hsn'].forEach(id => {
-            const el = document.getElementById(id); if(el) el.value = '';
-        });
-        document.getElementById('edit-prod-id').value = '';
-        document.getElementById('new-prod-mrp').placeholder = "0";
-        document.getElementById('new-prod-pur').placeholder = "0";
-        document.getElementById('new-prod-sale').placeholder = "0";
-        document.getElementById('new-prod-stock').placeholder = "0";
-        document.getElementById('new-prod-track-imei').checked = true;
-        
-        currentUploadedImage = "";
-        document.getElementById('prod-img-preview').src = "";
-        document.getElementById('prod-img-preview').classList.add('hidden');
-        document.getElementById('prod-img-placeholder').classList.remove('hidden');
-        
+        ['new-prod-name','new-prod-brand','new-prod-model','new-prod-sku','new-prod-mrp','new-prod-pur','new-prod-sale','new-prod-stock','new-prod-hsn'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+        document.getElementById('edit-prod-id').value = ''; document.getElementById('new-prod-mrp').placeholder = "0"; document.getElementById('new-prod-pur').placeholder = "0"; document.getElementById('new-prod-sale').placeholder = "0"; document.getElementById('new-prod-stock').placeholder = "0"; document.getElementById('new-prod-track-imei').checked = true;
+        currentUploadedImage = ""; document.getElementById('prod-img-preview').src = ""; document.getElementById('prod-img-preview').classList.add('hidden'); document.getElementById('prod-img-placeholder').classList.remove('hidden');
         handleOpeningStockChange();
     }
 
     function editProduct(id) {
         const p = inventoryCache.find(x => x.id === id);
         if(!p) return;
-        document.getElementById('edit-prod-id').value = p.id;
-        document.getElementById('new-prod-name').value = p.name;
-        document.getElementById('new-prod-brand').value = p.brand;
-        document.getElementById('new-prod-category').value = p.category;
-        document.getElementById('new-prod-model').value = p.model;
-        document.getElementById('new-prod-sku').value = p.sku;
-        document.getElementById('new-prod-mrp').value = p.mrp;
-        document.getElementById('new-prod-pur').value = p.purPrice;
-        document.getElementById('new-prod-sale').value = p.salePrice;
-        document.getElementById('new-prod-stock').value = p.stock;
-        document.getElementById('new-prod-hsn').value = p.hsn;
-        document.getElementById('new-prod-gst').value = p.gst;
+        document.getElementById('edit-prod-id').value = p.id; document.getElementById('new-prod-name').value = p.name; document.getElementById('new-prod-brand').value = p.brand; document.getElementById('new-prod-category').value = p.category; document.getElementById('new-prod-model').value = p.model; document.getElementById('new-prod-sku').value = p.sku; document.getElementById('new-prod-mrp').value = p.mrp; document.getElementById('new-prod-pur').value = p.purPrice; document.getElementById('new-prod-sale').value = p.salePrice; document.getElementById('new-prod-stock').value = p.stock; document.getElementById('new-prod-hsn').value = p.hsn; document.getElementById('new-prod-gst').value = p.gst;
         
-        if (p.image) {
-            currentUploadedImage = p.image;
-            document.getElementById('prod-img-preview').src = currentUploadedImage;
-            document.getElementById('prod-img-preview').classList.remove('hidden');
-            document.getElementById('prod-img-placeholder').classList.add('hidden');
-        } else {
-            currentUploadedImage = "";
-            document.getElementById('prod-img-preview').src = "";
-            document.getElementById('prod-img-preview').classList.add('hidden');
-            document.getElementById('prod-img-placeholder').classList.remove('hidden');
-        }
+        if (p.image) { currentUploadedImage = p.image; document.getElementById('prod-img-preview').src = currentUploadedImage; document.getElementById('prod-img-preview').classList.remove('hidden'); document.getElementById('prod-img-placeholder').classList.add('hidden'); } 
+        else { currentUploadedImage = ""; document.getElementById('prod-img-preview').src = ""; document.getElementById('prod-img-preview').classList.add('hidden'); document.getElementById('prod-img-placeholder').classList.remove('hidden'); }
 
         document.getElementById('new-prod-track-imei').checked = p.trackImei;
         handleOpeningStockChange();
@@ -829,14 +1066,12 @@
             const inputs = document.getElementById('new-prod-imei-list').querySelectorAll('input');
             inputs.forEach((inp, idx) => { if(p.imeiList[idx]) inp.value = p.imeiList[idx]; });
         }
-
         document.getElementById('add-product-form').scrollIntoView({behavior:'smooth'});
     }
 
     function saveLiveProduct() {
         const name = document.getElementById("new-prod-name").value.trim().toUpperCase();
         if(!name) return showPopup("Validation Error", "Product Name is required!", true);
-        
         const sale = Number(document.getElementById("new-prod-sale").value) || 0;
         if(sale <= 0) return showPopup("Validation Error", "Valid Sale Price is required!", true);
 
@@ -851,46 +1086,24 @@
         }
 
         const editId = document.getElementById('edit-prod-id').value;
-
         const prod = {
-            id: editId || ('PRD-' + Date.now()),
-            name: name,
-            brand: document.getElementById("new-prod-brand").value.trim() || "-",
-            category: document.getElementById("new-prod-category").value,
-            model: document.getElementById("new-prod-model").value.trim() || "-",
-            sku: document.getElementById("new-prod-sku").value.trim() || ("SKU-"+Math.floor(Math.random()*10000)),
-            mrp: Number(document.getElementById("new-prod-mrp").value) || 0,
-            purPrice: Number(document.getElementById("new-prod-pur").value) || 0,
-            salePrice: sale,
-            stock: stock,
-            hsn: document.getElementById("new-prod-hsn").value.trim() || "-",
-            gst: Number(document.getElementById("new-prod-gst").value) || 0,
-            lowStockAlert: Number(document.getElementById("new-prod-low").value) || 5,
-            trackImei: trackImei,
-            imeiList: imeiList,
-            image: currentUploadedImage
+            id: editId || ('PRD-' + Date.now()), name: name, brand: document.getElementById("new-prod-brand").value.trim() || "-",
+            category: document.getElementById("new-prod-category").value, model: document.getElementById("new-prod-model").value.trim() || "-",
+            sku: document.getElementById("new-prod-sku").value.trim() || ("SKU-"+Math.floor(Math.random()*10000)), mrp: Number(document.getElementById("new-prod-mrp").value) || 0,
+            purPrice: Number(document.getElementById("new-prod-pur").value) || 0, salePrice: sale, stock: stock,
+            hsn: document.getElementById("new-prod-hsn").value.trim() || "-", gst: Number(document.getElementById("new-prod-gst").value) || 0,
+            lowStockAlert: Number(document.getElementById("new-prod-low").value) || 5, trackImei: trackImei, imeiList: imeiList, image: currentUploadedImage
         };
 
-        if (editId) {
-            const idx = inventoryCache.findIndex(x => x.id === editId);
-            if(idx !== -1) inventoryCache[idx] = prod;
-        } else {
-            inventoryCache.push(prod);
-        }
+        if (editId) { const idx = inventoryCache.findIndex(x => x.id === editId); if(idx !== -1) inventoryCache[idx] = prod; } 
+        else { inventoryCache.push(prod); }
 
         localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache));
-
-        if (!itemsCache.includes(name)) {
-            itemsCache.push(name);
-            localStorage.setItem("sre_items", JSON.stringify(itemsCache));
-            refreshItemList();
-        }
-
-        clearProductForm();
-        renderProductTable();
-        showPopup("Success", editId ? "Product updated successfully!" : "Product added successfully!");
+        if (!itemsCache.includes(name)) { itemsCache.push(name); localStorage.setItem("sre_items", JSON.stringify(itemsCache)); refreshItemList(); }
+        clearProductForm(); renderProductTable(); showPopup("Success", editId ? "Product updated successfully!" : "Product added successfully!");
     }
 
+    // 5. ID BASED DELETE
     function deleteProduct(id) {
         if(confirm("Are you sure you want to delete this product?")) {
             inventoryCache = inventoryCache.filter(p => p.id !== id);
@@ -899,48 +1112,27 @@
         }
     }
 
-    // CSV IMPORT PARSER
     function importProductsCSV(event) {
-        const file = event.target.files[0];
-        if(!file) return;
+        const file = event.target.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            const text = e.target.result;
-            const rows = text.split("\n");
-            let count = 0;
+            const text = e.target.result; const rows = text.split("\n"); let count = 0;
             for(let i=1; i<rows.length; i++) {
                 if(!rows[i].trim()) continue;
                 const cols = rows[i].split(",");
                 if(cols.length >= 2) {
-                    const name = cols[0].replace(/"/g,"").trim().toUpperCase();
-                    if(!name) continue;
+                    const name = cols[0].replace(/"/g,"").trim().toUpperCase(); if(!name) continue;
                     inventoryCache.push({
-                        id: 'PRD-' + Date.now() + i,
-                        name: name,
-                        brand: cols[1]?.replace(/"/g,"").trim() || "-",
-                        category: cols[2]?.replace(/"/g,"").trim() || "Mobile Phone",
-                        model: cols[3]?.replace(/"/g,"").trim() || "-",
-                        sku: cols[4]?.replace(/"/g,"").trim() || ("SKU-"+Math.floor(Math.random()*10000)),
-                        mrp: Number(cols[5]) || 0,
-                        purPrice: Number(cols[6]) || 0,
-                        salePrice: Number(cols[7]) || 0,
-                        stock: Number(cols[8]) || 0,
-                        hsn: cols[9]?.replace(/"/g,"").trim() || "-",
-                        gst: Number(cols[10]) || 0,
-                        lowStockAlert: 5,
-                        trackImei: false,
-                        imeiList: [],
-                        image: ""
+                        id: 'PRD-' + Date.now() + i, name: name, brand: cols[1]?.replace(/"/g,"").trim() || "-", category: cols[2]?.replace(/"/g,"").trim() || "Mobile Phone", model: cols[3]?.replace(/"/g,"").trim() || "-",
+                        sku: cols[4]?.replace(/"/g,"").trim() || ("SKU-"+Math.floor(Math.random()*10000)), mrp: Number(cols[5]) || 0, purPrice: Number(cols[6]) || 0, salePrice: Number(cols[7]) || 0,
+                        stock: Number(cols[8]) || 0, hsn: cols[9]?.replace(/"/g,"").trim() || "-", gst: Number(cols[10]) || 0,
+                        lowStockAlert: 5, trackImei: false, imeiList: [], image: ""
                     });
-                    count++;
-                    if(!itemsCache.includes(name)) itemsCache.push(name);
+                    count++; if(!itemsCache.includes(name)) itemsCache.push(name);
                 }
             }
-            localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache));
-            localStorage.setItem("sre_items", JSON.stringify(itemsCache));
-            renderProductTable();
-            refreshItemList();
-            showPopup("Import Success", `${count} Products imported!`);
+            localStorage.setItem("sre_inventory", JSON.stringify(inventoryCache)); localStorage.setItem("sre_items", JSON.stringify(itemsCache));
+            renderProductTable(); refreshItemList(); showPopup("Import Success", `${count} Products imported!`);
         };
         reader.readAsText(file);
     }
@@ -948,23 +1140,14 @@
     function exportProductsCSV() {
         if(inventoryCache.length === 0) return showPopup("Empty", "No products to export", true);
         let csv = "Product Name,Brand,Category,Model,SKU,MRP,Purchase Price,Sale Price,Stock,HSN,GST\n";
-        inventoryCache.forEach(p => {
-            csv += `"${p.name}","${p.brand}","${p.category}","${p.model}","${p.sku}",${p.mrp},${p.purPrice},${p.salePrice},${p.stock},"${p.hsn}",${p.gst}\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', 'SRE_Products.csv');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        inventoryCache.forEach(p => { csv += `"${p.name}","${p.brand}","${p.category}","${p.model}","${p.sku}",${p.mrp},${p.purPrice},${p.salePrice},${p.stock},"${p.hsn}",${p.gst}\n`; });
+        const blob = new Blob([csv], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.setAttribute('href', url); a.setAttribute('download', 'SRE_Products.csv'); document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
+    // 6. IMEI SEARCH IN MASTER
     function renderProductTable() {
         const search = (document.getElementById("prod-search")?.value || "").toUpperCase();
-        let html = '';
-        let total = inventoryCache.length, inStock = 0, lowStock = 0, outStock = 0;
+        let html = ''; let total = inventoryCache.length, inStock = 0, lowStock = 0, outStock = 0;
 
         const filtered = inventoryCache.filter(p => {
             const hasImei = p.imeiList && p.imeiList.some(imei => imei.includes(search));
@@ -973,22 +1156,15 @@
 
         filtered.forEach((p) => {
             let statusBadge = '';
-            if (p.stock <= 0) {
-                statusBadge = '<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Out of Stock</span>';
-                outStock++;
-            } else if (p.stock <= p.lowStockAlert) {
-                statusBadge = '<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Low Stock</span>';
-                lowStock++;
-            } else {
-                statusBadge = '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">In Stock</span>';
-                inStock++;
-            }
+            if (p.stock <= 0) { statusBadge = '<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Out of Stock</span>'; outStock++; } 
+            else if (p.stock <= p.lowStockAlert) { statusBadge = '<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">Low Stock</span>'; lowStock++; } 
+            else { statusBadge = '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">In Stock</span>'; inStock++; }
             
-            let imgHtml = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded-md object-cover mx-auto">` : `<div class="w-8 h-8 bg-slate-100 rounded-md mx-auto flex items-center justify-center text-sm">📦</div>`;
+            let imgHtml = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<div class="w-8 h-8 bg-slate-100 rounded mx-auto flex items-center justify-center text-sm">📦</div>`;
 
             html += `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="p-3 text-center"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad] focus:ring-[#004aad]"></td>
+                <td class="p-3 text-center"><input type="checkbox" class="w-3.5 h-3.5 rounded border-slate-300 text-[#004aad]"></td>
                 <td class="p-3 text-center">${imgHtml}</td>
                 <td class="p-3 text-slate-900 font-black whitespace-nowrap">${p.name}</td>
                 <td class="p-3 whitespace-nowrap">${p.brand}</td>
@@ -1007,100 +1183,237 @@
         });
 
         if(filtered.length === 0) html = '<tr><td colspan="12" class="text-center p-8 text-slate-400 font-bold text-[10px] tracking-wider">No products found.</td></tr>';
-        
         document.getElementById("prod-table-body").innerHTML = html;
-        
         if(search === "") {
-            document.getElementById("prod-stat-total").innerText = total;
-            document.getElementById("prod-stat-in").innerText = inStock;
-            document.getElementById("prod-stat-low").innerText = lowStock;
-            document.getElementById("prod-stat-out").innerText = outStock;
+            document.getElementById("prod-stat-total").innerText = total; document.getElementById("prod-stat-in").innerText = inStock;
+            document.getElementById("prod-stat-low").innerText = lowStock; document.getElementById("prod-stat-out").innerText = outStock;
         }
     }
 
-    function recalcTotals() {
-      let rawPaid = 0;
-      if (currentEntryType === "PURCHASE") {
-          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
-          if (mode === "Cash + QR") {
-              rawPaid = (Number(document.getElementById("pur-split-cash").value) || 0) + (Number(document.getElementById("pur-split-qr").value) || 0);
-              document.getElementById("pay-paid").value = rawPaid || "";
-          } else if (mode === "Credit") {
-              rawPaid = 0;
-          } else {
-              rawPaid = Number(document.getElementById("pay-paid").value) || 0;
-          }
-      } else {
-          const s = document.getElementById("pay-secondary").value;
-          const p = document.getElementById("pay-primary").value;
-          let activeMode = p;
-          if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value;
-          if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
+    // Billing Logic Functions
+    function handlePurQtyChange(input) {
+       recalcTotals(); 
+       const row = input.closest(".item-row"); const qty = Math.max(1, Number(input.value) || 1);
+       const btn = row.querySelector(".pur-expand-btn"); const extraBox = row.querySelector(".pur-extra-imeis");
+       if (currentBillType === "ACCESSORIES") { btn.classList.add("hidden"); extraBox.innerHTML = ""; return; }
 
-          const isSplit = activeMode.includes("+");
-          if (isSplit) {
-            if (s === "Finance") {
-              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("fin-split-cash").value) || 0;
-              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("fin-split-qr").value) || 0;
-              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("fin-split-card").value) || 0;
-            } else if (s === "Dues") {
-              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("dues-split-cash").value) || 0;
-              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("dues-split-qr").value) || 0;
-              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("dues-split-card").value) || 0;
-            } else {
-              if(activeMode.includes("Cash")) rawPaid += Number(document.getElementById("split-cash").value) || 0;
-              if(activeMode.includes("QR")) rawPaid += Number(document.getElementById("split-qr").value) || 0;
-              if(activeMode.includes("Card")) rawPaid += Number(document.getElementById("split-card").value) || 0;
-            }
-            document.getElementById("pay-paid").value = rawPaid || "";
-          } else {
-            rawPaid = Number(document.getElementById("pay-paid").value) || 0;
-          }
-      }
+       if (qty > 1) {
+           btn.classList.remove("hidden"); const existing = Array.from(extraBox.querySelectorAll("input")).map(i => i.value);
+           let html = '';
+           for(let i=2; i<=qty; i++) {
+               const val = existing[i-2] || "";
+               html += `<input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="IMEI/Serial ${i}" class="item-imei-extra w-full premium-input px-2 bg-white border border-slate-200 rounded font-mono font-bold outline-none uppercase text-[#004aad] focus:border-[#004aad] shadow-sm" />`;
+           }
+           extraBox.innerHTML = html; extraBox.classList.remove("hidden"); btn.innerText = "⬆️";
+       } else { btn.classList.add("hidden"); extraBox.innerHTML = ""; extraBox.classList.add("hidden"); btn.innerText = "⬇️"; }
+    }
 
-      let grand = 0; let totalTaxable = 0; let totalGst = 0; let totalDiscount = 0; let globalGstRate = 0;
+    function togglePurImeis(btn) {
+       const box = btn.closest(".item-row").querySelector(".pur-extra-imeis");
+       if (box.classList.contains("hidden")) { box.classList.remove("hidden"); btn.innerText = "⬆️"; } else { box.classList.add("hidden"); btn.innerText = "⬇️"; }
+    }
+
+    function handleQtyChange(input) { renderItemImeis(input.closest(".item-row")); recalcTotals(); }
+
+    function renderItemImeis(row) {
+      const imeiBox = row.querySelector(".item-imeis-box");
       const isRepairSale = (currentBillType === "REPAIRING" && currentEntryType === "SALE");
+      if (isRepairSale) { imeiBox.innerHTML = ""; return; }
+      
+      const isMobile = currentBillType === "MOBILE"; const existingImeis = Array.from(imeiBox.querySelectorAll(".item-imei")).map(inp => inp.value);
+      let qty = Math.max(1, Number(row.querySelector(".item-qty").value) || 1);
+      if (currentEntryType === "SALE" && qty > 10) qty = 10; 
+      
+      let html = '<div class="grid grid-cols-2 gap-3 mt-3">';
+      for(let i=0; i < qty; i++){ 
+        const val = existingImeis[i] || "";
+        if (isMobile) html += `<div class="flex flex-col"><div class="flex items-center h-4 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">IMEI ${i+1} *</label></div><input type="text" maxlength="15" oninput="this.value=this.value.replace(/[^0-9]/g,'')" value="${val}" placeholder="15 Digit IMEI" class="item-imei w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" /></div>`; 
+        else html += `<div class="flex flex-col"><div class="flex items-center h-4 mb-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Serial No ${i+1}</label></div><input type="text" value="${val}" placeholder="Serial Number" class="item-imei w-full premium-input px-3 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold outline-none uppercase text-[#004aad] focus:bg-white focus:border-[#004aad] transition-all shadow-sm" /></div>`;
+      }
+      html += '</div>';
+      imeiBox.innerHTML = html;
+    }
 
-      // SUM BOTH FOR SALE AND PURCHASE (UNIFIED LOGIC)
-      if (!isRepairSale) {
-        document.querySelectorAll(".item-row").forEach(r => {
-          const q = Number(r.querySelector(".item-qty").value) || 1;
-          const rate = Number(r.querySelector(".item-rate")?.value) || 0;
-          const gstSlab = Number(r.querySelector(".item-gst")?.value) || 0;
-          
-          let basicValue = Math.max(0, rate * q);
-          let gstAmount = basicValue * (gstSlab / 100);
-          let itemTotal = basicValue + gstAmount;
-          
-          const amtDisplay = r.querySelector(".item-amt-display");
-          if(amtDisplay) amtDisplay.innerText = itemTotal.toLocaleString("en-IN", {minimumFractionDigits: 2});
+    function onPaymentModeChange() {
+      const p = document.getElementById("pay-primary").value; const s = document.getElementById("pay-secondary").value;
+      document.getElementById("fin-box").classList.toggle("hidden", s !== "Finance"); document.getElementById("dues-box").classList.toggle("hidden", s !== "Dues");
+      let activeMode = p;
+      if (s === "Finance") activeMode = document.getElementById("fin-dp-mode").value; if (s === "Dues") activeMode = document.getElementById("dues-mode").value;
+      const isSplit = activeMode.includes("+");
 
-          totalTaxable += basicValue; totalGst += gstAmount; grand += itemTotal;
-        });
-        
-        const globalDisc = Number(document.getElementById("global-discount").value) || 0;
-        globalGstRate = Number(document.getElementById("global-gst").value) || 0;
-        
-        totalDiscount = globalDisc;
-        if(globalDisc > 0) grand -= globalDisc;
-        
-        grand = Math.round(grand);
-        document.getElementById("form-basic-amt").innerText = "Rs. " + totalTaxable.toLocaleString("en-IN", {minimumFractionDigits: 2});
-        document.getElementById("form-gst-amt").innerText = "Rs. " + totalGst.toLocaleString("en-IN", {minimumFractionDigits: 2});
-
-      } else {
-        grand = Number(document.getElementById("rep-charge")?.value) || 0;
-        totalTaxable = grand;
+      document.getElementById("split-box").classList.toggle("hidden", s !== "" || !isSplit);
+      if (s === "" && isSplit) {
+        document.getElementById("wrap-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
       }
 
-      const paid = rawPaid;
-      const due = Math.max(0, grand - paid);
+      document.getElementById("fin-split-container").classList.toggle("hidden", s !== "Finance" || !isSplit);
+      if (s === "Finance" && isSplit) {
+        document.getElementById("wrap-fin-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-fin-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-fin-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
+      }
+
+      document.getElementById("dues-split-container").classList.toggle("hidden", s !== "Dues" || !isSplit);
+      if (s === "Dues" && isSplit) {
+        document.getElementById("wrap-dues-split-cash").classList.toggle("hidden", !activeMode.includes("Cash"));
+        document.getElementById("wrap-dues-split-qr").classList.toggle("hidden", !activeMode.includes("QR"));
+        document.getElementById("wrap-dues-split-card").classList.toggle("hidden", !activeMode.includes("Card"));
+      }
+
+      const payPaidInput = document.getElementById("pay-paid");
+      if (isSplit) {
+        payPaidInput.readOnly = true; payPaidInput.classList.add("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300"); payPaidInput.classList.remove("bg-blue-50", "text-[#004aad]", "border-blue-400"); payPaidInput.placeholder = "Auto Calculated...";
+      } else {
+        payPaidInput.readOnly = false; payPaidInput.classList.remove("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300"); payPaidInput.classList.add("bg-blue-50", "text-[#004aad]", "border-blue-400"); payPaidInput.placeholder = "Enter Amount...";
+      }
+      recalcTotals();
+    }
+
+    function updatePurPaymentUI(mode) {
+        const labels = { "Credit": "lbl-pay-Credit", "Cash": "lbl-pay-Cash", "QR": "lbl-pay-QR", "Cash + QR": "lbl-pay-CashQR" };
+        for (let key in labels) {
+            const lbl = document.getElementById(labels[key]); if (!lbl) continue;
+            if (key === mode) lbl.className = "flex-1 flex justify-center items-center cursor-pointer bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-sm rounded h-full transition-all";
+            else lbl.className = "flex-1 flex justify-center items-center cursor-pointer text-slate-500 hover:bg-white hover:text-[#004aad] hover:shadow-sm rounded h-full transition-all";
+        }
+    }
+
+    function onPurPaymentModeChange() {
+        const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
+        updatePurPaymentUI(mode);
+        const isSplit = mode === "Cash + QR"; const isCredit = mode === "Credit";
+
+        document.getElementById("pur-split-box").classList.toggle("hidden", !isSplit);
+        const payPaidInput = document.getElementById("pay-paid");
+        if (isSplit || isCredit) {
+            payPaidInput.readOnly = true; payPaidInput.classList.add("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300"); payPaidInput.classList.remove("bg-blue-50", "text-[#004aad]", "border-blue-400"); payPaidInput.placeholder = isCredit ? "Credit (Rs. 0 Paid)" : "Auto Calculated...";
+            if (isCredit) payPaidInput.value = "";
+        } else {
+            payPaidInput.readOnly = false; payPaidInput.classList.remove("bg-slate-200", "cursor-not-allowed", "text-slate-500", "border-slate-300"); payPaidInput.classList.add("bg-blue-50", "text-[#004aad]", "border-blue-400"); payPaidInput.placeholder = "Enter Amount...";
+        }
+        recalcTotals();
+    }
+
+    // 7. TOTALS/PAID/DUE/DISCOUNT CALCULATION FIX
+    function recalcTotals(isUserTypingPaid = false) {
+      let grand = 0; let totalTaxable = 0; let totalGst = 0; 
       
-      document.getElementById("fin-loan-display").innerText = "Rs. " + due.toLocaleString("en-IN");
+      // Calculate Items for both Sale & Purchase
+      document.querySelectorAll(".item-row").forEach(r => {
+        const q = Number(r.querySelector(".item-qty").value) || 1;
+        const rate = Number(r.querySelector(".item-rate")?.value) || 0;
+        const gstSlab = Number(r.querySelector(".item-gst")?.value) || 0;
+        
+        let basicValue = Math.max(0, rate * q);
+        let gstAmount = basicValue * (gstSlab / 100);
+        let itemTotal = basicValue + gstAmount;
+        
+        const amtDisplay = r.querySelector(".item-amt-display");
+        if(amtDisplay) amtDisplay.innerText = itemTotal.toLocaleString("en-IN", {minimumFractionDigits: 2});
+
+        totalTaxable += basicValue; totalGst += gstAmount; grand += itemTotal;
+      });
+      
+      const globalDisc = Number(document.getElementById("global-discount").value) || 0;
+      if (globalDisc > 0) grand = Math.max(0, grand - globalDisc);
+      grand = Math.round(grand);
+
+      document.getElementById("form-basic-amt").innerText = "Rs. " + totalTaxable.toLocaleString("en-IN", {minimumFractionDigits: 2});
+      document.getElementById("form-gst-amt").innerText = "Rs. " + totalGst.toLocaleString("en-IN", {minimumFractionDigits: 2});
       document.getElementById("total-grand").innerText = "Rs. " + grand.toLocaleString("en-IN");
-      document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
+
+      // Handle Paid & Due
+      let rawPaid = 0;
+      const payInput = document.getElementById("pay-paid");
       
-      return { grand, paid, due, totalTaxable, totalGst, totalDiscount, gstSlab: globalGstRate };
+      let mode = "";
+      if(currentEntryType === "PURCHASE") {
+          mode = document.querySelector('input[name="pur_pay_mode"]:checked')?.value || "Cash";
+      } else {
+          mode = document.getElementById("pay-primary")?.value || "Cash";
+      }
+
+      const isSplit = mode === "Cash + QR" || document.getElementById("pay-secondary")?.value !== "";
+      
+      if (isSplit) {
+          rawPaid = (Number(document.getElementById("pur-split-cash")?.value)||0) + (Number(document.getElementById("pur-split-qr")?.value)||0) + (Number(document.getElementById("split-cash")?.value)||0) + (Number(document.getElementById("split-qr")?.value)||0);
+          if(!isUserTypingPaid) payInput.value = rawPaid;
+      } else if (mode === "Credit") {
+          rawPaid = 0; if(!isUserTypingPaid) payInput.value = "";
+      } else {
+          if(!isUserTypingPaid) { payInput.value = grand; rawPaid = grand; } 
+          else { rawPaid = Number(payInput.value) || 0; }
+      }
+
+      const due = Math.max(0, grand - rawPaid);
+      document.getElementById("total-due").innerText = "Rs. " + due.toLocaleString("en-IN");
+      document.getElementById("fin-loan-display").innerText = "Rs. " + due.toLocaleString("en-IN");
+
+      return { grand, paid: rawPaid, due, totalTaxable, totalGst, totalDiscount: globalDisc, gstSlab: 0 };
+    }
+
+    function startNewBill(type, entryType = currentEntryType) {
+      currentBillType = type; currentEntryType = entryType;
+      document.getElementById("form-entry-type").innerText = entryType;
+      ["MOBILE", "ACCESSORIES", "REPAIRING"].forEach(t => {
+          const el = document.getElementById(`pill-${t}`);
+          if (t === type) el.className = "flex-1 sm:flex-none h-[32px] px-4 rounded text-[9px] font-black tracking-widest bg-gradient-to-b from-[#004aad] to-blue-700 text-white shadow-sm transition-all";
+          else el.className = "flex-1 sm:flex-none h-[32px] px-4 rounded text-[9px] font-black tracking-widest text-slate-500 hover:text-[#004aad] hover:bg-white transition-all";
+      });
+      const isPurchase = (entryType === "PURCHASE"); const isRepairSale = (type === "REPAIRING" && !isPurchase); 
+
+      document.getElementById("pur-top-bar").classList.toggle("hidden", !isPurchase); document.getElementById("sale-top-bar").classList.toggle("hidden", isPurchase);
+      if (isPurchase) {
+         document.getElementById("pur-supplier-name").value = ""; document.getElementById("pur-invoice-no").value = "";
+         const today = new Date(); const yyyy = today.getFullYear(); const mm = String(today.getMonth() + 1).padStart(2, '0'); const dd = String(today.getDate()).padStart(2, '0');
+         document.getElementById("pur-invoice-date").value = `${yyyy}-${mm}-${dd}`;
+      }
+      if (isPurchase || isRepairSale) document.getElementById("cust-box").classList.add("hidden"); else document.getElementById("cust-box").classList.remove("hidden");
+      document.getElementById("global-tax-discount-box").classList.toggle("hidden", isPurchase); document.getElementById("sale-payment-section").classList.toggle("hidden", isPurchase); document.getElementById("purchase-payment-section").classList.toggle("hidden", !isPurchase);
+      document.getElementById("box-basic-amt").classList.toggle("hidden", !isPurchase); document.getElementById("box-gst-amt").classList.toggle("hidden", !isPurchase);
+      document.getElementById("repair-box").classList.toggle("hidden", !isRepairSale);
+      document.getElementById("pur-grid-header").classList.toggle("hidden", !isPurchase); document.getElementById("items-grid-header").classList.toggle("hidden", isPurchase);
+      
+      document.getElementById("items-wrapper").className = "overflow-x-auto pb-2";
+      document.getElementById("items-container").className = "space-y-2 min-w-[850px] sm:min-w-full";
+      document.getElementById("items-container").innerHTML = "";
+      
+      if (isPurchase) { document.querySelector('input[name="pur_pay_mode"][value="Credit"]').checked = true; updatePurPaymentUI("Credit"); onPurPaymentModeChange(); }
+      document.getElementById("cust-name").value = ""; document.getElementById("cust-phone").value = ""; document.getElementById("cust-address").value = ""; document.getElementById("cust-gstin").value = "";
+      ["split-cash", "split-qr", "split-card", "fin-split-cash", "fin-split-qr", "fin-split-card", "dues-split-cash", "dues-split-qr", "dues-split-card", "pay-paid", "fin-company", "fin-rate", "dues-rate", "global-discount", "rep-phone", "rep-device", "rep-issue", "pur-split-cash", "pur-split-qr"].forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+      document.getElementById("pay-primary").value = "Cash"; document.getElementById("pay-secondary").value = ""; document.getElementById("global-gst").value = "0"; 
+      
+      if(!isPurchase) onPaymentModeChange();
+      if(!isRepairSale) addNewItemRow(true);
+      if (!isPurchase) document.getElementById("form-invoice-no").innerText = `SRE-${new Date().getFullYear()}-${(billsCache.length + 1).toString().padStart(3, "0")}`;
+      
+      recalcTotals(); showView("new-bill");
+    }
+
+    function changeBillType(type) { startNewBill(type, currentEntryType); }
+
+    // 8. JS COMPRESSION FIX
+    function compressBill(b) {
+        try {
+            const validItems = b.items.filter(x => x && x.name && String(x.name).trim() !== "");
+            const isPurchase = b.billType && String(b.billType).includes("PURCHASE");
+            const invData = isPurchase ? String(b.invoiceNo) : String(b.invoiceNo).replace(/[^0-9]/g, '').slice(-3);
+            const min = [
+                invData, 
+                String(b.billDate), String(b.customerName), String(b.customerMobile||"-"), String(b.customerAddress||"-"), 
+                validItems.map(x => [String(x.name).substring(0,20), String(x.imei||"-").substring(0,25), Number(x.qty)||1, Number(x.rate)||0, Number(x.amount)||0, Number(x.disc)||0, Number(x.gst)||0]), 
+                Number(b.totalTaxable)||0, Number(b.totalGst)||0, Number(b.totalDiscount)||0, Number(b.gstSlab)||0, String(b.paymentMode||"Cash"), Number(b.paid)||0, Number(b.due)||0, 
+                [Number(b.paymentBreakdown?.cash||0), Number(b.paymentBreakdown?.qr||0), Number(b.paymentBreakdown?.card||0)], 
+                b.finance ? String(b.finance.company||"") : "", String(b.paymentRate||""), String(b.billType) 
+            ];
+            const encodedStr = encodeURIComponent(JSON.stringify(min));
+            return encodeURIComponent(btoa(unescape(encodedStr)));
+        } catch (e) {
+            console.error("Compression Error:", e);
+            return null; // Return null so it doesn't crash the save process
+        }
     }
 
     function saveBill() {
@@ -1113,7 +1426,6 @@
       } else {
         if (currentEntryType === "PURCHASE") {
             name = document.getElementById("pur-supplier-name").value.trim().toUpperCase();
-            phone = "-"; address = "-"; gstin = "-";
             if(!name) return showPopup("Validation Error", "Supplier Name is required!", true);
         } else {
             name = document.getElementById("cust-name").value.trim().toUpperCase();
@@ -1125,16 +1437,11 @@
         }
       }
 
-      let s_val = "", p_val = "", aMode = "";
-      let checkSplit = false;
-      let finalInvoiceNo = "";
-      let formattedDate = getFormattedDate();
+      let s_val = "", p_val = "", aMode = ""; let checkSplit = false; let finalInvoiceNo = ""; let formattedDate = getFormattedDate();
 
       if (currentEntryType === "SALE") {
           finalInvoiceNo = document.getElementById("form-invoice-no").innerText;
-          s_val = document.getElementById("pay-secondary").value;
-          p_val = document.getElementById("pay-primary").value;
-          aMode = p_val;
+          s_val = document.getElementById("pay-secondary").value; p_val = document.getElementById("pay-primary").value; aMode = p_val;
           if (s_val === "Finance") aMode = document.getElementById("fin-dp-mode").value;
           if (s_val === "Dues") aMode = document.getElementById("dues-mode").value;
           checkSplit = aMode.includes("+");
@@ -1152,8 +1459,7 @@
           if (!finalInvoiceNo) return showPopup("Validation Error", "Invoice No. is required!", true);
           const rawDate = document.getElementById("pur-invoice-date").value;
           if (!rawDate) return showPopup("Validation Error", "Invoice Date is required!", true);
-          const dObj = new Date(rawDate);
-          const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const dObj = new Date(rawDate); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
           formattedDate = dObj.getDate() + " " + m[dObj.getMonth()] + " " + String(dObj.getFullYear()).slice(-2);
           const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
           if (mode === "Cash + QR") {
@@ -1167,12 +1473,9 @@
       const totals = recalcTotals();
       if (totals.grand <= 0) return showPopup("Validation Error", "Amount must be greater than 0!", true);
 
-      let items = [];
-      if (isRepairSale) {
-        items = [{ name: document.getElementById("rep-device").value.trim().toUpperCase(), imei: document.getElementById("rep-issue").value.trim().toUpperCase(), qty: 1, rate: totals.totalTaxable + totals.totalDiscount, amount: totals.totalTaxable + totals.totalDiscount }];
-      } else {
-        let err = false; let imeiErr = false; let rateErr = false; let imeiStockErr = false; let stockErrImei = "";
-        
+      let items = []; let err = false; let imeiErr = false; let rateErr = false; let imeiStockErr = false; let stockErrImei = "";
+      
+      if (!isRepairSale) {
         document.querySelectorAll(".item-row").forEach(r => {
           const pName = r.querySelector(".item-name").value.trim().toUpperCase();
           if(!pName) err = true;
@@ -1185,6 +1488,14 @@
                 const val = inp.value.trim().toUpperCase();
                 if(val) { if(currentBillType === "MOBILE" && val.length !== 15) imeiErr = true; validImeis.push(val); }
              });
+             // Sale fallback for imei inputs
+             if (currentEntryType === "SALE") {
+                 r.querySelectorAll(".item-imei").forEach(inp => {
+                   const val = inp.value.trim().toUpperCase();
+                   if(currentBillType === "MOBILE" && val.length !== 15) imeiErr = true;
+                   if(val) validImeis.push(val); 
+                 });
+             }
           }
           
           // STRICT FIX: IMEI Sale Validation
@@ -1204,11 +1515,11 @@
 
           items.push({ name: pName, imei: validImeis.length > 0 ? validImeis.join(", ") : "-", qty: q, rate: rate, amount: amt, disc: 0, gst: gst });
         });
-        
-        if (err || rateErr) return showPopup("Validation Error", "Product Name and Rate are required!", true);
-        if(imeiErr) return showPopup("Validation Error", "IMEI number must be exactly 15 numeric digits!", true);
-        if(imeiStockErr) return showPopup("Stock Error", `IMEI ${stockErrImei} is not in stock!`, true);
       }
+        
+      if (err || rateErr) return showPopup("Validation Error", "Product Name and Rate are required!", true);
+      if (imeiErr) return showPopup("Validation Error", "IMEI number must be exactly 15 numeric digits!", true);
+      if (imeiStockErr) return showPopup("Stock Error", `IMEI ${stockErrImei} is not in stock!`, true);
 
       let cashAmt = 0, qrAmt = 0, cardAmt = 0;
       if (currentEntryType === "SALE") {
@@ -1232,14 +1543,11 @@
             }
           }
       } else {
-          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value;
-          p_val = mode;
+          const mode = document.querySelector('input[name="pur_pay_mode"]:checked').value; p_val = mode;
           if (mode === "Cash") cashAmt = totals.paid;
           else if (mode === "QR") qrAmt = totals.paid;
-          else if (mode === "Cash + QR") {
-              cashAmt = Number(document.getElementById("pur-split-cash").value) || 0;
-              qrAmt = Number(document.getElementById("pur-split-qr").value) || 0;
-          } else if (mode === "Credit") { s_val = "Dues"; }
+          else if (mode === "Cash + QR") { cashAmt = Number(document.getElementById("pur-split-cash").value) || 0; qrAmt = Number(document.getElementById("pur-split-qr").value) || 0; } 
+          else if (mode === "Credit") { s_val = "Dues"; }
       }
 
       const paymentBreakdown = { cash: cashAmt, qr: qrAmt, card: cardAmt };
@@ -1253,8 +1561,7 @@
         customerName: name, customerMobile: phone, customerAddress: address, customerGstin: gstin, items,
         paymentMode: s_val || p_val, paymentBreakdown: paymentBreakdown, paymentRate: pRate,
         grandTotal: totals.grand, paid: totals.paid, due: totals.due,
-        totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount,
-        gstSlab: totals.gstSlab, finance: finData, token: token
+        totalTaxable: totals.totalTaxable, totalGst: totals.totalGst, totalDiscount: totals.totalDiscount, gstSlab: totals.gstSlab, finance: finData, token: token
       };
 
       const scanPayload = compressBill(billData);
@@ -1276,8 +1583,7 @@
                  p.stock += item.qty;
                  if(item.imei) {
                      if(!p.imeiList) p.imeiList = [];
-                     let newImeis = item.imei.split(",").map(i => i.trim()).filter(x=>x!=="-");
-                     p.imeiList.push(...newImeis);
+                     p.imeiList.push(...item.imei.split(",").map(i => i.trim()).filter(x=>x!=="-"));
                  }
              }
          }
@@ -1294,6 +1600,131 @@
       document.getElementById("view-new-bill").classList.add("hidden");
       showPopup("Bill Generated", "Invoice saved successfully!", false, billData);
     }
+
+    function displayInvoice(bill) {
+      activeInvoiceData = bill;
+      document.getElementById("inv-no").innerText = bill.invoiceNo; document.getElementById("inv-date").innerText = bill.billDate;
+      document.getElementById("inv-cust-name").innerText = bill.customerName; document.getElementById("inv-cust-phone").innerText = bill.customerMobile || "-";
+      document.getElementById("inv-cust-address").innerText = bill.customerAddress || "-"; document.getElementById("inv-cust-gstin").innerText = bill.customerGstin || "-";
+
+      const isPur = bill.billType && bill.billType.includes("PURCHASE");
+      document.getElementById("inv-header-title").innerText = isPur ? "PURCHASE VOUCHER" : (bill.billType.includes("PAYMENT") || bill.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
+      document.getElementById("inv-name-label").innerText = isPur || bill.billType.includes("PAYMENT") ? "Supplier" : "Name";
+
+      const tbody = document.getElementById("inv-items-body"); tbody.innerHTML = "";
+      for (let i = 0; i < 8; i++) {
+        const it = bill.items[i];
+        if (it) {
+          let dispName = it.name; if (isPur && (it.disc > 0 || it.gst > 0)) dispName += ` <span class="text-[9px] text-[#004aad] block mt-0.5">[G:${it.gst}%]</span>`;
+          tbody.innerHTML += `<tr><td class="p-2 border border-[#004aad] text-center font-bold text-[10px] text-slate-900">${i+1}</td><td class="p-2 border border-[#004aad] font-bold text-[10px] text-slate-900">${dispName}</td><td class="p-2 border border-[#004aad] font-bold text-[10px] text-slate-900 break-all">${it.imei}</td><td class="p-2 border border-[#004aad] table-col-qty font-bold text-[10px] text-slate-900">${it.qty}</td><td class="p-2 border border-[#004aad] table-col-rate font-bold text-[10px] text-slate-900">${Number(it.rate).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td><td class="p-2 border border-[#004aad] table-col-amt font-bold text-[10px] text-slate-900">${Number(it.amount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</td></tr>`;
+        } else { tbody.innerHTML += `<tr><td class="p-2 border border-[#004aad] text-center font-bold text-[10px] text-slate-300">${i+1}</td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td><td class="border border-[#004aad]"></td></tr>`; }
+      }
+
+      const grand = Number(bill.grandTotal) || 0; const gst = Number(bill.totalGst) || 0; const subtotal = bill.totalTaxable + bill.totalDiscount;
+      const bd = document.getElementById("inv-total-breakdown"); let bdHtml = '';
+      if (isPur) {
+          bdHtml = `<div class="flex justify-between p-2"><span>Basic Amount</span><span class="font-black">Rs. ${Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+          if(Number(bill.totalDiscount) > 0) bdHtml += `<div class="flex justify-between p-2"><span>Discount</span><span>-${Number(bill.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+          if(Number(bill.totalGst) > 0) bdHtml += `<div class="flex justify-between p-2 text-[#004aad]"><span>GST Amount</span><span>Rs. ${Number(bill.totalGst).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+      } else {
+          bdHtml = `<div class="flex justify-between p-2"><span>Subtotal</span><span class="font-black">Rs. ${subtotal.toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+          if(Number(bill.totalDiscount) > 0) bdHtml += `<div class="flex justify-between p-2"><span>Discount</span><span>-${Number(bill.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+          if(gst > 0) {
+            const halfGst = (bill.gstSlab / 2) || 9;
+            bdHtml += `<div class="flex justify-between p-2 text-[#004aad]"><span>Taxable Value</span><span>Rs. ${Number(bill.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div><div class="flex justify-between p-2 text-[#004aad]"><span>${halfGst}% CGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div><div class="flex justify-between p-2 text-[#004aad]"><span>${halfGst}% SGST</span><span>Rs. ${(gst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}</span></div>`;
+          }
+      }
+      bd.innerHTML = bdHtml;
+      
+      const showGrand = (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT")) ? b.paid : grand;
+      document.getElementById("inv-grand-total").innerText = "Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2});
+
+      document.getElementById("inv-qr-container").innerHTML = "";
+      new QRCode(document.getElementById("inv-qr-container"), { text: bill.publicUrl, width: 80, height: 80, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
+      
+      ["dashboard", "new-bill", "settings", "ledger", "payment", "product", "expense", "stock", "reports", "gst-reports", "party"].forEach(v => { const el = document.getElementById("view-" + v); if(el) el.classList.add("hidden"); });
+      document.getElementById("view-invoice").classList.remove("hidden"); document.getElementById("bottom-nav").classList.add("hidden");
+    }
+
+    function downloadVectorPDF() {
+      if (!activeInvoiceData) return;
+      const { jsPDF } = window.jspdf; const doc = new jsPDF("p", "mm", "a4"); const b = activeInvoiceData;
+      const blue = [0, 74, 173]; const dark = [15, 23, 42];
+      doc.setDrawColor(...blue); doc.setLineWidth(0.8); doc.rect(15, 12, 180, 260);
+      const isPur = b.billType && b.billType.includes("PURCHASE");
+      const docTitle = isPur ? "PURCHASE VOUCHER" : (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT") ? "TRANSACTION RECEIPT" : "TAX INVOICE");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...blue); doc.text(docTitle, 105, 25, { align: "center" });
+
+      let y = 35; doc.setTextColor(...dark); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
+      doc.text("Invoice No.", 20, y); doc.text(":", 40, y); doc.text(b.invoiceNo, 43, y); doc.text("Date", 140, y); doc.text(":", 152, y); doc.text(b.billDate, 155, y);
+      y += 6; doc.text(isPur || b.billType.includes("PAYMENT") ? "Supplier" : "Name", 20, y); doc.text(":", 40, y); doc.text(b.customerName, 43, y); doc.text("Mobile", 140, y); doc.text(":", 152, y); doc.text(b.customerMobile || "-", 155, y);
+      y += 6; doc.text("Address", 20, y); doc.text(":", 40, y); doc.text(b.customerAddress || "-", 43, y); doc.text("GSTIN", 140, y); doc.text(":", 152, y); doc.text(b.customerGstin || "-", 155, y);
+
+      y += 8; doc.setFillColor(...blue); doc.rect(15, y, 180, 6.5, "F"); doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+      doc.text("S.No", 19, y+4.5); doc.text("Brand / Product", 35, y+4.5); doc.text("Model / IMEI", 88, y+4.5); doc.text("Qty.", 138, y+4.5); doc.text("Rate", 154, y+4.5); doc.text("Amount", 177, y+4.5);
+
+      y += 6.5; doc.setDrawColor(...blue); doc.setLineWidth(0.3); doc.setTextColor(...dark); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
+      for (let i = 0; i < 8; i++) {
+        const item = b.items[i];
+        doc.rect(15, y, 180, 7.5); doc.line(26, y, 26, y + 7.5); doc.line(85, y, 85, y + 7.5); doc.line(134, y, 134, y + 7.5); doc.line(148, y, 148, y + 7.5); doc.line(168, y, 168, y + 7.5); 
+        doc.text(String(i+1), 20.5, y+5, { align:"center" });
+        if (item) {
+          let dispName = String(item.name).substring(0,24); if (isPur && (item.disc > 0 || item.gst > 0)) dispName += ` [G:${item.gst}%]`;
+          doc.text(dispName, 28, y+5); doc.text(String(item.imei || "-").substring(0, 42), 87, y+5); doc.text(String(item.qty), 141, y+5, { align:"center" }); doc.text(Number(item.rate).toLocaleString("en-IN", {minimumFractionDigits: 2}), 165, y+5, { align:"right" }); doc.text(Number(item.amount).toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, y+5, { align:"right" });
+        }
+        y += 7.5;
+      }
+
+      doc.rect(15, y, 115, 42); const qrCanvas = document.querySelector("#inv-qr-container canvas");
+      if (qrCanvas) { 
+          doc.addImage(qrCanvas.toDataURL("image/png"), "PNG", 25, y+12.5, 17, 17); doc.setTextColor(...blue); doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("VERIFIED E-BILL", 46, y+20);
+          doc.setTextColor(80,80,80); doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.text("Scan QR with any Camera", 46, y+25); doc.text("to verify and open online.", 46, y+29);
+      }
+
+      doc.rect(134, y, 61, 42); doc.setLineWidth(0.2); const grand = Number(b.grandTotal); let rY = y; let breakdown = [];
+      if (isPur) {
+          breakdown.push({l: "Basic Amount", v: Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: "-"+Number(b.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          if(Number(b.totalGst) > 0) breakdown.push({l: "GST Amount", v: Number(b.totalGst).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+      } else {
+          breakdown.push({l: "Subtotal", v: (b.totalTaxable+Number(b.totalDiscount)).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          if(Number(b.totalDiscount) > 0) breakdown.push({l:"Discount", v: "-"+Number(b.totalDiscount).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          if(Number(b.totalGst) > 0) {
+              const halfGst = (b.gstSlab / 2) || 9;
+              breakdown.push({l:"Taxable Value", v: Number(b.totalTaxable).toLocaleString("en-IN", {minimumFractionDigits: 2})}); breakdown.push({l: halfGst + "% CGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})}); breakdown.push({l: halfGst + "% SGST", v: (b.totalGst/2).toLocaleString("en-IN", {minimumFractionDigits: 2})});
+          }
+      }
+      breakdown.forEach(row => { doc.line(134, rY+5.5, 195, rY+5.5); doc.setTextColor(...dark); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.text(row.l, 137, rY+4); doc.setFont("helvetica", "bold"); doc.text(String(row.v), 192, rY+4, {align:"right"}); rY += 5.5; });
+
+      const showGrand = (b.billType.includes("PAYMENT") || b.billType.includes("RECEIPT")) ? b.paid : grand;
+      doc.setFillColor(...blue); doc.rect(134, rY, 61, 42 - (rY - y), "F"); doc.setTextColor(255,255,255); doc.setFontSize(8.5); doc.text("GRAND TOTAL", 137, rY+6); doc.setFontSize(10); doc.text("Rs. " + showGrand.toLocaleString("en-IN", {minimumFractionDigits: 2}), 192, rY+6, {align:"right"});
+      doc.setTextColor(130); doc.setFontSize(7.5); doc.setFont("helvetica", "italic"); doc.text("* This is a computer-generated electronic invoice and does not require physical signatures.", 105, y+52, { align: "center" });
+
+      doc.save(`Invoice_${b.invoiceNo}.pdf`);
+    }
+
+    function shareWhatsApp() {
+      const phone = "91" + (activeInvoiceData.customerMobile || "").replace(/\D/g, "");
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent("Invoice Link: "+activeInvoiceData.publicUrl)}`, "_blank");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const scanParam = new URLSearchParams(window.location.search).get("scan");
+      if (scanParam) {
+          try {
+             document.getElementById("top-invoice-bar").innerHTML = `<div class="w-full flex justify-between items-center bg-blue-50 px-4 py-3 rounded-2xl border border-blue-100"><span class="font-black text-[#004aad] text-[10px] uppercase tracking-widest">✅ E-Bill Loaded</span><button onclick="downloadVectorPDF()" class="px-6 py-2.5 bg-[#004aad] text-white font-black text-[10px] rounded-xl shadow-md animate-bounce hover:shadow-lg transition-all">📥 DOWNLOAD INVOICE</button></div>`;
+             displayInvoice(expandBill(scanParam));
+          } catch(e) { showPopup("Error", "Invalid or corrupted QR Code data!", true); }
+      } else { 
+          setInterval(() => {
+             const d = new Date(); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+             const ampm = d.getHours() >= 12 ? 'PM' : 'AM'; const hrs = d.getHours() % 12 || 12; const mins = String(d.getMinutes()).padStart(2, '0');
+             const dtStr = `Fri, ${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}  ${hrs}:${mins} ${ampm}`;
+             const el = document.getElementById("header-datetime"); if(el) el.innerText = dtStr;
+          }, 1000);
+          showView('dashboard'); 
+      }
+    });
   </script>
 </body>
 </html>
